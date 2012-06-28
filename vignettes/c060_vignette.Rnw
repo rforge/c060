@@ -164,6 +164,24 @@ p_{\alpha,\lambda}(|\beta|)= \lambda\times ( (1-\alpha)\frac{1}{2} |\beta|^2 + \
 Here, $\alpha \in [0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many variables, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
+The elastic net penalty function contrains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
+
+\parapraph{\textbf{Fixed grid}}
+Tuning parameters are usually determined by a grid search. The grid search method calculates a target value,
+e.g. the misclassification rate, at each point over a fixed grid of parameter values. This method may offer some
+protection against local minima but it is not very efficient. 
+The density of the grid plays a critical role in finding global optima. By increasing the density of the grid, the computation cost increases rapidly with no guaranty of finding global optima. 
+Ffurthermore, the choice of the fixed grid is highly arbitrary and do not protect from stucking in local optima. 
+
+\parapraph{\textbf{Interval search}}
+Instead of using a fixed grid, an interval search approach can be applied. \Citet{Froehlich2005} proposed an 
+efficient algorithm for finding a global optimum on the tuning parameter space 
+called Efficient Parameter Selection via Global Optimization (EPSGO). The main idea of the algorithm is to treat the finding optimal tuning parameter
+problem as a global optimization problem. For that purpose one learns a Gaussian Process model of the error surface in parameter space and samples systematically at points for where a specific parameter namely expected improvement criterion reaches the maximum. 
+
+The algorithm learns the Gaussian Process (GP) model from the points in the parameter space which have been already visited. An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{Froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \Citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
+
+
 
 
 \subsection{Stability selection}
@@ -229,10 +247,16 @@ library(mlegp) #for EPSGO.R
 library(pamr) #for tune.glmnet.interval.R
 
 # R functions required
-source("../R/peperr_glmnet.r")
-source("../R/stabilityselection.R")
-source("../R/tune_glmnet_interval.R")
-source("../R/EPSGO.R")
+#source("~/c060/pkg/R/peperr_glmnet.r")
+#source("~/c060/pkg/R/stabilityselection.R")
+#source("~/c060/pkg/R//tune_glmnet_interval.R")
+#source("~/c060/pkg/R/EPSGO.R")
+
+#read in all files from the R dir
+#R.dir<-"~/c060/pkg/R"
+R.dir<-"../R"
+files <- list.files(path=R.dir, full.names=TRUE)
+for (f in files) { cat(".");source(f) }
 
 dir.create("figures",showWarnings = FALSE)
 
@@ -444,7 +468,7 @@ print(sel$stable)
 \clearpage
 \subsection{Elastic net penalised Cox PH regression model}
 
-\subsubsection{Tune both $\lambda$ and $\alpha$ by interval search}
+In this section  both $\lambda$ and $\alpha$ are tunied by the interval search. 
 
 <<interval_search_cox_setup, echo=F, results=hide>>=  
   x <- t(exprs(eset))
@@ -468,20 +492,24 @@ print(sel$stable)
 @
 
 The task is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross validation error of the model is minimal.
-Instead of using a fixed grid, an interval search approach is applied. REFF 
+Instead of using a fixed grid, an interval search approach is applied. 
 
 The parameter space of tuning parameters is defined as follows:
 
 <<interval_search_cox_pre, echo=F>>=
 print(bounds)
 @
-The second tuning parameter $\lambda$ will be found for each given $\alpha$ via regularization path.  Thus, the two dimensional parameter space has the form $\left(0, 1\right) \times \boldsymbol{R}$. The seed is \Sexpr{seed}. For each given $\alpha$ an optimal lambda is definded as largest value of lambda such that error is within 1 standard error of the minimum. (parameter  type.min = 'lambda.1se').
 
-<<interval_search_cox, echo=F, results=hide, cache=TRUE>>=
+
+The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via regularization path.  Thus, the two dimensional parameter space has the form $\left(0, 1\right) \times \mathbb{R}_+$. %The seed is \Sexpr{seed}.
+For each given $\alpha$ an optimal lambda is definded as largest value of lambda such that error is within one standard error of the minimum. (parameter  type.min = 'lambda.1se').
+
+<<interval_search_cox, echo=F, results=hide>>=
   # fix folds for each model
   set.seed(seed)
   foldid <- my.balanced.folds(class.column.factor=y[,2], cross.outer=nfolds)
-  
+  #table(foldid,y[,2])
+
   print("start interval search")
   fit <- EPSGO(Q.func, 
              bounds=bounds, 
@@ -490,7 +518,7 @@ The second tuning parameter $\lambda$ will be found for each given $\alpha$ via 
              seed=seed, 
              fminlower=fminlower,
              # Q.func arguments
-  					 x=x, y=y, family=family, 
+    				 x=x, y=y, family=family, 
              #nfolds=nfolds,  
              foldid=foldid,
              type.min=type.min,
@@ -498,24 +526,29 @@ The second tuning parameter $\lambda$ will be found for each given $\alpha$ via 
              verbose=verbose)
   names(fit) 
  
+
   print("chose the model with min num of FS ")      
   print("# FS: ")
   sel.models <- sapply(fit$model.list, "[", "model") [fit$Ytrain == fit$fmin ]
   sel.alpha <- fit$xmin
-  sel.error <- fit$fmin		
+  sel.error <- fit$fmin  	
   		
   out <- list(model=sel.models, alpha=sel.alpha, error=sel.error) 
   save(fit, out, file="Rdata/fit_interval_search.RData") 
-@
 
+@
 <<interval_search_cox_extract, echo=F, results=hide>>=
 # 
 alphas <- fit$Xtrain[,1]
-lambdas <- unlist(sapply(sapply(fit$model, "[", 2), "[", 5))
+lambdas <- unlist(sapply(sapply(fit$model, "[", "model"), "[", "lambda"))
 deviances <- fit$Ytrain
+# round problems!!!! take first from the fit 
 # number of selected features in the models; dfs
-n.features <- unlist(sapply(sapply(fit$model, "[", 2), "[", 3))
+tmp.models<-sapply(sapply(sapply(fit$model, "[", "model"), "[", "cvreg"), "[", "glmnet.fit")
 
+n.features<-mapply( function(List, lam) List$df[which(List$lambda %in% lam)], tmp.models, lambdas)
+
+                
 opt.alpha <- out$alpha
 opt.lambda <- out$model[[1]]$lambda
 
@@ -527,11 +560,11 @@ rownames(summary_int_search) <- c(1:nrow(summary_int_search))
 toPrint <- xtable(summary_int_search[1:10,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search", digits = c(0,5, 7, 5, 0))
 print(toPrint, table.placement = "tbp", caption.placement = "top")
 @
-The visited points in the parameter space ($\alpha$, $\lambda$) and resulting cross-validated deviances are summarised in table~\ref{tab:sum_int_search}.
 
-The minimal mean cross-validated deviance over the folds of \Sexpr{round(out$error,3)} is reached for optimal parameter pair $(\alpha, \lambda ) $ = (\Sexpr{round(opt.alpha,3)},\Sexpr{round(opt.lambda,3)}). 
+The first ten 'visited' points (out of \Sexpr{nrow(summary_int_search)})in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search}.
 
-The 'visited' points with corresponding deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search}. 
+
+The minimal mean cross-validated deviance over the folds of \Sexpr{round(out$error,3)} was reached for optimal parameter pair $(\alpha, \lambda ) $ = (\Sexpr{round(opt.alpha,3)},\Sexpr{round(opt.lambda,3)}). 
 
 <<interval_search_cox_fit_opt, echo=F, results=hide>>=
 #select the model with optimal parameters from the object fit
@@ -539,41 +572,40 @@ The 'visited' points with corresponding deviance and number of selected features
 f <- fit$model.list[unlist(sapply(fit$model.list,"[",1)) == fit$fmin]
 if (length(f)>1) print("more than one optimal model!")
 #take the first model
-f1 <- f[[1]]$model
+f1 <- f[[1]]$model$cvreg
 
-# fit the model with found optimal alpha
-set.seed(seed)
-cvres <- cv.glmnet(y=y, x=t(exprs(eset)), family="cox", nfolds=10, alpha=opt.alpha)
-res <- cvres$glmnet.fit
+res<-f1$glmnet.fit
 
 cof <- coef(res, s=opt.lambda)
 names.cof <- rownames(cof)
 cofn <- cof[which(cof!=0)]
-names(cofn) <- names.cof[which(cof!=0)]                     
-@
+names(cofn) <- names.cof[which(cof!=0)] 
 
-<<>>=
+bet <- res$beta[match(names(cofn), rownames(res$beta)),]
+
+@
+The final model selected \Sexpr{length(cofn)} features:
+<<interval_search_cox_summary>>=
 summary(cofn)
 head(sort(cofn))
 tail(sort(cofn))
 @
 
 A feature selected by the stability algorithm is in the set of selected features
-<<>>=
+<<interval_search_cox_check_overlap_stability>>=
 '206932_at' %in% names.cof
 @
 
+\textbf{TODO : 3D/ 2D plots}
 
-\textbf{TODO : plots}
-
-\begin{figure}
-\begin{center}
-<<interval_search_cox_out_plot, echo=F, results=hide, fig=TRUE, height=4>>=
-plot(cvres)
-@
-\end{center}
-\caption{\label{fig:interval_search} \Sexpr{type.measure} as a function of log($\alpha$) for the AML data set. }
-\end{figure}
+% \begin{figure}
+% \begin{center}
+% <<interval_search_cox_out_plot, echo=F, results=hide, fig=TRUE, height=4>>=
+% plot(cvres)
+% @
+% \end{center}
+% \caption{\label{fig:interval_search} \Sexpr{type.measure} as a function of log($\alpha$) for the AML data set. }
+% \end{figure}
 
 % 
 % 
@@ -600,6 +632,19 @@ plot(cvres)
 % 
 %
 
+\begin{figure}
+<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
+
+par(las=3)
+plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
+axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
+
+abline(v=out$alpha, col="red")
+@
+\caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. }
+\end{figure}
+
+ The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath_int_search}.
 \clearpage
 \section{Conclusions}
 
