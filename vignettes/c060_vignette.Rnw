@@ -1,5 +1,5 @@
 % setwd("C:/Projekte/explained variation/peperr/CSDA/c060/pkg/vignettes")
-% setwd("~/Projekte_StatsMethods/c060_workcopy/pkg/vignette")
+% setwd("~/Projekte_StatsMethods/c060_workcopy/vignette")
 % library(cacheSweave)
 % Sweave("c060_vignette.Rnw", driver = cacheSweaveDriver)
 % tools::texi2dvi("c060_vignette.tex", pdf=TRUE)
@@ -31,7 +31,7 @@
 \journal{Computational Statistics \& Data Analysis}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+%\SweaveOpts{concordance=TRUE}
 
 \begin{frontmatter}
 
@@ -60,11 +60,12 @@
 \SweaveOpts{prefix.string=figures/fig, eps=FALSE}
 %Because eps=FALSE, all graphics are created as pdf graphics only. This implies that the resulting tex document needs to be compiled with pdflatex rather than with latex.
 
-\title{Extended inference for lasso and elastic-net regularized Cox and generalized linear models}
-%\title{Extended functionalities for lasso and elastic-net regularized Cox and generalized linear models}
-%\title{An \R{} package for extended functionalities for lasso and elastic-net regularized Cox and generalized linear models}
-\author{Martin Sill, Thomas Hielscher, Natalia Becker, Manuela Zucknick}
+\title{Extended inference with lasso and elastic-net regularized Cox and generalized linear models}
+\author{Martin Sill\corref{cor1}}
+\author{Thomas Hielscher, Natalia Becker, Manuela Zucknick}
 \address{Division of Biostatistics, German Cancer Research Center, Im Neuenheimer Feld 280, 69120 Heidelberg, Germany}
+
+\cortext[cor1]{Corresponding author: m.sill@dkfz-heidelberg.de}
 
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{<author name>}
@@ -72,19 +73,17 @@
 %% \address[label2]{<address>}
 
 \begin{abstract}
-We have developed an \R{} package \texttt{c060} with the aim of improving \R{} software functionality for high-dimensional risk prediction modelling, in particular for prognostic modelling of patient survival data using high-throughput genomic data. 
+We have developed the \R{} package \texttt{c060} with the aim of improving \R{} software functionality for high-dimensional risk prediction modelling, e.g. for prognostic modelling of survival data using high-throughput genomic data. 
 
-Penalized regression models such as implemented in the popular CRAN package \texttt{glmnet} provide a statistically appealing method to build prediction models from high-dimensional data sources. The \texttt{glmnet} package provides an efficient state-of-the-art algorithm for fitting penalized Cox and generalized linear models. However, in a practical application the data analysis will not stop at the point, where the model has been fitted. One is for example interested in the stability of selected features or in assessing the prediction performance of a model and we provide functions to deal with both of these tasks with the possibility of speeding up computing time thorugh parallel computing. Another feature that we provide is an approach to select the optimal parameter combination for elastic net penalties using an efficient interval-search algorithm.
+Penalized regression models provide a statistically appealing way of building risk prediction models from high-dimensional data. The popular CRAN package \texttt{glmnet} package implements an efficient algorithm for fitting penalized Cox and generalized linear models. However, in practical applications the data analysis will typically not stop at the point where the model has been fitted. One is for example often interested in the stability of selected features and in assessing the prediction performance of a model and we provide functions to deal with both of these tasks. Our \R{} functions are computationally efficient and offer the possibility of speeding up computing time through parallel computing. Another feature which can drastically reduce computing time is an efficient interval-search algorithm, which we have implemented for selecting the optimal parameter combination for elastic net penalties.
 
-These functions have been useful in our daily work here at the German Cancer Research 
-Center where prognostic modelling of patient survival data is of particular interest. Although we focus on a survival data application of penalized Cox PH regression models in this article, the functions in our \R{} package are applicable to all types of regression models implemented in the \texttt{glmnet} package.
+These functions have been useful in our daily work at the German Cancer Research 
+Center where prognostic modelling of patient survival data is of particular interest. Although we focus on a survival data application of penalized Cox models in this article, the functions in our \R{} package are applicable to all types of regression models implemented in the \texttt{glmnet} package.
 
 \end{abstract}
 
 \begin{keyword}
-%% keywords here, in the form: keyword \sep keyword
-%% MSC codes here, in the form: \MSC code \sep code
-%% or \MSC[2008] code \sep code (2000 is the default)
+penalized log-likelihood method, stability selection, interval search, prediction error, R software
 \end{keyword}
 
 \end{frontmatter}
@@ -92,26 +91,28 @@ Center where prognostic modelling of patient survival data is of particular inte
 \section{Introduction}
 \label{intro}
 
-Penalized regression models provide a statistically appealing method to build prediction models from high-dimensional data sources. Since the 
-introduction of the lasso for linear regression models \citep{tibshirani96}, the methodology has been extended to generalized linear regression models,
-time-to-event endpoints \citep{tibshirani97} etc. In addition to the well-known $L_1$- (lasso) and $L_2$-norms (ridge) penalty functions, various other penalties have been proposed in recent years to select features and/or estimate their effects. In particular, we will use the elastic net penalty function \citep{zou05}, which is a linear combination of the $L_1$- and $L_2$-norms.
+Penalized regression models provide a statistically appealing method to build prediction models from high-dimensional data sources, where it is the aim to simultaneously select features and to fit the model \citep{fan2010,benner2010}. Since the introduction of the lasso for linear regression models \citep{tibshirani96}, the methodology has been extended to generalized linear regression models and time-to-event endpoints \citep{tibshirani97} among others. In addition to the well-known $L_1$- (lasso) and $L_2$-norm (ridge) penalty functions, various other penalties have been proposed in recent years to select features and/or estimate their effects. In particular, we will use the elastic net penalty function \citep{zou05}, which is a linear combination of the $L_1$- and $L_2$-norms.
 
-With ever increasing data, the properties of the algorithm to actually fit the model have become almost as important as the statistical model itself. 
-In 2010, Friedman, Hastie and Tibshirani proposed a coordinate descent algorithm \citep{FHT2010} for generalized linear regression models, which has since then been extended to penalized Cox PH regression models \citep{simon2011}. Due to its efficiency this algorithm is considered one of the state-of-the-art
-approaches to estimate penalized regression models with lasso, ridge or elastic net penalty terms. 
+With ever increasing data, the properties of the algorithm used for fitting the model have become almost as important as the statistical model itself. 
+In 2010, Friedman et al. proposed a coordinate descent algorithm \citep{FHT2010} for generalized linear regression models, which has since then been extended to penalized Cox proportional hazards (PH) regression models \citep{simon2011}. Due to its efficiency this algorithm is considered one of the state-of-the-art
+approaches to estimate penalized regression models with lasso, ridge or elastic net penalty terms, especially in high-dimensional data scenarios. 
 
-This algorithm has also been implemented in \R{} in the \texttt{glmnet} package. The package provides functions to tune and fit regression models, 
+This algorithm has been implemented in \R{} \citep{R11} in the \texttt{glmnet} package. The package provides functions to tune and fit regression models, 
 plot the results, and make predictions. However, in practical applications, where often an independent validation data set is lacking, some additional features and routines are desirable as part of a complete data analysis. We have assembled some functions that enhance the existing functionality of the \texttt{glmnet} package or
 allow to use it within the framework of other existing \R{} packages. These functions have been useful in our daily work at the German Cancer Research 
-Center where prognostic modelling of patient survival data is of particular interest. Therefore, for illustration purposes we focus on penalized Cox PH regression models in this article. But most of the functions are applicable to all types of regression models implemented in the \texttt{glmnet} package.
+Center where prognostic modelling of patient survival data is of particular interest. Therefore, for illustration purposes we focus on penalized Cox PH regression models in this article. But the \R{} functions are applicable to all types of regression models implemented in the \texttt{glmnet} package.
 
-We provide \R{} functions to perform stability selection \citep{MeinshausenBuehlmann2010} in a computationally efficient way using \texttt{glmnet} which allows to select the most stable features at a given error level. We also provide an approach to select the optimal parameter combination ($\alpha$, $\lambda$) for elastic net penalties using an interval-search algorithm \citep{froehlich2005} which is often faster and more accurate than a standard grid search (Ref for a comparison study?). Another very useful addition for real-life applications of \texttt{glmnet} for building prognostic models is the provision of wrapper functions to allow the computation of resampling-based prediction error curves with the framework of the \R{} package \texttt{peperr} \citep{Porz2009}. The \texttt{peperr} package makes it computationally feasible to assess the
-predictive accuracy of a penalized Cox PH regression model via resampling methods even for very large-scale applications by employing parallel computing. We also provide the possibility to spead up stability selection by parallel computing using the functionalities of the \R{} base package \texttt{parallel}.
+Computational efficiency is an important requirement of the software to make applications feasible for real-life data analysis tasks in fields such as molecular oncology, where one aims to develop sparse risk prediction models based on very large numbers of molecular features measured with high-throughput technologies such as microarrays or next-generation sequencing. Therefore, we provide functionality to speed up computations, in particular through parallel computing.
+
+We provide \R{} functions to perform stability selection \citep{MeinshausenBuehlmann2010} in a computationally efficient way using \texttt{glmnet} which allows to select the most stable features at a given error level. We have also implemented an approach to select the optimal parameter combination ($\alpha$, $\lambda$) for elastic net penalties using an interval-search algorithm \citep{froehlich2005} which is often faster and more accurate than a standard grid search \citep{Jones1998}. Another very useful addition for real-life applications of \texttt{glmnet} for building risk-prediction models is the provision of wrapper functions to allow the computation of resampling-based prediction errors within the framework of the \R{} package \texttt{peperr} \citep{Porz2009}. The \texttt{peperr} package makes it computationally feasible to assess the
+predictive accuracy of a penalized regression model via resampling methods even for very large-scale applications by employing parallel computing. We also provide the possibility to speed up stability selection by parallel computing using the functionalities of the \R{} base package \texttt{parallel}.
+
+The software is available as \R{} package \texttt{c060} on R-forge (URL \url{http://c060.r-forge.r-project.org}). 
 
 \section{Data application}
-Throughout this article we use the gene expression data set on cytogenetically normal acute myeloid leukemia (CN-AML) by \citet{metzeler08} and corresponding clinical data in order to illustrate a typical application of penalized Cox PH regression models with the aim of developing a prognostic model for patient survival while at the same time identifying the most influential gene expression features. To simulate the typical situation that only one data set is available for model training and evaluation, we only use the data set that was used as validation data in the original publication by \citet{metzeler08}. The data can be accessed from the Gene Expression Omnibus (GEO) data repository (\url{http://www.ncbi.nlm.nih.gov/geo}) by the National Center for Biotechnology Information (NCBI). We find the Metzeler \textit{et al.} data set under GEO accession number GSE12417.
+Throughout this article we use the gene expression data set of cytogenetically normal acute myeloid leukemia (AML) patients by \citet{metzeler08} and corresponding clinical data in order to illustrate a typical application of penalized Cox PH regression models, where the aim is to develop a prognostic model for patient survival while at the same time identifying the most influential gene expression features. To simulate the typical situation that only one data set is available for model training and evaluation, we only use the data set that was used as validation data in the original publication by \citet{metzeler08}. The data can be accessed from the Gene Expression Omnibus (GEO) data repository (\url{http://www.ncbi.nlm.nih.gov/geo}) by the National Center for Biotechnology Information (NCBI). We find the Metzeler \textit{et al.} data set under GEO accession number GSE12417.
 
-The data set contains gene expression data for 79 patient samples measured with Affymetrix HG-U133 Plus 2.0 microarrays. The median survival time of these 79 patients was 17.6 months with 40\% censoring.
+The data set contains gene expression data for 79 patient samples measured with Affymetrix HG-U133 Plus 2.0 microarrays. The median survival time of these 79 patients was 17.6 months with a censoring rate of 40\%.
 
 \section{Methods and algorithms}
 
@@ -166,20 +167,20 @@ Here, $\alpha \in [0,1]$ determines the influence of the $L_1$ penalty relative 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
 The elastic net penalty function contrains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
 
-\parapraph{\textbf{Fixed grid}}
+\paragraph{Fixed grid}
 Tuning parameters are usually determined by a grid search. The grid search method calculates a target value,
 e.g. the misclassification rate, at each point over a fixed grid of parameter values. This method may offer some
 protection against local minima but it is not very efficient. 
 The density of the grid plays a critical role in finding global optima. By increasing the density of the grid, the computation cost increases rapidly with no guaranty of finding global optima. 
 Ffurthermore, the choice of the fixed grid is highly arbitrary and do not protect from stucking in local optima. 
 
-\parapraph{\textbf{Interval search}}
-Instead of using a fixed grid, an interval search approach can be applied. \Citet{Froehlich2005} proposed an 
+\paragraph{Interval search}
+Instead of using a fixed grid, an interval search approach can be applied. \Citet{froehlich2005} proposed an 
 efficient algorithm for finding a global optimum on the tuning parameter space 
 called Efficient Parameter Selection via Global Optimization (EPSGO). The main idea of the algorithm is to treat the finding optimal tuning parameter
 problem as a global optimization problem. For that purpose one learns a Gaussian Process model of the error surface in parameter space and samples systematically at points for where a specific parameter namely expected improvement criterion reaches the maximum. 
 
-The algorithm learns the Gaussian Process (GP) model from the points in the parameter space which have been already visited. An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{Froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \Citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
+The algorithm learns the Gaussian Process (GP) model from the points in the parameter space which have been already visited. An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
 
 
 
@@ -254,7 +255,7 @@ library(pamr) #for tune.glmnet.interval.R
 
 #read in all files from the R dir
 #R.dir<-"~/c060/pkg/R"
-R.dir<-"../R"
+R.dir<-"../pkg/R"
 files <- list.files(path=R.dir, full.names=TRUE)
 for (f in files) { cat(".");source(f) }
 
@@ -322,7 +323,7 @@ names(cofn) <- names.cof[which(cof!=0)]
 \caption{\label{fig:cvlasso}Cross-validated partial log-likelihood function, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set.}
 \end{figure}
 
-We can apply the \texttt{glmnet} function to fit a lasso-penalized Cox model to the CN-AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ data derived values:
+We can apply the \texttt{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ data derived values:
 <<glmnet0, echo=TRUE, results=hide>>=
 fit <- glmnet(y=y, x=t(exprs(eset)), family="cox")
 @
@@ -448,18 +449,18 @@ The function draws subsets and calculates in parallel the stability path, e.g. t
 set.seed(1234)
 y <- cbind(time=pData(eset)$os, status=pData(eset)$os_status)
 cores <- 2
+fwer <- 0.5
+pi.thr <- 0.6
 #calculate stability path
 res <- stability.path(y=y, x=t(exprs(eset)), weakness=1, mc.cores=cores, family="cox")
 par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
 #plot stability path and perform stability selection controlling a fwer of 0.5
-sel <- plot.stabpath(res, fwer=.2, pi_thr=0.55, xvar="lambda", col.all="gray")
-#sel <- plot.stabpath(res, fwer=0.2, pi_thr=0.5, xvar="norm")
-#sel <- plot.stabpath(res, fwer=0.2, pi_thr=0.5, xvar="dev")
+sel <- plot.stabpath(res, fwer=fwer, pi_thr=pi.thr, xvar="lambda", col.all="gray")
 @
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalised Cox PH regression model applied to the AML data set.}
 \end{figure}
 
-Controlling a FWER of $0.5$ the estimated set of stable features comprises a single gene (with $\hat\Pi > 0.6$ at $\lambda =$\Sexpr{round(sel$lambda, 3)}) which is:
+Controlling a FWER of \Sexpr{fwer} the estimated set of stable features comprises a single gene (with $\hat\Pi >$\Sexpr{pi.thr} at $\lambda =$\Sexpr{round(sel$lambda, 3)}) which is:
 <<stabilitySelection2, echo=F, results=verbatim>>=
 print(sel$stable)
 @
@@ -504,7 +505,7 @@ print(bounds)
 The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via regularization path.  Thus, the two dimensional parameter space has the form $\left(0, 1\right) \times \mathbb{R}_+$. %The seed is \Sexpr{seed}.
 For each given $\alpha$ an optimal lambda is definded as largest value of lambda such that error is within one standard error of the minimum. (parameter  type.min = 'lambda.1se').
 
-<<interval_search_cox, echo=F, results=hide>>=
+<<interval_search_cox, echo=F, results=hide, cache=TRUE>>=
   # fix folds for each model
   set.seed(seed)
   foldid <- my.balanced.folds(class.column.factor=y[,2], cross.outer=nfolds)
@@ -556,10 +557,10 @@ summary_int_search <- as.data.frame(cbind(alpha=alphas,lambda=lambdas,deviance=d
 rownames(summary_int_search) <- c(1:nrow(summary_int_search))
 @
 
-<<label=tab_int_search, echo=FALSE, results=tex>>=                             
-toPrint <- xtable(summary_int_search[1:10,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search", digits = c(0,5, 7, 5, 0))
-print(toPrint, table.placement = "tbp", caption.placement = "top")
-@
+%<<label=tab_int_search, echo=FALSE, results=tex>>=                             
+%toPrint <- xtable(summary_int_search[1:10,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search", digits = c(0,5, 7, 5, 0))
+%print(toPrint, table.placement = "tbp", caption.placement = "top")
+%@
 
 The first ten 'visited' points (out of \Sexpr{nrow(summary_int_search)})in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search}.
 
@@ -632,21 +633,27 @@ A feature selected by the stability algorithm is in the set of selected features
 % 
 %
 
-\begin{figure}
-<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
-
-par(las=3)
-plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
-axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
-
-abline(v=out$alpha, col="red")
-@
-\caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. }
-\end{figure}
+%\begin{figure}
+%<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
+%
+%par(las=3)
+%plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
+%axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
+%
+%abline(v=out$alpha, col="red")
+%@
+%\caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. }
+%\end{figure}
 
  The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath_int_search}.
+
 \clearpage
-\section{Conclusions}
+\section{Conclusions and outlook}
+The programming language and statistical computing environment \R{} provides a highly useful framework for statistical data analysis and modelling. It is the dominating statistical software in many areas, for example in molecular biology and medicine, which is largely due to the highly successful Bioconductor project, which provides tools for the analysis and comprehension of high-throughput genomic data. Due to the open-source nature of \R{} and Bioconductor, many very useful software packages have been developed by \R{} users and made available for the entire \R{} community. One example is the \texttt{glmnet} package, which  implements an efficient state-of-the-art algorithm for fitting penalized Cox and generalized linear models \citep{FHT2010,simon2011}.
+
+We have presented our \R{} package \texttt{c060}, which provides extensions to \texttt{glmnet} and additional features which are essential for a full data analysis in practical applications, including stability selection, estimation of prediction error (curves) and an efficient interval search algorithm for finding the optimal elastic net tuning parameter combination. These extensions have proved useful in our daily work, in particular for the task of performing prognostic modelling of patient survival data based on high-dimensional molecular biology data.
+
+The \texttt{c060} package will be kept updated in the future to keep up with the fast-developing field of penalized regression methodology for variable selection and risk prediction modelling with high-dimensional input data. One example are developments for the estimation of standard errors, confidence intervals and the determination of p-values in high-dimensional regularized regression models, e.g. through subsampling methods similar to the approach taken by \citet{wasserman2009} and \citet{MeinshausenBuehlmann2010}.
 
 %\section{Session Information}
 %The version number of \R{} and packages loaded for generating the vignette were:
