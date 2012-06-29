@@ -165,7 +165,7 @@ p_{\alpha,\lambda}(|\beta|)= \lambda\times ( (1-\alpha)\frac{1}{2} |\beta|^2 + \
 Here, $\alpha \in [0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many variables, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
-The elastic net penalty function contains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
+The elastic net penalty function contrains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
 
 \paragraph{Fixed grid}
 Tuning parameters are usually determined by a grid search. The grid search method calculates a target value,
@@ -180,9 +180,7 @@ efficient algorithm for finding a global optimum on the tuning parameter space
 called Efficient Parameter Selection via Global Optimization (EPSGO). The main idea of the algorithm is to treat the finding optimal tuning parameter
 problem as a global optimization problem. For that purpose one learns a Gaussian Process model of the error surface in parameter space and samples systematically at points for where a specific parameter namely expected improvement criterion reaches the maximum. 
 
-First, an initial set of uniformly distibuted points in the parameter space is randomly selected. The algorithm learns the Gaussian Process  model from the points  which have been already visited. Then, by adding new points one updates the Gaussian Process model until the opimumum is reached or stopping criteria are met.
-
-An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
+The algorithm learns the Gaussian Process (GP) model from the points in the parameter space which have been already visited. An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
 
 
 
@@ -240,6 +238,7 @@ library(ggplot2)
 library(GEOquery)
 library(limma)
 library(xtable)
+library(survival)
 
 library(glmnet)
 require(penalizedSVM)
@@ -298,21 +297,24 @@ if (file.exists("Rdata/expressionSet.Rdata")) {
 
 <<preprocessData, echo=F, results=hide>>=
 # unspecific filtering: select most varying probe sets
+nfeatures <- 10000
 rowvars    <- rowVars(exprs(geo_exprs_data))
-topprobes   <- which(rowvars>=sort(rowvars,decreasing=T)[10000])
+topprobes   <- which(rowvars>=sort(rowvars,decreasing=T)[nfeatures])
 eset       <- geo_exprs_data[topprobes,]     
 @
 
 \clearpage
 \section{Application and demonstration of software}
-\subsection{Starting off: Lasso-penalised Cox model} 
+In the following we will demonstrate the use of the functions provided with the \texttt{c060} package in an application to the AML data set by \citet{metzeler08}. For the sake of convenience we reduce the total number of \Sexpr{nrow(geo_exprs_data)} gene expression features that have been measured with the Affymetrix HG-U133 Plus 2.0 microarray technology to the top \Sexpr{nfeatures} features with largest variance across all \Sexpr{ncol(eset)} samples. For all computations the data set is stored as an \texttt{ExpressionSet} (from Bioconductor package \texttt{Biobase}) called \texttt{eset}. Gene expression data can be accessed through the call \texttt{exprs(eset)} and overall survival data and other patient-specific data (e.g. patient age) are stored within the \texttt{phenoData} object \texttt{pData(eset)}.
+
+\subsection{Starting off: Fitting the lasso-penalized Cox model} 
+Our goal is to develop a prognostic model for patient overall survival based on the gene expression data. The purpose of this modelling exercise is not just to fit a prognostic model that is capable of predicting overall survival rates, but we also want to find out which gene expression features are most relevant for this task. Traditionally, this problem can be solved by variable selection methods and we start our data analysis exercise by fitting the lasso-penalized Cox model, which provides automatic variable selection.
 
 \begin{figure}
 \begin{center}
 <<glmnet, echo=F, results=hide, fig=TRUE, height=4>>=
 set.seed(1234)
-y <- cbind(time=pData(eset)$os, status=pData(eset)$os_status)
-cvres <- cv.glmnet(y=y, x=t(exprs(eset)), family="cox", nfolds=10)
+cvres <- cv.glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), x=t(exprs(eset)), family="cox", nfolds=10)
 res <- cvres$glmnet.fit
 plot(cvres)
 
@@ -322,21 +324,21 @@ cofn <- cof[which(cof!=0)]
 names(cofn) <- names.cof[which(cof!=0)]
 @
 \end{center}
-\caption{\label{fig:cvlasso}Cross-validated partial log-likelihood function, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set.}
+\caption{\label{fig:cvlasso}Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
 \end{figure}
 
 We can apply the \texttt{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ data derived values:
 <<glmnet0, echo=TRUE, results=hide>>=
-fit <- glmnet(y=y, x=t(exprs(eset)), family="cox")
+fit <- glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), x=t(exprs(eset)), family="cox")
 @
  
-We tune the lasso penalty parameter by 10-fold cross-validation using the \texttt{cv.glmnet} function. The loss function, i.e. the cross-validated partial log-likelihood, is shown in Figure \ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. The penalty parameter value minimizing the loss function is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features:
+In order to determine the optimal lasso penalty parameter value, we perform 10-fold cross-validation using the \texttt{cv.glmnet} function. The loss function, i.e. the cross-validated partial log-likelihood deviance, is shown in Figure \ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. The penalty parameter value minimizing the loss function is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} ($\log\lambda =$\Sexpr{round(log(cvres$lambda.min), 3)}) and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features:
 <<glmnet2, echo=F, results=verbatim>>=
 print(cofn)
 #cofn.ix <- predict(res, type="nonzero", s=cvres$lambda.min)
 @
 
-The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath}. The coefficient path shows the development of the regression coefficient estimates with increasing regularization.
+The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath}. The coefficient path shows the development of the regression coefficient estimates with increasing regularization. While the selected \Sexpr{length(cofn)} features are the only features selected at the optimal $\lambda$ value, they do not remain among the features with largest effect sizes when the penalty is reduced and thus more and more coefficients start to enter the model. In fact, for 4 out of the \Sexpr{length(cofn)} features, the coefficient estimates go back down to zero for small values of $\log\lambda$, indicating that these features get replaced by other gene expression variables in very large models.
 
 \begin{figure}
 \begin{center}
@@ -366,18 +368,11 @@ abline(v=res$dev.ratio[match(cvres$lambda.min, cvres$lambda)], lty=3)
 abline(v=res$dev.ratio[match(cvres$lambda.1se, cvres$lambda)], lty=3)
 @
 \end{center}
-\caption{\label{fig:coefpath}Coefficient paths for lasso penalised Cox PH regression model applied to the AML data set.}
+\caption{\label{fig:coefpath}Coefficient paths for lasso-penalized Cox PH regression models applied to the AML data set. The features with highlighted paths have non-zero coefficients in the model with the optimal $\lambda$ value as determined by ten-fold cross-validation. The dotted vertical have the same meaning as in Figure \ref{fig:cvlasso}. The top plots show the coefficient path scaled to reflect $\log(\lambda)$ on the x-axis (top left: full path, top right: zoomed in to only show the selected features). The bottom plots show the coefficient paths relative to the $L_1$-norms of the estimated coefficient vector (left) and to the fraction of the null partial log-likelihood deviance explained (right).}
 \end{figure}
 
-%\clearpage
-%At this point we would like to assess the prediction performance of the lasso model. We can do this with bootstrapped prediction error curves and corresponding integrated Brier score values (see Thomas' functions adapted for peperr/pec).
-
-%Once we have seen that this model is not very satisfactory, we can attempt to improve the model in two ways. First, we can fit an elastic net model rather than lasso (and use Natalia's search algorithm for that). And second, we can assess the stability of the lasso (and elastic net) models by stability selection and identify the most stable features (using Martin's stabilityselection.R script).
-
-\subsection{Resampling based prediction errors}
+\subsection{Assessment of prediction performance with resampling-based prediction errors}
 \label{pec}
-
-\commentMZ{Start of this section by explaining what would be done to assess the prediction performance of other types of models (LM and GLM), why survival data is special, and why we don't need a new R function for LM/GLM models.}
 
 Once the final prognostic model is selected, we need to assess its prediction accuracy for future patients, frequently also in comparison
 with established clinico-pathological prognostic markers. In many applications no independent validation data set is available.
@@ -405,7 +400,7 @@ Here, we include patient's age as mandatory model variable into the prognostic m
 run the calculation on 3 CPUs in parallel using a socket cluster set-up.
 
 <<peperrMandatoryParallel, echo=T, results=hide, cache=T>>=
-obj  <- peperr(response=Surv(eset$os, eset$os_status),
+obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
          x=data.frame(eset$age,t(exprs(eset))),
          fit.fun=fit.glmnet,args.fit=list(standardize=F,family="cox", 
          penalty.factor=rep(0:1,times=c(1,dim(eset)[1]))),
@@ -428,7 +423,7 @@ In addition, we provide a slightly modified version of the prediction error curv
 plot.peperr.curves(obj, at.risk=T)
 @
 \end{center}
-\caption{Prediction error curves based on time-dependent Brier score.}
+\caption{Prediction error curves based on time-dependent Brier score for the lasso-penalized Cox PH regression model applied to the AML data set (evaluation time points reflect days). The gray lines show the prediction error curves of 100 bootstrap samples. The other lines show the prediction error curves of the null model (estimated by the Kaplan-Meier estimator without covariate information), the full apparent error estimates (i.e. the errors as estimated when applying the model to the entire training data set), and the .632+ bootstrap error estimates.}
 \label{fig:pec}
 \end{figure}
 
@@ -459,7 +454,7 @@ par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
 #plot stability path and perform stability selection controlling a fwer of 0.5
 sel <- plot.stabpath(res, fwer=fwer, pi_thr=pi.thr, xvar="lambda", col.all="gray")
 @
-\caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalised Cox PH regression model applied to the AML data set.}
+\caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=\Sexpr{fwer} and $\hat\Pi >$\Sexpr{pi.thr}.}
 \end{figure}
 
 Controlling a FWER of \Sexpr{fwer} the estimated set of stable features comprises a single gene (with $\hat\Pi >$\Sexpr{pi.thr} at $\lambda =$\Sexpr{round(sel$lambda, 3)}) which is:
@@ -469,9 +464,9 @@ print(sel$stable)
 
 
 \clearpage
-\subsection{Elastic net penalised Cox PH regression model}
+\subsection{Elastic net penalized Cox PH regression model}
 
-In this section  both $\lambda$ and $\alpha$ are tunied by the interval search. 
+In this section  both $\lambda$ and $\alpha$ are tuned by the interval search. 
 
 <<interval_search_cox_setup, echo=F, results=hide>>=  
   x <- t(exprs(eset))
@@ -559,21 +554,12 @@ summary_int_search <- as.data.frame(cbind(alpha=alphas,lambda=lambdas,deviance=d
 rownames(summary_int_search) <- c(1:nrow(summary_int_search))
 @
 
-At the initial step wesample 21 points in the parameter space, Those points are randomly distibuted and cover uniformly the whole interval. Gaussian Process is trained basiedon the initial points. Then,  iteratively next points are added to the Gaussian Process model in order to find an optimal combination of tuning parameters. In total, \Sexpr{nrow(summary_int_search)} were needed to reach the optimum. 
+%<<label=tab_int_search, echo=FALSE, results=tex>>=                             
+%toPrint <- xtable(summary_int_search[1:10,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search", digits = c(0,5, 7, 5, 0))
+%print(toPrint, table.placement = "tbp", caption.placement = "top")
+%@
 
-<<label=tab_int_search1, echo=FALSE, results=tex>>=                             
-toPrint <- xtable(summary_int_search[1:5,], caption = "Summary of five intial points in the parameter space", label = "tab:sum_int_search1", digits = c(0,5, 7, 5, 0))
-print(toPrint, table.placement = "tbp", caption.placement = "top")
-@
-The first five initial 'visited' points in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search1}.
-
-
-<<label=tab_int_search2, echo=FALSE, results=tex>>=                             
-toPrint <- xtable(summary_int_search[22:31,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search2", digits = c(0,5, 7, 5, 0))
-print(toPrint, table.placement = "tbp", caption.placement = "top")
-@
-
-The next section of the summary table shows ten 'visited' points, which are chosen in iteration steps (figure~\ref{tab:sum_int_search2}).
+The first ten 'visited' points (out of \Sexpr{nrow(summary_int_search)})in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search}.
 
 
 The minimal mean cross-validated deviance over the folds of \Sexpr{round(out$error,3)} was reached for optimal parameter pair $(\alpha, \lambda ) $ = (\Sexpr{round(opt.alpha,3)},\Sexpr{round(opt.lambda,3)}). 
@@ -610,33 +596,53 @@ A feature selected by the stability algorithm is in the set of selected features
 
 \textbf{TODO : 3D/ 2D plots}
 
-\begin{figure}
-<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE,height=10>>=
+% \begin{figure}
+% \begin{center}
+% <<interval_search_cox_out_plot, echo=F, results=hide, fig=TRUE, height=4>>=
+% plot(cvres)
+% @
+% \end{center}
+% \caption{\label{fig:interval_search} \Sexpr{type.measure} as a function of log($\alpha$) for the AML data set. }
+% \end{figure}
 
-par(las=3)
-par(mfrow=c(2,1))
-ylim=range(summary_int_search$deviance)
-ylim[1]<-ylim[1]-0.01
-plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p", ylim=ylim)
-axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
+% 
+% 
+% \begin{figure}
+% \begin{center}
+% <<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
+% 
+% par(las=3)
+% plot(cbind(alphas,deviances), ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
+% axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
+% 
+% abline(v=out$alpha, col="red")
+% 
+% 
+% 
+% plot(cbind(alphas,lambdas),  xlab="alpha", ylab="lambda", type="p")
+% 
+% @
+% \end{center}
+% \caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. err ewr 22222}
+% \end{figure}
+% 
+% 
+% 
+%
 
-rug(summary_int_search[, c("alpha")],side=1, col="black",ticksize = 0.03)
-#for (i in 1: (nrow(summary_int_search)-22-1))  rug(summary_int_search[21+i, c("alpha")],side=1, col="blue",ticksize = 0.03+0.005*i)
-abline(v=opt.alpha, col="red")
+%\begin{figure}
+%<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
+%
+%par(las=3)
+%plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
+%axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
+%
+%abline(v=out$alpha, col="red")
+%@
+%\caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. }
+%\end{figure}
 
-niter<-nrow(summary_int_search) - 21
-iter<-c(rep(0,21), c(1:niter))
-plot(summary_int_search$alpha, iter, xlab="alpha", ylab="Iteration")
-grid(NA, niter+1, lwd=2)
-abline(v=opt.alpha, col="red")
-@
-\caption{\label{fig:interval_search} \textbf{Top}: Deviance as a function of $\alpha$ for the AML data set. The number ofselected features is shown on the top of the plot.The optimal $\alpha$ is highlighted by a red line.
-\textbf{Buttom}: The distribution of initial and visited points in the parameter space for the interval search.  }
-\end{figure}
-
-Figure \ref{fig:interval_search} illustrates the partial likelihood deviance as a function of the tuning parameter $\alpha$. On the top of the plot corresponding number of features selected are shown. The optimal model is found for small $\alpha$: $\alpha$ =\Sexpr{opt.alpha}. The bottom panel presents the distribution of initial points (iteration=0) and visited points in the parameter space.
-This plot shows nicely that the interval search algorithm does not sequentially check up the parameter space, but rather find promising regions and draw a new sample there.   
- The optimal $\alpha$ is highlighted as a red line.
+ The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath_int_search}.
 
 \clearpage
 \section{Conclusions and outlook}
