@@ -117,24 +117,21 @@ The data set contains gene expression data for 79 patient samples measured with 
 \section{Methods and algorithms}
 
 \subsection{Penalized generalized linear models and Cox models}\label{methods:penalized}
-An efficient implementation for fitting generalized linear models and Cox proportional hazards models with regularization by the lasso or elastic net penalty terms is provided by the \R{} package \texttt{glmnet} \citep{FHT2010, simon2011}. This implementation uses a coordinate descent algorithm for fitting the models for a specified penalty parameter value $\lambda$. The computation of an entire regularization path across a range of values $\{\lambda_1,\lambda_2...,\lambda_k\}$ with \texttt{glmnet} is very fast, because previously computed solutions for $\{\lambda_1,...,\lambda_{j-1}\}$ are used as a 'hot' starting value for the computation of $\lambda_j$.
+An efficient implementation for fitting generalized linear models and Cox proportional hazards models with regularization by the lasso or elastic net penalty terms is provided by the \R{} package \texttt{glmnet} \citep{FHT2010, simon2011}. This implementation uses a coordinate descent algorithm for fitting the models for a specified penalty parameter value $\lambda$. The computation of an entire regularization path across a range of values $\Lambda = \{\lambda_1,\lambda_2...,\lambda_K\}$ with \texttt{glmnet} is generally very fast, because previously computed solutions for $\{\lambda_1,...,\lambda_{k-1}\}$ are used as 'hot' starting values for the computation of $\lambda_k$. This implies that it is often more efficient to compute the models for the entire regularization path rather than just individual models. We use this feature of \texttt{glmnet} in all of our implemented algorithms to make most use of the computational speed of \texttt{glmnet}.
 
-Models are fitted by maximizing the penalized log-likelihood function for generalized linear models and the penalized partial log-likelihood for Cox models. Cross-validation can be performed to decide which model (i.e. which penalty parameter values) to choose by using the cross-validated (partial) log-likelihood as the loss function.
-
-The penalized (partial) log-likelihood is given by
+Models are fitted by maximizing the penalized log-likelihood function for generalized linear models and the penalized partial log-likelihood for Cox models. The penalized (partial) log-likelihood function is given by
 \begin{equation}\label{pen.part.likelihood}
-l_n(\boldsymbol\beta)- \sum_{j=1}^p  p_{\lambda^*}(|\beta_j|)
+l_n(\boldsymbol\beta)- \sum_{j=1}^p  p_{\lambda}(|\beta_j|)
 \end{equation}
 where $l_n(\boldsymbol\beta)$ denotes the (partial) log-likelihood given $n$ observations.
-The dimension of the parameter vector $\boldsymbol\beta$ is $p$ and $p_\lambda(|\cdot|)$ is the penalty function with tuning parameter $\lambda^*$. Correspondingly, the objective function employed in \texttt{glmnet} is (with $\lambda = \frac{2}{n}\lambda^*$):
-\begin{equation}\label{obj.fun}
-- \frac{2}{n}l_n(\boldsymbol\beta) + \sum_{j=1}^p  p_\lambda(|\beta_j|).
-\end{equation}
+The dimension of the parameter vector $\boldsymbol\beta$ is $p$ and $p_\lambda(|\cdot|)$ is the penalty function with tuning parameter $\lambda$.
+
+Cross-validation can be performed to decide which model, i.e. which penalty parameter values, to choose by using the negative cross-validated (partial) log-likelihood as the loss function. Actually, within the \texttt{glmnet} package, the (partial) log-likelihood deviance is used as the loss function rather than the log-likelihood function itself. The deviance is equal to −2 times the log-likelihood ratio of the model of interest compared to the saturated model, which has one free parameter per observation. Obviously, both versions will result in the same optimization result.
 
 \subsection{$L_2$-penalized Cox regression}
 Penalized maximum likelihood estimation in Cox regression with the ridge penalty
 \begin{equation}\label{ridge}
-p_\lambda(|\beta|)=\lambda\beta^2
+p_\lambda(|\beta_j|)=\lambda\beta_j^2
 \end{equation}
 was introduced by \citet{verweij94}.
 The ridge penalty results in parameter estimates that are biased towards zero, but does not set values to exactly zero, and hence does not perform variable selection.
@@ -143,15 +140,15 @@ On the other hand, it has been found to produce models with good prediction perf
 \subsection{$L_1$-penalized Cox regression}
 \Citet{tibshirani97} proposed to use an $L_1$-penalized Cox model with
 \begin{equation}
-p_\lambda(|\beta|)=\lambda | \beta |
+p_\lambda(|\beta_j|)=\lambda | \beta_j |
 \end{equation}
-and described a technique, called the lasso for ''least absolute shrinkage and selection operator'', for parameter estimation.
+and described a technique, called the lasso for ``least absolute shrinkage and selection operator'', for parameter estimation.
 The $L_1$-penalty has the advantage over the $L_2$-penalty of shrinking some of the coefficients to zero, i.e. it performs automatic variable selection.
 
 \subsection{The elastic net}
 \Citet{zou05} introduced the elastic net, which employs a combination of the $L_1$- and $L_2$-penalty
 \begin{equation}\label{enet}
-p_{\lambda_1,\lambda_2}(|\beta|)=\lambda_1 | \beta | + \lambda_2 \beta ^2.
+p_{\lambda_1,\lambda_2}(|\beta_j|)=\lambda_1 | \beta_j | + \lambda_2 \beta_j ^2.
 \end{equation}
 \Citet{zou05} rescale the initial solutions from the optimization of the doubly-penalized log-likelihood function by the factor $1 + \lambda_2$, in order to reduce the effect of the double shrinkage.
 Like lasso the elastic net performs automatic variable selection by setting some coefficient estimates to zero.
@@ -160,9 +157,9 @@ This is especially the case in situations with high correlation, where the lasso
 
 Throughout this manuscript we use an alternative parametrization of the elastic net penalty function equivalently to the formulation used in the \texttt{glmnet} package:
 \begin{equation}\label{enet2}
-p_{\alpha,\lambda}(|\beta|)= \lambda\times ( (1-\alpha)\frac{1}{2} |\beta|^2 + \alpha |\beta|).
+p_{\alpha,\lambda}(|\beta_j|)= \lambda\times (\alpha |\beta_j| + (1-\alpha)\frac{1}{2} |\beta_j|^2).
 \end{equation}
-Here, $\alpha \in [0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many variables, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
+Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many variables, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
 The elastic net penalty function contrains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
@@ -327,9 +324,10 @@ names(cofn) <- names.cof[which(cof!=0)]
 \caption{\label{fig:cvlasso}Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
 \end{figure}
 
-We can apply the \texttt{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ data derived values:
+We can apply the \texttt{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ values with a data-derived range of values:
 <<glmnet0, echo=TRUE, results=hide>>=
-fit <- glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), x=t(exprs(eset)), family="cox")
+fit <- glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), 
+              x=t(exprs(eset)), family="cox")
 @
  
 In order to determine the optimal lasso penalty parameter value, we perform 10-fold cross-validation using the \texttt{cv.glmnet} function. The loss function, i.e. the cross-validated partial log-likelihood deviance, is shown in Figure \ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. The penalty parameter value minimizing the loss function is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} ($\log\lambda =$\Sexpr{round(log(cvres$lambda.min), 3)}) and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features:
