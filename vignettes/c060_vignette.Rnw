@@ -126,7 +126,7 @@ l_n(\boldsymbol\beta)- \sum_{j=1}^p  p_{\lambda}(|\beta_j|)
 where $l_n(\boldsymbol\beta)$ denotes the (partial) log-likelihood given $n$ observations.
 The dimension of the parameter vector $\boldsymbol\beta$ is $p$ and $p_\lambda(|\cdot|)$ is the penalty function with tuning parameter $\lambda$.
 
-Cross-validation can be performed to decide which model, i.e. which penalty parameter values, to choose by using the negative cross-validated (partial) log-likelihood as the loss function. Actually, within the \texttt{glmnet} package, the (partial) log-likelihood deviance is used as the loss function rather than the log-likelihood function itself. The deviance is equal to −2 times the log-likelihood ratio of the model of interest compared to the saturated model, which has one free parameter per observation. Obviously, both versions will result in the same optimization result.
+Cross-validation can be performed to decide which model, i.e. which penalty parameter values, to choose by using the negative cross-validated (partial) log-likelihood as the loss function. Actually, within the \texttt{glmnet} package, the (partial) log-likelihood deviance is used as the loss function rather than the log-likelihood function itself. The deviance is equal to ??????2 times the log-likelihood ratio of the model of interest compared to the saturated model, which has one free parameter per observation. Obviously, both versions will result in the same optimization result.
 
 \subsection{$L_2$-penalized Cox regression}
 Penalized maximum likelihood estimation in Cox regression with the ridge penalty
@@ -134,7 +134,7 @@ Penalized maximum likelihood estimation in Cox regression with the ridge penalty
 p_\lambda(|\beta_j|)=\lambda\beta_j^2
 \end{equation}
 was introduced by \citet{verweij94}.
-The ridge penalty results in parameter estimates that are biased towards zero, but does not set values to exactly zero, and hence does not perform variable selection.
+The ridge penalty results in parameter estimates that are biased towards zero, but does not set values to exactly zero, and hence does not perform feature selection.
 On the other hand, it has been found to produce models with good prediction performance in high-dimensional genomic applications \citep[e.g.][]{bovelstad07}, in particular if predictors are highly correlated.
 
 \subsection{$L_1$-penalized Cox regression}
@@ -143,7 +143,7 @@ On the other hand, it has been found to produce models with good prediction perf
 p_\lambda(|\beta_j|)=\lambda | \beta_j |
 \end{equation}
 and described a technique, called the lasso for ``least absolute shrinkage and selection operator'', for parameter estimation.
-The $L_1$-penalty has the advantage over the $L_2$-penalty of shrinking some of the coefficients to zero, i.e. it performs automatic variable selection.
+The $L_1$-penalty has the advantage over the $L_2$-penalty of shrinking some of the coefficients to zero, i.e. it performs automatic feature selection.
 
 \subsection{The elastic net}
 \Citet{zou05} introduced the elastic net, which employs a combination of the $L_1$- and $L_2$-penalty
@@ -151,15 +151,15 @@ The $L_1$-penalty has the advantage over the $L_2$-penalty of shrinking some of 
 p_{\lambda_1,\lambda_2}(|\beta_j|)=\lambda_1 | \beta_j | + \lambda_2 \beta_j ^2.
 \end{equation}
 \Citet{zou05} rescale the initial solutions from the optimization of the doubly-penalized log-likelihood function by the factor $1 + \lambda_2$, in order to reduce the effect of the double shrinkage.
-Like lasso the elastic net performs automatic variable selection by setting some coefficient estimates to zero.
-But the additional $L_2$-penalty term distributes the weight to more variables, such that the elastic net tends to select more variables than the lasso. 
-This is especially the case in situations with high correlation, where the lasso would select only one variable of a set of highly correlated variables, while the ridge penalty would give them equal weight.
+Like lasso the elastic net performs automatic feature selection by setting some coefficient estimates to zero.
+But the additional $L_2$-penalty term distributes the weight to more features, such that the elastic net tends to select more features than the lasso. 
+This is especially the case in situations with high correlation, where the lasso would select only one feature of a set of highly correlated features, while the ridge penalty would give them equal weight.
 
 Throughout this manuscript we use an alternative parametrization of the elastic net penalty function equivalently to the formulation used in the \texttt{glmnet} package:
 \begin{equation}\label{enet2}
 p_{\alpha,\lambda}(|\beta_j|)= \lambda\times (\alpha |\beta_j| + (1-\alpha)\frac{1}{2} |\beta_j|^2).
 \end{equation}
-Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many variables, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
+Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many features, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
 The elastic net penalty function contrains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
@@ -177,14 +177,16 @@ efficient algorithm for finding a global optimum on the tuning parameter space
 called Efficient Parameter Selection via Global Optimization (EPSGO). The main idea of the algorithm is to treat the finding optimal tuning parameter
 problem as a global optimization problem. For that purpose one learns a Gaussian Process model of the error surface in parameter space and samples systematically at points for where a specific parameter namely expected improvement criterion reaches the maximum. 
 
-The algorithm learns the Gaussian Process (GP) model from the points in the parameter space which have been already visited. An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
+The interval search can be divided into two phases. In the initial phase, a set of uniformly distibuted points in the parameter space is randomly selected. Then in the iteration phase, the algorithm learns the Gaussian Process  model from the points  which have been already visited. By adding new points one updates the Gaussian Process model.
+New points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
 
+An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. 
 
 
 
 \subsection{Stability selection}
 In contrast to the previously described methods that are typically used to find sparse but also well predicting models, the stability selection proposed by \citet{MeinshausenBuehlmann2010} aims to find stable features which show strong association with the outcome. 
-The stability selection is a general approach that combines variable selection methods such as $L_1$ penalized Cox models with resampling. By applying the corresponding variable selection method to subsamples that were drawn without replacement, selection probabilities for each feature can be estimated. These selection probabilities are used to define a set of stable features. \citet{MeinshausenBuehlmann2010} provide a theoretical framework for controlling Type I error rates of falsely assigning features to the estimated set of stable features. The selection probability of each feature along the regularization path, e.g. the range of possible penalization parameters $\Lambda=\{\lambda_1,\lambda_2...,\lambda_k\}$, is called stability path.
+The stability selection is a general approach that combines feature selection methods such as $L_1$ penalized Cox models with resampling. By applying the corresponding feature selection method to subsamples that were drawn without replacement, selection probabilities for each feature can be estimated. These selection probabilities are used to define a set of stable features. \citet{MeinshausenBuehlmann2010} provide a theoretical framework for controlling Type I error rates of falsely assigning features to the estimated set of stable features. The selection probability of each feature along the regularization path, e.g. the range of possible penalization parameters $\Lambda=\{\lambda_1,\lambda_2...,\lambda_k\}$, is called stability path.
 Given an arbitrary threshold $\pi_{thr} \in (0.5,1)$ and the set of penalization parameters $\Lambda$, the set of stable features estimated with the stability selection is:
 \begin{equation} 
  \hat{S}_{\beta}^{stable}=\left\{i: \max_{\lambda_{j} \in \Lambda} \hat{\Pi}_{i}^{\lambda_{j}} \geq \pi_{thr} \right\},
@@ -200,7 +202,7 @@ This is an upper bound
 \begin{equation}
 e_{\Lambda} = \sqrt{E(V)p(2\pi_{thr}-1)},
 \end{equation}
-which can be controlled by reducing the length of the regularization path $\Lambda$. In multiple testing the expected number of falsely selected variables is also known as the per-family error rate (PFER) and if divided by the total number of features $p$ it will become the per-comparison error rate (PCER) \cite{Dudoit2003}. The stability selection allows to control these Type I error rates. For instance, suppose the threshold $\pi_{thr} = 0.8$ is fixed, then
+which can be controlled by reducing the length of the regularization path $\Lambda$. In multiple testing the expected number of falsely selected features is also known as the per-family error rate (PFER) and if divided by the total number of features $p$ it will become the per-comparison error rate (PCER) \cite{Dudoit2003}. The stability selection allows to control these Type I error rates. For instance, suppose the threshold $\pi_{thr} = 0.8$ is fixed, then
 choosing $\Lambda$ such that $q_{\Lambda} \leq \sqrt{0.6p}$ will control $E(V)=1$. Moreover, by choosing $\Lambda$ so that $q_{\Lambda} \leq \sqrt{0.6p\alpha}$ will control the family wise error rate (FWER) at level $\alpha$, $P(|V|>0) \leq \alpha$.\\
 According to \citet{FHT2010} the coordinate descent algorithm implemented in the \texttt{glmnet} is most efficient regarding the computational time, when used to calculate a whole regularization path. To utilize this property our algorithm calculates the stability path by first generating subsets and then calculating for each subset the regularization path using the coordinate descent algorithm. The resulting regularization paths are then merged to form the stability path. Furthermore, since the calculations of the regularization paths for each subset are independent of each other, the algorithm can easily be parallelized using the package \texttt{parallel}. %In parallel computing such easily to parallelize  embarrassingly parallel computations.    
 
@@ -244,6 +246,7 @@ library(peperr) #for peperr_glmnet.R
 library(tgp) #for EPSGO.R
 library(mlegp) #for EPSGO.R
 library(pamr) #for tune.glmnet.interval.R
+library(lattice) # for plotting 
 
 # R functions required
 #source("~/c060/pkg/R/peperr_glmnet.r")
@@ -305,7 +308,7 @@ eset       <- geo_exprs_data[topprobes,]
 In the following we will demonstrate the use of the functions provided with the \texttt{c060} package in an application to the AML data set by \citet{metzeler08}. For the sake of convenience we reduce the total number of \Sexpr{nrow(geo_exprs_data)} gene expression features that have been measured with the Affymetrix HG-U133 Plus 2.0 microarray technology to the top \Sexpr{nfeatures} features with largest variance across all \Sexpr{ncol(eset)} samples. For all computations the data set is stored as an \texttt{ExpressionSet} (from Bioconductor package \texttt{Biobase}) called \texttt{eset}. Gene expression data can be accessed through the call \texttt{exprs(eset)} and overall survival data and other patient-specific data (e.g. patient age) are stored within the \texttt{phenoData} object \texttt{pData(eset)}.
 
 \subsection{Starting off: Fitting the lasso-penalized Cox model} 
-Our goal is to develop a prognostic model for patient overall survival based on the gene expression data. The purpose of this modelling exercise is not just to fit a prognostic model that is capable of predicting overall survival rates, but we also want to find out which gene expression features are most relevant for this task. Traditionally, this problem can be solved by variable selection methods and we start our data analysis exercise by fitting the lasso-penalized Cox model, which provides automatic variable selection.
+Our goal is to develop a prognostic model for patient overall survival based on the gene expression data. The purpose of this modelling exercise is not just to fit a prognostic model that is capable of predicting overall survival rates, but we also want to find out which gene expression features are most relevant for this task. Traditionally, this problem can be solved by feature selection methods and we start our data analysis exercise by fitting the lasso-penalized Cox model, which provides automatic feature selection.
 
 \begin{figure}
 \begin{center}
@@ -336,7 +339,7 @@ print(cofn)
 #cofn.ix <- predict(res, type="nonzero", s=cvres$lambda.min)
 @
 
-The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath}. The coefficient path shows the development of the regression coefficient estimates with increasing regularization. While the selected \Sexpr{length(cofn)} features are the only features selected at the optimal $\lambda$ value, they do not remain among the features with largest effect sizes when the penalty is reduced and thus more and more coefficients start to enter the model. In fact, for 4 out of the \Sexpr{length(cofn)} features, the coefficient estimates go back down to zero for small values of $\log\lambda$, indicating that these features get replaced by other gene expression variables in very large models.
+The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath}. The coefficient path shows the development of the regression coefficient estimates with increasing regularization. While the selected \Sexpr{length(cofn)} features are the only features selected at the optimal $\lambda$ value, they do not remain among the features with largest effect sizes when the penalty is reduced and thus more and more coefficients start to enter the model. In fact, for 4 out of the \Sexpr{length(cofn)} features, the coefficient estimates go back down to zero for small values of $\log\lambda$, indicating that these features get replaced by other gene expression features in very large models.
 
 \begin{figure}
 \begin{center}
@@ -394,7 +397,7 @@ The $.632+$ bootstrap estimator is calculated based on subsampling \citep{BS2008
 
 The \texttt{peperr} package is designed for high-dimensional covariates data and allows for various set-ups of parallel computations.
 Also, additional arguments can be passed directly to the \texttt{glmnet} call by specifing additional arguments for the fitting and/or tuning procedure.
-Here, we include patient's age as mandatory model variable into the prognostic model, i.e. age is not subject to penalization, and 
+Here, we include patient's age as mandatory model feature into the prognostic model, i.e. age is not subject to penalization, and 
 run the calculation on 3 CPUs in parallel using a socket cluster set-up.
 
 <<peperrMandatoryParallel, echo=T, results=hide, cache=T>>=
@@ -436,8 +439,8 @@ as for time-to-event endpoints. The predicted class probability is calculated wi
 \clearpage
 \subsection{Stability selection}
 
-To identify genes which have a relevant influence on the survival times of the patients in the AML data set and to control a Type I error that the genes identified are truly associated with the survival times, the stability selection \cite{MeinshausenBuehlmann2010} can be used. To calculate the stability path for the $L_1$-penalized Cox regression we use the function \texttt{stability.path}. 
-The function draws subsets and calculates in parallel the stability path, e.g. the selection probabilities of each feature along the range of possible penalization parameters. For parallelization we use the package \texttt{parallel}, which is since R 2.14.0 a base package. On Unix like systems the parallelization is done by forking via the function \texttt{mclapply} whereas under Windows systems socket cluster are used. To estimate the stable set of genes given a desired Type I error rate, the function \texttt{stability.selection} or \texttt{plot.stabpath} can be called. Here, we used the function \texttt{plot.stabpath} which will also plot the regularization path for the complete data set along with the stability path, where the stable features are marked in red.
+To identify features which have a relevant influence on the survival times of the patients in the AML data set and to control a Type I error that the features identified are truly associated with the survival times, the stability selection \cite{MeinshausenBuehlmann2010} can be used. To calculate the stability path for the $L_1$-penalized Cox regression we use the function \texttt{stability.path}. 
+The function draws subsets and calculates in parallel the stability path, e.g. the selection probabilities of each feature along the range of possible penalization parameters. For parallelization we use the package \texttt{parallel}, which is since R 2.14.0 a base package. On Unix like systems the parallelization is done by forking via the function \texttt{mclapply} whereas under Windows systems socket cluster are used. To estimate the stable set of features given a desired Type I error rate, the function \texttt{stability.selection} or \texttt{plot.stabpath} can be called. Here, we used the function \texttt{plot.stabpath} which will also plot the regularization path for the complete data set along with the stability path, where the stable features are marked in red.
 
 \begin{figure}
 <<stabilitySelection, echo=F, results=hide, fig=TRUE>>=
@@ -455,7 +458,7 @@ sel <- plot.stabpath(res, fwer=fwer, pi_thr=pi.thr, xvar="lambda", col.all="gray
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=\Sexpr{fwer} and $\hat\Pi >$\Sexpr{pi.thr}.}
 \end{figure}
 
-Controlling a FWER of \Sexpr{fwer} the estimated set of stable features comprises a single gene (with $\hat\Pi >$\Sexpr{pi.thr} at $\lambda =$\Sexpr{round(sel$lambda, 3)}) which is:
+Controlling a FWER of \Sexpr{fwer} the estimated set of stable features comprises a single feature (with $\hat\Pi >$\Sexpr{pi.thr} at $\lambda =$\Sexpr{round(sel$lambda, 3)}) which is:
 <<stabilitySelection2, echo=F, results=verbatim>>=
 print(sel$stable)
 @
@@ -552,14 +555,21 @@ summary_int_search <- as.data.frame(cbind(alpha=alphas,lambda=lambdas,deviance=d
 rownames(summary_int_search) <- c(1:nrow(summary_int_search))
 @
 
-%<<label=tab_int_search, echo=FALSE, results=tex>>=                             
-%toPrint <- xtable(summary_int_search[1:10,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search", digits = c(0,5, 7, 5, 0))
-%print(toPrint, table.placement = "tbp", caption.placement = "top")
-%@
+At the initial step we sample 21 points in the parameter space, Those points are randomly distibuted and cover uniformly the whole interval. Gaussian Process is trained based on the initial points. Then,  iteratively, next points are added to the Gaussian Process model in order to find an optimal combination of tuning parameters. In total, \Sexpr{nrow(summary_int_search)} were needed to reach the optimum. 
 
-The first ten 'visited' points (out of \Sexpr{nrow(summary_int_search)})in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search}.
+<<label=tab_int_search1, echo=FALSE, results=tex>>=                             
+toPrint <- xtable(summary_int_search[1:5,], caption = "Summary of five intial points in the parameter space", label = "tab:sum_int_search1", digits = c(0,5, 7, 5, 0))
+print(toPrint, table.placement = "tbp", caption.placement = "top")
+@
+The first five initial 'visited' points in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search1}.
 
 
+<<label=tab_int_search2, echo=FALSE, results=tex>>=                             
+toPrint <- xtable(summary_int_search[22:31,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search2", digits = c(0,5, 7, 5, 0))
+print(toPrint, table.placement = "tbp", caption.placement = "top")
+@
+
+The next section of the summary table shows ten 'visited' points, which are chosen in iteration steps (figure~\ref{tab:sum_int_search2}).
 The minimal mean cross-validated deviance over the folds of \Sexpr{round(out$error,3)} was reached for optimal parameter pair $(\alpha, \lambda ) $ = (\Sexpr{round(opt.alpha,3)},\Sexpr{round(opt.lambda,3)}). 
 
 <<interval_search_cox_fit_opt, echo=F, results=hide>>=
@@ -592,55 +602,66 @@ A feature selected by the stability algorithm is in the set of selected features
 '206932_at' %in% names.cof
 @
 
-\textbf{TODO : 3D/ 2D plots}
 
-% \begin{figure}
-% \begin{center}
-% <<interval_search_cox_out_plot, echo=F, results=hide, fig=TRUE, height=4>>=
-% plot(cvres)
-% @
-% \end{center}
-% \caption{\label{fig:interval_search} \Sexpr{type.measure} as a function of log($\alpha$) for the AML data set. }
-% \end{figure}
+\begin{figure}
+<<interval_search_cox_out_plot1, echo=F, results=hide, fig=TRUE,height=10>>=
 
-% 
-% 
-% \begin{figure}
-% \begin{center}
-% <<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
-% 
-% par(las=3)
-% plot(cbind(alphas,deviances), ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
-% axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
-% 
-% abline(v=out$alpha, col="red")
-% 
-% 
-% 
-% plot(cbind(alphas,lambdas),  xlab="alpha", ylab="lambda", type="p")
-% 
-% @
-% \end{center}
-% \caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. err ewr 22222}
-% \end{figure}
-% 
-% 
-% 
-%
+# 
+# breaks <- do.breaks(range(summary_int_search$deviance), 20)
+# n_init <- 20 # number of initial alpha values at iteration zero
+# summary_int_search$cols <- level.colors(summary_int_search$deviance,at=breaks, col.regions = cm.colors(n=20,alpha=0.5))
+# print(xyplot(alpha ~ lambda, data = summary_int_search, groups = cols, cex = 2, col = "black",   jitter.y=T, amount=0.01,
+#              scales=list(x=list(log=T, equispaced.log = FALSE)), # x axis on log-scale
+#              panel = function(x, y, groups, ..., subscripts) { 
+#              fill <- groups[subscripts] 
+#              panel.grid(h = -1, v = -1)
+#              panel.xyplot(x, y, pch = rep(c(22,21),c(n_init,nrow(summary_int_search)-n_init)), fill = fill, ...) ;
+#              ltext(x=x, y=y, labels=n.features, pos=ifelse(y<0.1,3,4), offset=3, cex=0.75,col=4)},
+#              legend = list(top = list(fun = draw.colorkey, args = list(key = list(space = "top", col = cm.colors(n=20,alpha=0.5), at = breaks), draw = FALSE))),
+#              main="cross-validated model deviance",sub="number of selected features are given in blue \n rectangles show initial alpha values"))
 
-%\begin{figure}
-%<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
-%
-%par(las=3)
-%plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
-%axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
-%
-%abline(v=out$alpha, col="red")
-%@
-%\caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. }
-%\end{figure}
 
- The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath_int_search}.
+
+
+
+
+summary_int_search$log_lambda <- log(summary_int_search$lambda)
+breaks                        <- do.breaks(range(summary_int_search$deviance), 20)
+n_init                        <- 21 # number of initial alpha values at iteration zero
+summary_int_search$cols       <- level.colors(summary_int_search$deviance,at=breaks, col.regions = gray.colors)
+
+print(xyplot(alpha ~ log_lambda, data = summary_int_search, groups = cols, cex = 2, col = "black",  
+             jitter.y=T, amount=0.01, xlab=expression(paste("log ",lambda)),ylab=expression(alpha),
+#             scales=list(x=list(log=T, equispaced.log = FALSE)), # x axis on log-scale
+             panel = function(x, y, groups, ..., subscripts) { 
+             fill <- groups[subscripts] 
+             panel.grid(h = -1, v = -1)
+             panel.xyplot(x, y, pch = rep(c(22,21),c(n_init,nrow(summary_int_search)-n_init)), fill = fill, ...) ;
+             ltext(x=x, y=y, labels=n.features, pos=ifelse(y<0.1,3,4), offset=3, cex=1,col=1)},
+             legend = list(top = list(fun = draw.colorkey, args = list(key = list(space = "top", col = gray.colors, at = breaks), draw = FALSE))),
+             main="cross-validated model deviance",
+             sub="number of selected features are printed next to symbol \n rectangles show initial alpha values"))
+
+@
+\caption{\label{fig:interval_search1} \textbf{Top}: Deviance as a function of $\alpha$ and log$\lambda$ for the AML data set.  }
+\end{figure}
+
+Figure~\ref{fig:interval_search1} illustrates the relationship between both tunig parameters $\alpha$ and $\lambda$ for the 'visited' points. The partial likelihood deviance is  colorcoded with black for small values and gray for large values. 
+To distinguish between initial and iteration points, the initial points are plotted as  squares and iteration points as circles. The iteration points were chosen in the regions with lower deviances. The number of features selected is written near each point. 
+
+The distribution of initial points (iteration=0) and visited points (iteration>0) in the parameter space is plotted in figure~\ref{fig:interval_search2}).
+This plot shows nicely that the interval search algorithm does not sequentially check up the parameter space, but rather find promising regions and draw a new sample there.  The optimal model is found for small values: $\alpha$ =\Sexpr{opt.alpha}, which is highlighted as a red line.
+
+\begin{figure}
+<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE,height=6>>=
+niter<-nrow(summary_int_search) - 21
+iter<-c(rep(0,21), c(1:niter))
+plot(summary_int_search$alpha, iter, xlab=expression(alpha), ylab="Iteration")
+grid(NA, niter+1, lwd=2)
+abline(v=opt.alpha, col="red")
+@
+\caption{\label{fig:interval_search2} The distribution of initial and visited points in the parameter space for the interval search plotted in chronological order.  }
+\end{figure}
 
 \clearpage
 \section{Conclusions and outlook}
@@ -648,7 +669,7 @@ The programming language and statistical computing environment \R{} provides a h
 
 We have presented our \R{} package \texttt{c060}, which provides extensions to \texttt{glmnet} and additional features which are essential for a full data analysis in practical applications, including stability selection, estimation of prediction error (curves) and an efficient interval search algorithm for finding the optimal elastic net tuning parameter combination. These extensions have proved useful in our daily work, in particular for the task of performing prognostic modelling of patient survival data based on high-dimensional molecular biology data.
 
-The \texttt{c060} package will be kept updated in the future to keep up with the fast-developing field of penalized regression methodology for variable selection and risk prediction modelling with high-dimensional input data. One example are developments for the estimation of standard errors, confidence intervals and the determination of p-values in high-dimensional regularized regression models, e.g. through subsampling methods similar to the approach taken by \citet{wasserman2009} and \citet{MeinshausenBuehlmann2010}.
+The \texttt{c060} package will be kept updated in the future to keep up with the fast-developing field of penalized regression methodology for feature selection and risk prediction modelling with high-dimensional input data. One example are developments for the estimation of standard errors, confidence intervals and the determination of p-values in high-dimensional regularized regression models, e.g. through subsampling methods similar to the approach taken by \citet{wasserman2009} and \citet{MeinshausenBuehlmann2010}.
 
 %\section{Session Information}
 %The version number of \R{} and packages loaded for generating the vignette were:
