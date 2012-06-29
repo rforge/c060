@@ -165,7 +165,7 @@ p_{\alpha,\lambda}(|\beta|)= \lambda\times ( (1-\alpha)\frac{1}{2} |\beta|^2 + \
 Here, $\alpha \in [0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many variables, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
-The elastic net penalty function contrains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
+The elastic net penalty function contains two tuning parameters which are data-dependent and cannot be set equal to some apriori values. The challenge is to find such a setting of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross validation error of the model is minimal.
 
 \paragraph{Fixed grid}
 Tuning parameters are usually determined by a grid search. The grid search method calculates a target value,
@@ -180,7 +180,9 @@ efficient algorithm for finding a global optimum on the tuning parameter space
 called Efficient Parameter Selection via Global Optimization (EPSGO). The main idea of the algorithm is to treat the finding optimal tuning parameter
 problem as a global optimization problem. For that purpose one learns a Gaussian Process model of the error surface in parameter space and samples systematically at points for where a specific parameter namely expected improvement criterion reaches the maximum. 
 
-The algorithm learns the Gaussian Process (GP) model from the points in the parameter space which have been already visited. An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
+First, an initial set of uniformly distibuted points in the parameter space is randomly selected. The algorithm learns the Gaussian Process  model from the points  which have been already visited. Then, by adding new points one updates the Gaussian Process model until the opimumum is reached or stopping criteria are met.
+
+An immense improvement in the training time for the GP compared to that of the classification and regression tasks was be observed \citep{froehlich2005}. Since the number of training points for the GP and hence the number of evaluations of the error surface of the Cox model mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points for the Cox model. Finally, new points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}, which avoids sticking in local minima. The EPSGO algorithm stops when the global optimum is achieved.
 
 
 
@@ -557,12 +559,21 @@ summary_int_search <- as.data.frame(cbind(alpha=alphas,lambda=lambdas,deviance=d
 rownames(summary_int_search) <- c(1:nrow(summary_int_search))
 @
 
-%<<label=tab_int_search, echo=FALSE, results=tex>>=                             
-%toPrint <- xtable(summary_int_search[1:10,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search", digits = c(0,5, 7, 5, 0))
-%print(toPrint, table.placement = "tbp", caption.placement = "top")
-%@
+At the initial step wesample 21 points in the parameter space, Those points are randomly distibuted and cover uniformly the whole interval. Gaussian Process is trained basiedon the initial points. Then,  iteratively next points are added to the Gaussian Process model in order to find an optimal combination of tuning parameters. In total, \Sexpr{nrow(summary_int_search)} were needed to reach the optimum. 
 
-The first ten 'visited' points (out of \Sexpr{nrow(summary_int_search)})in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search}.
+<<label=tab_int_search1, echo=FALSE, results=tex>>=                             
+toPrint <- xtable(summary_int_search[1:5,], caption = "Summary of five intial points in the parameter space", label = "tab:sum_int_search1", digits = c(0,5, 7, 5, 0))
+print(toPrint, table.placement = "tbp", caption.placement = "top")
+@
+The first five initial 'visited' points in the parameter space ($\alpha$, $\lambda$)  with corresponding cross-validated deviance and number of selected features in each model are presented in figure~\ref{tab:sum_int_search1}.
+
+
+<<label=tab_int_search2, echo=FALSE, results=tex>>=                             
+toPrint <- xtable(summary_int_search[22:31,], caption = "Summary of visited points in the parameter space", label = "tab:sum_int_search2", digits = c(0,5, 7, 5, 0))
+print(toPrint, table.placement = "tbp", caption.placement = "top")
+@
+
+The next section of the summary table shows ten 'visited' points, which are chosen in iteration steps (figure~\ref{tab:sum_int_search2}).
 
 
 The minimal mean cross-validated deviance over the folds of \Sexpr{round(out$error,3)} was reached for optimal parameter pair $(\alpha, \lambda ) $ = (\Sexpr{round(opt.alpha,3)},\Sexpr{round(opt.lambda,3)}). 
@@ -599,53 +610,33 @@ A feature selected by the stability algorithm is in the set of selected features
 
 \textbf{TODO : 3D/ 2D plots}
 
-% \begin{figure}
-% \begin{center}
-% <<interval_search_cox_out_plot, echo=F, results=hide, fig=TRUE, height=4>>=
-% plot(cvres)
-% @
-% \end{center}
-% \caption{\label{fig:interval_search} \Sexpr{type.measure} as a function of log($\alpha$) for the AML data set. }
-% \end{figure}
+\begin{figure}
+<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE,height=10>>=
 
-% 
-% 
-% \begin{figure}
-% \begin{center}
-% <<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
-% 
-% par(las=3)
-% plot(cbind(alphas,deviances), ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
-% axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
-% 
-% abline(v=out$alpha, col="red")
-% 
-% 
-% 
-% plot(cbind(alphas,lambdas),  xlab="alpha", ylab="lambda", type="p")
-% 
-% @
-% \end{center}
-% \caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. err ewr 22222}
-% \end{figure}
-% 
-% 
-% 
-%
+par(las=3)
+par(mfrow=c(2,1))
+ylim=range(summary_int_search$deviance)
+ylim[1]<-ylim[1]-0.01
+plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p", ylim=ylim)
+axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
 
-%\begin{figure}
-%<<interval_search_cox_out_plot2, echo=F, results=hide, fig=TRUE, height=4>>=
-%
-%par(las=3)
-%plot(summary_int_search[, c("alpha", "deviance")] , ylab="Partial Likelihood Deviance", xlab="alpha", type="p")
-%axis(3,at=alphas, tick = TRUE, labels=n.features,cex.axis=0.7 )
-%
-%abline(v=out$alpha, col="red")
-%@
-%\caption{\label{fig:interval_search2} \Sexpr{type.measure} as a function of $\alpha$ for the AML data set. }
-%\end{figure}
+rug(summary_int_search[, c("alpha")],side=1, col="black",ticksize = 0.03)
+#for (i in 1: (nrow(summary_int_search)-22-1))  rug(summary_int_search[21+i, c("alpha")],side=1, col="blue",ticksize = 0.03+0.005*i)
+abline(v=opt.alpha, col="red")
 
- The selected features are highlighted as red lines in the coefficient paths shown in Figure \ref{fig:coefpath_int_search}.
+niter<-nrow(summary_int_search) - 21
+iter<-c(rep(0,21), c(1:niter))
+plot(summary_int_search$alpha, iter, xlab="alpha", ylab="Iteration")
+grid(NA, niter+1, lwd=2)
+abline(v=opt.alpha, col="red")
+@
+\caption{\label{fig:interval_search} \textbf{Top}: Deviance as a function of $\alpha$ for the AML data set. The number ofselected features is shown on the top of the plot.The optimal $\alpha$ is highlighted by a red line.
+\textbf{Buttom}: The distribution of initial and visited points in the parameter space for the interval search.  }
+\end{figure}
+
+Figure \ref{fig:interval_search} illustrates the partial likelihood deviance as a function of the tuning parameter $\alpha$. On the top of the plot corresponding number of features selected are shown. The optimal model is found for small $\alpha$: $\alpha$ =\Sexpr{opt.alpha}. The bottom panel presents the distribution of initial points (iteration=0) and visited points in the parameter space.
+This plot shows nicely that the interval search algorithm does not sequentially check up the parameter space, but rather find promising regions and draw a new sample there.   
+ The optimal $\alpha$ is highlighted as a red line.
 
 \clearpage
 \section{Conclusions and outlook}
