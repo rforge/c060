@@ -1,4 +1,4 @@
-% setwd("C:/Projekte/explained variation/peperr/CSDA/c060/pkg/vignettes")
+% setwd("C:/Projekte/explained variation/peperr/CSDA/c060/vignettes")
 % setwd("~/Projekte_StatsMethods/c060_workcopy/vignette")
 % library(cacheSweave)
 % Sweave("c060_vignette.Rnw", driver = cacheSweaveDriver)
@@ -245,17 +245,7 @@ library(mlegp) #for EPSGO.R
 library(pamr) #for tune.glmnet.interval.R
 library(lattice) # for plotting 
 
-# R functions required
-#source("~/c060/pkg/R/peperr_glmnet.r")
-#source("~/c060/pkg/R/stabilityselection.R")
-#source("~/c060/pkg/R//tune_glmnet_interval.R")
-#source("~/c060/pkg/R/EPSGO.R")
-
-#read in all files from the R dir
-#R.dir<-"~/c060/pkg/R"
-R.dir<-"../pkg/R"
-files <- list.files(path=R.dir, full.names=TRUE)
-for (f in files) { cat(".");source(f) }
+library(c060)
 
 dir.create("figures",showWarnings = FALSE)
 
@@ -406,7 +396,7 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
          penalty.factor=rep(0:1, times=c(1,dim(eset)[1]))),
          trace=F, RNG="fixed", seed=0815, 
          cpus=3, parallel=T, clustertype="SOCK", 
-         load.list=list(functions=c("basesurv")),
+         load.list=list(packages=c("c060")),
          indices=resample.indices(n=dim(eset)[2], sample.n=100, 
          method="sub632"))
 @
