@@ -31,6 +31,7 @@
 \journal{Computational Statistics \& Data Analysis}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE}
 
 \begin{frontmatter}
@@ -195,7 +196,7 @@ E(V) \leq \frac{1}{(2\pi_{thr}-1)} \frac{q^{2}_{\Lambda}}{p},
 \end{equation}
 where $q_{\Lambda}$ is the average of the number of non-zero coefficients w.r.t. to the drawn subsamples.  
 Interpreting Equation \ref{stab} the expected number of falsely selected features decreases by either reducing the average number of selected features $q_{\Lambda}$ or by increasing the threshold $\pi_{thr}$. Suppose that $\pi_{thr}$ is fixed, then the stability selection controls $E(V)$ as long as the average number of selected features is less than $e_{\Lambda}$. 
-This is an upper bound for q^2
+This is an upper bound 
 \begin{equation}
 e_{\Lambda} = \sqrt{E(V)p(2\pi_{thr}-1)},
 \end{equation}
@@ -439,7 +440,7 @@ pi.thr <- 0.6
 res <- stability.path(y=y, x=t(exprs(eset)), weakness=1, mc.cores=cores, family="cox")
 par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
 #plot stability path and perform stability selection controlling a fwer of 0.5
-sel <- plot.stabpath(res, fwer=fwer, pi_thr=pi.thr, xvar="lambda", col.all="gray")
+sel <- plotstabpath(res, fwer=fwer, pi_thr=pi.thr, xvar="lambda", col.all="gray")
 @
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=\Sexpr{fwer} and $\hat\Pi >$\Sexpr{pi.thr}.}
 \end{figure}
