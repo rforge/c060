@@ -167,7 +167,7 @@ pi.thr <- 0.6
 res <- stability.path(y=y, x=t(exprs(eset)), weakness=1, mc.cores=cores, family="cox")
 par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
 #plot stability path and perform stability selection controlling a fwer of 0.5
-sel <- plot.stabpath(res, fwer=fwer, pi_thr=pi.thr, xvar="lambda", col.all="gray")
+sel <- plotstabpath(res, fwer=fwer, pi_thr=pi.thr, xvar="lambda", col.all="gray")
 
 
 ###################################################
