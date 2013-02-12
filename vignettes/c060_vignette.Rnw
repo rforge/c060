@@ -427,20 +427,35 @@ as for time-to-event endpoints. The predicted class probability is calculated wi
 \subsection{Stability selection}
 
 We use stability selection to identify prognostic features which have a relevant influence on the survival times of the patients in the AML data set and to control Type I errors to ensure that the features identified are truly associated with the survival times. To calculate the stability path for the $L_1$-penalized Cox regression we use the function \code{stability.path} from our \proglang{R} package. 
-The function draws subsamples and calculates in parallel the stability path, ie. the selection probabilities of each feature along the range of possible penalization parameter values. For parallelization we use the package \pkg{parallel}, which has been a base package since \proglang{R} version 2.14.0. On Unix-like systems the parallelization is done by forking via the function \code{mclapply} whereas under Windows systems socket clusters are used. 
+The function draws subsets and calculates in parallel the stability path, e.g. the selection probabilities of each feature along the range of possible penalization parameter values. For parallelization we use the package \pkg{parallel}, which has been a base package since \proglang{R} version 2.14.0. On Unix-like systems the parallelization is done by forking via the function \code{mclapply} whereas under Windows systems socket clusters are used. 
 
-<<stabilitySelection, echo=T, results=verbatim, fig=TRUE>>=
+<<stabilitySelection1, echo=T, results=verbatim>>=
 set.seed(1234)
 y <- cbind(time=pData(eset)$os, status=pData(eset)$os_status)
-spath <- stability.path(y=y, x=t(exprs(eset)), weakness=1, mc.cores=2, family="cox")
+spath <- stability.path(y=y, x=t(exprs(eset)), mc.cores=2, family="cox")
 @
-The function \code{stability.selection} can be called to estimate the stable set of features given a desired Type I error rate. Controlling a family-wise error rate (FWER) of $0.5$ the estimated set of stable features comprises a single feature (with $\hat\Pi > 0.6$ at $\lambda =$\Sexpr{round(sel$lambda, 3)} ): \Sexpr{names(stability.selection(spath,fwer=0.5)$stable)}.
 
-Note that an FWER threshold of 0.5 is unusually high. For this data set the use of smaller, more conventional thresholds, e.g. 0.05 or 0.1, will result in an empty set of stable features. 
-The stability path can be visualized by the function \code{plot.stabpath}, which will call \code{stability.selection} to identify stable features and highlight them in plot.
-%#par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
+The function \code{stability.selection} can be called to estimate the stable set of features. Controlling a family-wise error rate (FWER) of $0.5$ the estimated set of stable features comprises a single feature (with $\hat\Pi>0.6$).
+
+<<stabilitySelection2, echo=T, results=verbatim>>=
+stability.selection(spath,fwer=0.5)$stable
+@
+
+Note that an FWER threshold of 0.5 is unusually high. For this data set the use of smaller, more conventional thresholds, e.g. 0.05 or 0.1, will result in an empty set of stable features. The stability path can be visualized by the function \code{plot.stabpath}, which will call \code{stability.selection} to identify stable features and highlight them in the plot.
+
 \begin{figure}
-<<stabilitySelection4, echo=T, results=hide, fig=TRUE>>=
+<<stabilitySelection3, echo=T, results=hide, fig=TRUE>>=
+par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
+plotstabpath(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
+@
+\caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
+\end{figure}
+
+Note that an FWER threshold of 0.5 is unusually high. For this data set the use of smaller, more conventional thresholds, e.g. 0.05 or 0.1, will result in an empty set of stable features. The stability path can be visualized by the function \code{plot.stabpath}, which will call \code{stability.selection} to identify stable features and highlight them in the plot.
+
+\begin{figure}
+<<stabilitySelection3, echo=T, results=hide, fig=TRUE>>=
+par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
 plotstabpath(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 @
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
