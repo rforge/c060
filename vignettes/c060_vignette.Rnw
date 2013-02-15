@@ -210,9 +210,7 @@ As mentioned before, according to \citet{FHT2010} the coordinate descent algorit
 
 The time-dependent Brier score \citep{graf99} can be used to assess and compare the prediction accuracy of prognostic models.
 The Brier score at time point $t$ is a weighted mean squared error between predicted survival probability and observed survival status.
-Weighting depends on the estimated censoring distribution to account for the observations under risk {\red or more general estimates
-thereof - More general estimates of what? Remove this phrase?} \citep{gerds2006}. Computing the error for each time point over the entire follow-up horizon yields a predicton error curve.
-As a reference we use prediction errors based on the Kaplan-Meier curves estimated without any covariate information. 
+Weighting depends on the estimated censoring distribution to account for the observations under risk \citep{gerds2006}. Computing the error for each time point over the entire follow-up horizon yields a predicton error curve. As a reference we use prediction errors based on the Kaplan-Meier curves estimated without any covariate information. 
 
 The empirical time-dependent Brier score $BS(t)$ is defined as a function of time $t > 0$ by
 \[
@@ -221,7 +219,9 @@ BS(t) = \frac{1}{n}\sum_{i=1}^{n}{\left[\frac{\hat{S}(t|x_i)^2I(t_i\leq t \wedge
 with individual survival time $t_i$, censoring indicator $\delta_i$ and estimated survival probability $\hat{S}(t|x_i)$ at time $t$ based on the prognostic model given covariate values $x_i$ for subject $i$ out of $n$ patients \citep{graf99}.
 $\hat G(t)$ denotes the Kaplan-Meier estimate of the censoring distribution at time $t$, which is based on the observations $(t_i; 1-\delta_i$), $i = 1,...,n$. $I$ stands for the indicator function. 
 
-In case no independent validation data are available, resampling-based prediction error curves are used to adequately assess the model's prediction accuracy. The $.632+$ bootstrap estimator \citep{efron1997}, {\red which is a weighted sum of the apparent error and the average out-of-bag bootstrap error - This does not really help without further explanation of ``apparent'' and ``out-of-bag''. Could we just remove this?}, can be used in this context, balancing a too optimistic and a too conservative error estimation. The $.632+$ bootstrap estimator is calculated based on subsampling (with replacement) rather than classical sampling wihout replacement, as that has been demonstrated to lead to more accurate estimates in a high-dimensional context \citep{BS2008}.
+In case no independent validation data are available, resampling-based prediction error curves are used to adequately assess the model's prediction accuracy. The $.632+$ bootstrap estimator \citep{efron1997} is commonly used for these applications, which is a weighted sum of the apparent error and the average out-of-bag bootstrap error. For the apparent error  the same data is used to develop the prognostic model and assess its performance. Due to overfitting, this error is far too optimistic, particularly with a high-dimensional covariate space. The average out-of-bag bootstrap error is too conservative since only a proportion of the entire data is used to develop the prognostic model in each bootstrap run. 
+The $.632+$ estimator balances both estimators, and additionally accounts for the relative overfitting based on the no-information error rate.
+Further, in our application the $.632+$ bootstrap estimator is calculated based on subsampling (with replacement) rather than classical sampling wihout replacement, as that has been demonstrated to lead to more accurate estimates in a high-dimensional context \citep{BS2008}.
 
 <<setup, echo=F, results=hide>>=
 rm(list=ls())
@@ -231,7 +231,6 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 library(cacheSweave)
 library(Biobase)
 library(genefilter)
-library(ggplot2)
 library(GEOquery)
 library(limma)
 library(xtable)
@@ -371,49 +370,36 @@ of the prognostic model in this situation. This is also called internal validati
 
 For this purpose the \proglang{R} package \pkg{peperr} \citep{Porz2009} provides a modular framework for survival and binary endpoints, i.e. prognostic and
 classification models. Wrapper functions for new or customized prediction model algorithms can be defined and passed to the generic call function \code{peperr}.  
-In case of prognostic models for survival endpoints, algorithm-specific wrapper functions are required for model fitting, tuning and prediction. Wrapper functions for selected machine learning approaches are already implemented, but unfortunately not yet for the \pkg{glmnet} package.
+In case of prognostic models for survival endpoints, algorithm-specific wrapper functions are required for model fitting, tuning and prediction. Wrapper functions for selected machine learning approaches are already implemented, but not yet for the \pkg{glmnet} package.
 
-With the \pkg{peperr} package prediction accuracy of survival models is by default assessed with prediction error curves based on the time-dependent Brier score, but it is also possible to define and use customized accuracy measures.
-
-We have implemented additional wrapper functions for the \pkg{glmnet} algorithm for fitting (\code{fit.glmnet}) and tuning (\code{complexity.glmnet}) the model,
-and predicting survival probabilities (\code{predictProb.glmnet}) based on the fitted model and the estimated baseline hazard from the training data. 
-
-We here want to assess the prognostic value of the $L_1$-penalized Cox PH regression model fitted in the previous section. {\red The $.632+$ subsampling-based bootstrap estimator is calculated using 100 bootstrap samples for illustration purposes (usually one would choose larger numbers of bootstrap samples, e.g. 500 or 1000). - This makes sense for the vignette, but not for the JSS paper, where running time is no problem. Should we rerun this with more bootstrap samples? We could also include a comparison of computing times with and without parallelisation to demonstrate how useful parallelisation is.}
-
-The \pkg{peperr} package is designed for high-dimensional covariates data and allows for various set-ups of parallel computations.
-Also, additional arguments can be passed directly to the \pkg{glmnet} call by specifing additional arguments for the fitting and/or tuning procedure.
+With the \pkg{peperr} package prediction accuracy of survival models is by default assessed with prediction error curves based on the time-dependent Brier score, but it is also possible to define and use customized accuracy measures. We have implemented additional wrapper functions for the \pkg{glmnet} algorithm for fitting (\code{fit.glmnet}) and tuning (\code{complexity.glmnet}) the model, and predicting survival probabilities (\code{predictProb.glmnet}) based on the fitted model and the estimated baseline hazard from the training data. We here want to assess the prognostic value of the $L_1$-penalized Cox PH regression model fitted in the previous section. The $.632+$ subsampling-based bootstrap estimator is calculated using 1000 bootstrap samples. The \pkg{peperr} package is designed for high-dimensional covariates data and allows for various set-ups of parallel computations.
+Also, additional arguments can be passed directly to the \pkg{glmnet} call by specifing additional arguments for the corresponding fitting and/or tuning procedure.
 Here, we include patient's age as mandatory model feature into the prognostic model, i.e. age is not subject to penalization, and 
-run the calculation on 3 CPUs in parallel using a socket cluster set-up. {\red Where in the function call do we actually specify that we use .632+ bootstrap?}
+run the calculation on 3 CPUs in parallel using a socket cluster set-up. 
 
 <<peperrMandatoryParallel, echo=T, results=hide, cache=T>>=
 obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
-         x=data.frame(eset$age,t(exprs(eset))),
-         fit.fun=fit.glmnet, 
-         args.fit=list(standardize=F, family="cox", 
-         penalty.factor=rep(0:1, times=c(1,dim(eset)[1]))),
-         complexity=complexity.glmnet,
-         args.complexity=list(standardize=F, nfolds=10, 
-         family="cox", 
-         penalty.factor=rep(0:1, times=c(1,dim(eset)[1]))),
-         trace=F, RNG="fixed", seed=0815, 
-         cpus=3, parallel=T, clustertype="SOCK", 
-         load.list=list(packages=c("c060")),
-         indices=resample.indices(n=dim(eset)[2], sample.n=100, 
-         method="sub632"))
+               x=data.frame(eset$age,t(exprs(eset))),
+               fit.fun=fit.glmnet, args.fit=list(standardize=F, family="cox",
+               penalty.factor=rep(0:1, times=c(1,dim(eset)[1]))),
+               complexity=complexity.glmnet, 
+               args.complexity=list(standardize=F, nfolds=10, family="cox", 
+               penalty.factor=rep(0:1, times=c(1,dim(eset)[1]))),
+               RNG="fixed", seed=0815, cpus=3, parallel=T, clustertype="SOCK", 
+               load.list=list(packages=c("c060")), 
+               indices=resample.indices(n=dim(eset)[2], sample.n=1000, method="sub632"))
 @
 
 Individual bootstrap results can be visualized with the \code{plot.peperr} function from the \pkg{peperr} package showing the selected complexity parameters, 
-out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again an algorithm specific wrapper (here \code{PLL.coxnet}) needs to be defined.
-
-In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package which allows to display the number still at risk (\code{plot.peperr.curves}) as shown in Figure \ref{fig:pec}. 
+out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again an algorithm specific wrapper (here \code{PLL.coxnet}) needs to be defined. In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package which allows to display the number still at risk (\code{plot.peperr.curves}) as shown in Figure \ref{fig:pec}. By default, the $.632+$ is calculated and displayed. Displaying also the $.632$ estimator, the no-information error rate and the average out-of-bag bootstrap error is optional in \code{plot.peperr.curves}. 
 
 \begin{figure}
 \begin{center}
 <<peperrPlot, echo=T, results=hide, fig=TRUE>>=
-plot.peperr.curves(obj, at.risk=T)
+plot.peperr.curves(obj, at.risk=T, allErrors=FALSE)
 @
 \end{center}
-\caption{Prediction error curves based on time-dependent Brier score for the lasso-penalized Cox PH regression model applied to the AML data set (evaluation time points reflect days). The gray lines show the prediction error curves of 100 bootstrap samples. The other lines show the prediction error curves of the null model (estimated by the Kaplan-Meier estimator without covariate information), the full apparent error estimates (i.e. the errors as estimated when applying the model to the entire training data set), and the .632+ bootstrap error estimates.}
+\caption{Prediction error curves based on time-dependent Brier score for the lasso-penalized Cox PH regression model applied to the AML data set (evaluation time points reflect days). The gray lines show the prediction error curves of 1000 bootstrap samples. The other lines show the prediction error curves of the null model (estimated by the Kaplan-Meier estimator without covariate information), the full apparent error estimates (i.e. the errors as estimated when applying the model to the entire training data set), and the .632+ bootstrap error estimates.}
 \label{fig:pec}
 \end{figure}
 
@@ -421,7 +407,7 @@ Note, that for classification models, the same wrapper functions for fitting and
 Model performance measures for classification tasks shipped with the \pkg{peperr} package are misclassification rate and Brier score. We have extended the functionality of the Brier score (\code{aggregation.brier}) and misclassification rate (\code{aggregation.misclass}) 
 calculation for the \pkg{glmnet} algorithm, and defined AUC under the ROC curve (\code{aggregation.auc}) as an additional performance measure.
 For binary responses, the \pkg{peperr} package does not quite provide the same modular flexibility 
-as for time-to-event endpoints. The predicted class probability is calculated within the performance/aggregation function by calling the algorithm-specific predict function. Whenever a new algorithm is incorporated, the aggregation function has to be modified and overwritten accordingly.
+as for time-to-event endpoints. The predicted class probability is calculated within the generic performance/aggregation function by calling the algorithm-specific predict function. Whenever a new algorithm is incorporated, the generic aggregation function needs to be adapted accordingly.
 
 \clearpage
 \subsection{Stability selection}
