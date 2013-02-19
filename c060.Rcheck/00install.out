@@ -1,0 +1,13 @@
+* installing *source* package ‘c060’ ...
+** R
+** preparing package for lazy loading
+** help
+Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:33: unknown macro '\item'
+Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:36: unknown macro '\item'
+Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:39: unknown macro '\item'
+Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:42: unknown macro '\item'
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded
+
+* DONE (c060)

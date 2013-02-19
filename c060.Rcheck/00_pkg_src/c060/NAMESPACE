@@ -1,0 +1,14 @@
+export(stability.path,
+       plotstabpath,
+       stability.selection,
+       aggregation.auc,
+       complexity.glmnet,
+       fit.glmnet,
+       PLL.coxnet,
+       plot.peperr.curves,
+       predictProb.glmnet,
+    predictProb.coxnet,
+    EPSGO,
+       tune.glmnet.interval,my.balanced.folds)
+
+

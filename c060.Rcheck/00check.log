@@ -1,0 +1,103 @@
+* using log directory ‘/data/c060/C060svn/c060.Rcheck’
+* using R version 2.15.2 (2012-10-26)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+* using session charset: UTF-8
+* checking for file ‘c060/DESCRIPTION’ ... OK
+* this is package ‘c060’ version ‘0.15’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking whether package ‘c060’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:33: unknown macro '\item'
+  Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:36: unknown macro '\item'
+  Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:39: unknown macro '\item'
+  Warning: /data/c060/C060svn/c060.Rcheck/00_pkg_src/c060/man/summary.int.search.Rd:42: unknown macro '\item'
+See ‘/data/c060/C060svn/c060.Rcheck/00install.out’ for details.
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking for unstated dependencies in R code ... OK
+* checking S3 generic/method consistency ... WARNING
+predictProb:
+  function(object, response, x, ...)
+predictProb.coxnet:
+  function(object, x, times, complexity, ...)
+
+predictProb:
+  function(object, response, x, ...)
+predictProb.glmnet:
+  function(object, x, times, complexity, ...)
+
+See section ‘Generic functions and methods’ of the ‘Writing R
+Extensions’ manual.
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+plot.summary.int.search: no visible binding for global variable ‘cols’
+plot.summary.int.search : <anonymous>: no visible binding for global
+  variable ‘n.features’
+* checking Rd files ... WARNING
+prepare_Rd: summary.int.search.Rd:33: unknown macro '\item'
+prepare_Rd: summary.int.search.Rd:36: unknown macro '\item'
+prepare_Rd: summary.int.search.Rd:39: unknown macro '\item'
+prepare_Rd: summary.int.search.Rd:42: unknown macro '\item'
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... WARNING
+Functions/methods with usage in documentation object 'plot.summary.int.search' but not in code:
+  plot.points.int.search
+
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in documentation object 'plot.summary.int.search'
+  ‘summary.int’ ‘start.N’
+Documented arguments not in \usage in documentation object 'plot.summary.int.search':
+  ‘fit’ ‘srat.N’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See the chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+S3 methods shown with full name in documentation object 'PLL.coxnet':
+  ‘PLL.coxnet’
+
+S3 methods shown with full name in documentation object 'plot.peperr.curves':
+  ‘plot.peperr.curves’
+
+S3 methods shown with full name in documentation object 'predictProb.coxnet':
+  ‘predictProb.coxnet’
+
+S3 methods shown with full name in documentation object 'predictProb.glmnet':
+  ‘predictProb.glmnet’
+
+The \usage entries for S3 methods should use the \method markup and not
+their full name.
+See the chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking examples ... OK
+* checking PDF version of manual ... OK
+WARNING: There were 5 warnings.
+NOTE: There was 1 note.
+See
+  ‘/data/c060/C060svn/c060.Rcheck/00check.log’
+for details.
