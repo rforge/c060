@@ -1,5 +1,69 @@
-% This file was created with JabRef 2.7.
+% This file was created with JabRef 2.9.2.
 % Encoding: UTF-8
+
+@ARTICLE{bovelstad07,
+  author = {B{\o}velstad, H M M and Nyg\r{a}rd, S and St{\o}rvold, H L L. and
+	Aldrin, M and Borgan, O and Frigessi, A and Lingj{\ae}rde, O C C.
+	},
+  title = {Predicting survival from microarray data - a comparative study.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {2080--2087},
+  date-modified = {2009-11-10 16:31:32 +0100}
+}
+
+@ARTICLE{becker2009,
+  author = {Becker, N and Werft, W and Toedt, G and  Lichter, P and Benner, A},
+  title = {penalizedSVM: a R-package for feature selection SVM classification.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {1711--1712},
+  owner = {becker},
+  timestamp = {2013.02.15}
+}
+
+@ARTICLE{benner2010,
+  author = {Benner, A. and Zucknick, M. and Hielscher, T. and Ittrich, C. and
+	Mansmann, U.},
+  title = {High-dimensional {Cox} models: The choice of penalty as part of the
+	model building process},
+  journal = {Biometrical Journal},
+  year = {2010},
+  volume = {52},
+  pages = {50--69},
+  number = {10}
+}
+
+@ARTICLE{BS2008,
+  author = {Binder, H. and Schumacher, M.},
+  title = {Adapting prediction error estimates for biased complexity selection
+	in high-dimensional bootstrap samples},
+  journal = {Statistical Applications in Genetics and Molecular Biology},
+  year = {2008},
+  volume = {7},
+  number = {1},
+  article = {12}
+}
+
+@ARTICLE{cox:1972,
+  author = {Cox, D.R.},
+  title = {Regression models and life tables (with discussion)},
+  journal = {Journal of the Royal Statistical Society; Series B},
+  year = {1975},
+  volume = {74},
+  pages = {187--200}
+}
+
+@ARTICLE{cox:1975,
+  author = {Cox, D.R.},
+  title = {Partial likelihood},
+  journal = {Biometrika},
+  year = {1975},
+  volume = {62},
+  pages = {269--276}
+}
 
 @ARTICLE{Dudoit2003,
   author = {Dudoit, Sandrine and Shaffer, Juliet P. and Boldrick, Jennifer C.},
@@ -10,7 +74,7 @@
   pages = {71--103},
   number = {1},
   abstract = {{DNA} microarrays are part of a new and promising class of biotechnologies
-  that allow the monitoring of expression levels in cells for thousands
+	that allow the monitoring of expression levels in cells for thousands
 	of genes simultaneously. An important and common question in {DNA}
 	microarray experiments is the identification of differentially expressed
 	genes, that is, genes whose expression levels are associated with
@@ -35,76 +99,78 @@
   url = {http://dx.doi.org/10.2307/3182872}
 }
 
-@article{MeinshausenBuehlmann2010,
- title={Stability selection}, 
- volume={72},
- number={4}, 
- journal={Journal of the Royal Statistical Society - Series B: Statistical Methodology},
- author={Meinshausen, Nicolai and B\"uhlmann, Peter}, 
- year={2010}, 
- pages={417--473}
+@ARTICLE{efron1997,
+  author = {Efron, B. and Tibshirani, R.},
+  title = {Improvements on cross-validation: The. 632+ bootstrap method},
+  journal = {Journal of the American Statistical Association},
+  year = {1997},
+  pages = {548--560},
+  publisher = {JSTOR}
 }
 
-@ARTICLE{BS2008,
-  author = {Binder, H. and Schumacher, M.},
-  title = {Adapting prediction error estimates for biased complexity selection
-	in high-dimensional bootstrap samples},
-  journal = {Statistical Applications in Genetics and Molecular Biology},
-  year = {2008},
-  volume = {7},
-  number = {1},
-  article = {12}
+@ARTICLE{fan2010,
+  author = {Fan, J. and Lv, J.},
+  title = {A selective overview of variable selection in high dimensional feature
+	space},
+  journal = {Statistica Sinica},
+  year = {2010},
+  volume = {20},
+  pages = {101--148}
 }
 
-@article{metzeler08,
-	Author = {K.H. Metzeler and M. Hummel and C.D. Bloomfield and K. Spiekermann and J. Braess and M.-C. Sauerland and A. Heinecke and M. Radmacher  and G. Marcucci and S.P. Whitman and K. Maharry and P. Paschka and R.A. Larson and W.E. Berdel and T. Buchner and B. Wormann and U. Mansmann  and W. Hiddemann and S.K. Bohlander and C. Buske},
-	Journal = {Blood},
-	Pages = {4193--4201},
-	Title = {An 86 probe set gene expression signature predicts survival in cytogenetically normal acute myeloid leukemia},
-	Volume = {112(10)},
-	Year = {2008}}
-
-@ARTICLE{cox:1972,
-  author = {Cox, D.R.},
-  title = {Regression models and life tables (with discussion)},
-  journal = {Journal of the Royal Statistical Society; Series B},
-  year = {1975},
-  volume = {74},
-  pages = {187--200}
-}
-
-@ARTICLE{cox:1975,
-  author = {Cox, D.R.},
-  title = {Partial likelihood},
-  journal = {Biometrika},
-  year = {1975},
-  volume = {62},
-  pages = {269--276}
+@MANUAL{glmnet,
+  title = {\pkg{glmnet}: Lasso and elastic-net regularized generalized linear
+	models},
+  author = {Jerome Friedman and Trevor Hastie and Rob Tibshirani},
+  year = {2013},
+  note = {\proglang{R}~package version~1.8-5},
+  url = {http://CRAN.R-project.org/package=glmnet}
 }
 
 @ARTICLE{FHT2010,
- title = {Regularization Paths for Generalized Linear Models via
-      Coordinate Descent},
-    author = {Jerome Friedman and Trevor Hastie and Robert Tibshirani},
-    journal = {Journal of Statistical Software},
-    year = {2010},
-    volume = {33},
-    number = {1},
-    pages = {1--22},
-    url = {http://www.jstatsoft.org/v33/i01/},
-  }
+  author = {Jerome Friedman and Trevor Hastie and Robert Tibshirani},
+  title = {Regularization Paths for Generalized Linear Models via Coordinate
+	Descent},
+  journal = {Journal of Statistical Software},
+  year = {2010},
+  volume = {33},
+  pages = {1--22},
+  number = {1},
+  url = {http://www.jstatsoft.org/v33/i01/}
+}
 
-@article{simon2011,
- title = {Regularization Paths for Cox's Proportional Hazards Model via Coordinate Descent},
-    author = {Noah Simon and Jerome Friedman and Trevor Hastie and Rob
-      Tibshirani},
-    journal = {Journal of Statistical Software},
-    year = {2011},
-    volume = {39},
-    number = {5},
-    pages = {1--13},
-    url = {http://www.jstatsoft.org/v39/i05/},
-  }
+@INPROCEEDINGS{froehlich2005,
+  author = {Froehlich, H. and Zell, A.},
+  title = {Efficient parameter selection for support vector machines in classification
+	and regression via model-based global optimization},
+  booktitle = {Proceedings of the International Joint Conference of Neural Networks},
+  year = {2005},
+  pages = {1431--1438}
+}
+
+@ARTICLE{Bioconductor,
+  author = {Robert C Gentleman and Vincent J. Carey and Douglas M. Bates and
+	{others}},
+  title = {Bioconductor: Open software development for computational biology
+	and bioinformatics},
+  journal = {Genome Biology},
+  year = {2004},
+  volume = {5},
+  pages = {R80},
+  url = {http://genomebiology.com/2004/5/10/R80}
+}
+
+@ARTICLE{gerds2006,
+  author = {Gerds, T.A. and Schumacher, M.},
+  title = {Consistent Estimation of the Expected Brier Score in General Survival
+	Models with Right-Censored Event Times},
+  journal = {Biometrical Journal},
+  year = {2006},
+  volume = {48},
+  pages = {1029--1040},
+  number = {6},
+  publisher = {Wiley Online Library}
+}
 
 @ARTICLE{graf99,
   author = {Erika Graf and Claudia Schmoor and Willi Sauerbrei and Martin Schumacher},
@@ -118,6 +184,48 @@
   key = {248}
 }
 
+@ARTICLE{Jones1998,
+  author = {Jones, D and Schonlau, M and Welch, W},
+  title = {Efficient global optimization of expensive black-box functions},
+  journal = {Journal of Global Optimization},
+  year = {1998},
+  volume = {13},
+  pages = {455--492}
+}
+
+@ARTICLE{MeinshausenBuehlmann2010,
+  author = {Meinshausen, Nicolai and B\"uhlmann, Peter},
+  title = {Stability selection},
+  journal = {Journal of the Royal Statistical Society - Series B: Statistical
+	Methodology},
+  year = {2010},
+  volume = {72},
+  pages = {417--473},
+  number = {4}
+}
+
+@ARTICLE{metzeler08,
+  author = {K.H. Metzeler and M. Hummel and C.D. Bloomfield and K. Spiekermann
+	and J. Braess and M.-C. Sauerland and A. Heinecke and M. Radmacher
+	and G. Marcucci and S.P. Whitman and K. Maharry and P. Paschka and
+	R.A. Larson and W.E. Berdel and T. Buchner and B. Wormann and U.
+	Mansmann and W. Hiddemann and S.K. Bohlander and C. Buske},
+  title = {An 86 probe set gene expression signature predicts survival in cytogenetically
+	normal acute myeloid leukemia},
+  journal = {Blood},
+  year = {2008},
+  volume = {112(10)},
+  pages = {4193--4201}
+}
+
+@MANUAL{peperr,
+  title = {\pkg{peperr}: Parallelised Estimation of Prediction Error},
+  author = {Christine Porzelius and Harald Binder},
+  year = {2011},
+  note = {\proglang{R}~package version~1.1-6},
+  url = {http://CRAN.R-project.org/package=peperr}
+}
+
 @ARTICLE{Porz2009,
   author = {Porzelius, C. and Binder, H. and Schumacher, M.},
   title = {Parallelized prediction error estimation for evaluation of high-dimensional
@@ -129,15 +237,15 @@
   number = {6}
 }
 
- @Manual{R11,
-    title = {R: A Language and Environment for Statistical Computing},
-    author = {{R Development Core Team}},
-    organization = {R Foundation for Statistical Computing},
-    address = {Vienna, Austria},
-    year = {2011},
-    note = {{ISBN} 3-900051-07-0},
-    url = {http://www.R-project.org/},
-  }
+@MANUAL{R11,
+  title = {R: A Language and Environment for Statistical Computing},
+  author = {{R Development Core Team}},
+  organization = {R Foundation for Statistical Computing},
+  address = {Vienna, Austria},
+  year = {2011},
+  note = {{ISBN} 3-900051-07-0},
+  url = {http://www.R-project.org/}
+}
 
 @ARTICLE{schumacher07,
   author = {Martin Schumacher and Harald Binder and Thomas Gerds},
@@ -148,6 +256,18 @@
   pages = {1768--1774},
   number = {14},
   keywords = {microarray, prediction, survival}
+}
+
+@ARTICLE{simon2011,
+  author = {Noah Simon and Jerome Friedman and Trevor Hastie and Rob Tibshirani},
+  title = {Regularization Paths for Cox's Proportional Hazards Model via Coordinate
+	Descent},
+  journal = {Journal of Statistical Software},
+  year = {2011},
+  volume = {39},
+  pages = {1--13},
+  number = {5},
+  url = {http://www.jstatsoft.org/v39/i05/}
 }
 
 @ARTICLE{tibshirani97,
@@ -169,6 +289,38 @@
   keywords = {Subset selection}
 }
 
+@ARTICLE{verweij94,
+  author = {Verweij, Pierre J. M. and van Houwelingen, Hans C.},
+  title = {Penalized Likelihood in {C}ox Regression},
+  journal = {Statistics in Medicine},
+  year = {1994},
+  volume = {13},
+  pages = {2427--2436},
+  date-modified = {2009-02-23 22:22:20 +0100},
+  keywords = {Cross-validation; Partial likelihood}
+}
+
+@ARTICLE{verweij93,
+  author = {Verweij, Pierre J. M. and van Houwelingen, Hans C.},
+  title = {Cross-validation in Survival Analysis},
+  journal = {Statistics in Medicine},
+  year = {1993},
+  volume = {12},
+  pages = {2305--2314},
+  date-modified = {2009-02-23 22:22:31 +0100},
+  keywords = {Proportional hazard; prediction}
+}
+
+@ARTICLE{wasserman2009,
+  author = {Wasserman, L. and Roeder, K.},
+  title = {High dimensional variable selection},
+  journal = {The Annals of Statistics},
+  year = {2009},
+  volume = {37},
+  pages = {2178--2201},
+  number = {5A}
+}
+
 @ARTICLE{zou05,
   author = {Zou, H. and Hastie, T.},
   title = {Regularization and variable selection via the elastic net},
@@ -177,127 +329,4 @@
   volume = {67(2)},
   pages = {301--320}
 }
-
-@INPROCEEDINGS{froehlich2005,
-  author = {Froehlich, H. and Zell, A.},
-  title = {Efficient parameter selection for support vector machines in classification and regression via model-based global optimization},
-  booktitle = {Proceedings of the International Joint Conference of Neural Networks},
-  year = {2005},
-  pages = {1431--1438}
-}
-
-@article{Jones1998,
-  author = {Jones, D and Schonlau, M and Welch, W},
-  title = {Efficient global optimization of expensive black-box functions},
-  journal = {Journal of Global Optimization},
-  year = {1998},
-  volume = {13},
-  pages = {455--492}
-}
-
-@article{bovelstad07,
-  Author = {B{\o}velstad, H M  M  and Nyg\r{a}rd, S   and St{\o}rvold, H L  L.  and Aldrin, M   and Borgan, O   and Frigessi, A   and Lingj{\ae}rde, O C  C. },
-	Date-Modified = {2009-11-10 16:31:32 +0100},
-	Journal = {Bioinformatics},
-	Pages = {2080--2087},
-	Title = {Predicting survival from microarray data - a comparative study.},
-	Volume = 23,
-	Year = {2007}}
-
-@article{verweij94,
-  Author = {Verweij, Pierre J. M. and van Houwelingen, Hans C.},
-	Date-Modified = {2009-02-23 22:22:20 +0100},
-	Journal = {Statistics in Medicine},
-	Keywords = {Cross-validation; Partial likelihood},
-	Pages = {2427--2436},
-	Title = {Penalized Likelihood in {C}ox Regression},
-	Volume = {13},
-	Year = {1994}}
-
-@article{verweij93,
-	Author = {Verweij, Pierre J. M. and van Houwelingen, Hans C.},
-	Date-Modified = {2009-02-23 22:22:31 +0100},
-	Journal = {Statistics in Medicine},
-	Keywords = {Proportional hazard; prediction},
-	Pages = {2305--2314},
-	Title = {Cross-validation in Survival Analysis},
-	Volume = {12},
-	Year = {1993}}
-
-@article{efron1997,
-  title={Improvements on cross-validation: The. 632+ bootstrap method},
-  author={Efron, B. and Tibshirani, R.},
-  journal={Journal of the American Statistical Association},
-  pages={548--560},
-  year={1997},
-  publisher={JSTOR}
-}
-
-
-@article{gerds2006,
-  title={Consistent Estimation of the Expected Brier Score in General Survival Models with Right-Censored Event Times},
-  author={Gerds, T.A. and Schumacher, M.},
-  journal={Biometrical Journal},
-  volume={48},
-  number={6},
-  pages={1029--1040},
-  year={2006},
-  publisher={Wiley Online Library}
-}
-
-@article{wasserman2009,
-  author={Wasserman, L. and Roeder, K.},
-  title={High dimensional variable selection},
-  journal={The Annals of Statistics},
-  volume={37},
-  number={5A},
-  pages={2178--2201},
-  year={2009}
-}
-
-@article{benner2010,
-  author={Benner, A. and Zucknick, M. and Hielscher, T. and Ittrich, C. and Mansmann, U.},
-  year={2010},
-  title={High-dimensional {Cox} models: The choice of penalty as part of the model building process},
-  journal={Biometrical Journal},
-  volume={52},
-  number={10},
-  pages={50--69}
-}
-
-@article{fan2010,
-  author={Fan, J. and Lv, J.},
-  year={2010},
-  title={A selective overview of variable selection in high dimensional feature space},
-  journal={Statistica Sinica},
-  volume={20},
-  pages={101--148}
-}
-
-@article{Bioconductor,
-    author = {Robert C Gentleman and Vincent J. Carey and Douglas M. Bates and {others}},
-    title = {Bioconductor: Open software development for computational biology and bioinformatics},
-    journal = {Genome Biology},
-    volume = {5},
-    year = {2004},
-    pages = {R80},
-    url = {http://genomebiology.com/2004/5/10/R80},
-  }
-
-@Manual{glmnet,
-  title  = {\pkg{glmnet}: Lasso and elastic-net regularized generalized linear models},
-  author = {Jerome Friedman and Trevor Hastie and Rob Tibshirani},
-  year   = {2013},
-  note   = {\proglang{R}~package version~1.8-5},
-  url    = {http://CRAN.R-project.org/package=glmnet},
-}
-
-@Manual{peperr,
-  title  = {\pkg{peperr}: Parallelised Estimation of Prediction Error},
-  author = {Christine Porzelius and Harald Binder},
-  year   = {2011},
-  note   = {\proglang{R}~package version~1.1-6},
-  url    = {http://CRAN.R-project.org/package=peperr},
-}
-
 
