@@ -1,0 +1,1000 @@
+\nonstopmode{}
+\documentclass[letterpaper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8,latin1]{inputenc}
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `c060'}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\item[Version]\AsIs{0.15}
+\item[Date]\AsIs{2012-06-09}
+\item[Author]\AsIs{Martin Sill, Thomas Hielscher, Manuela Zucknick, Natalia Becker.}
+\item[Maintainer]\AsIs{Martin Sill }\email{m.sill@dkfz.de}\AsIs{}
+\item[Title]\AsIs{Additional variable selection, model validation and parameter
+tuning functions for glmnet models}
+\item[Depends]\AsIs{glmnet, survival, parallel, mlegp, tgp, peperr, penalizedSVM}
+\item[Imports]\AsIs{glmnet, survival, parallel, mlegp, tgp, peperr, penalizedSVM}
+\item[Suggests]\AsIs{survival}
+\item[Description]\AsIs{c060 provides additional functions to perform stability selection, model validation and parameter tuning for glmnet models}
+\item[License]\AsIs{GPL-2}
+\item[LazyLoad]\AsIs{yes}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{aggregation.auc}{Determine the area under the ROC curve for a fitted model}{aggregation.auc}
+\keyword{models}{aggregation.auc}
+\keyword{regression}{aggregation.auc}
+\keyword{classification}{aggregation.auc}
+%
+\begin{Description}\relax
+Evaluate the area under the ROC curve for a fitted model on new data. To be used as argument \code{aggregation.fun} in \code{peperr} call. 
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+aggregation.auc(full.data=NULL, response, x, model, cplx=NULL,  type=c("apparent", "noinf"), 
+   fullsample.attr = NULL, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{full.data}] passed from \code{peperr}, but not used for calculation.
+\item[\code{response}] vector of binary response.
+\item[\code{x}] \code{n*p} matrix of covariates.
+\item[\code{model}] model fitted as returned by a \code{fit.fun}, as used in a call to \code{peperr}.
+\item[\code{cplx}] passed from \code{peperr}, but not necessary for calculation.
+\item[\code{type}] character.
+\item[\code{fullsample.attr}] passed from \code{peperr}, but not necessary for calculation.
+\item[\code{...}] additional arguments, passed to \code{predict} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+Area under the ROC curve is calculated based on internal \code{glmnet:::auc} function from package \code{glmnet}.
+
+\end{Details}
+%
+\begin{Value}
+Scalar, indicating the area under the ROC curve.
+\end{Value}
+%
+\begin{Author}\relax
+Thomas Hielscher \bsl{}
+\email{t.hielscher@dkfz.de}
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{peperr}{peperr}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{complexity.glmnet}{Interface for determination of penalty lambda in penalized regression model via cross-validation}{complexity.glmnet}
+\keyword{models}{complexity.glmnet}
+\keyword{penalized regression}{complexity.glmnet}
+%
+\begin{Description}\relax
+Determines the amount of shrinkage for a penalized regression model fitted by glmnet via cross-validation, conforming to the calling convention required by argument \code{complexity} in \code{peperr} call. 
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+complexity.glmnet(response, x, full.data, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{response}] a survival object (with \code{Surv(time, status)}, or a binary vector with entries 0 and 1).
+\item[\code{x}] \code{n*p} matrix of covariates.
+\item[\code{full.data}] data frame containing response and covariates of the full data set.
+\item[\code{...}] additional arguments passed to \code{cv.glmnet} call such as \code{family}.
+
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+Function is basically a wrapper for \code{cv.glmnet} of package \code{glmnet}. A n-fold cross-validation (default n=10) is performed to determine the optimal penalty lambda.
+For Cox PH regression models the deviance based on penalized partial log-likelihood is used as loss function. For binary endpoints other loss functions are available as well (see \code{type.measure}). Deviance is default. Calling \code{peperr}, the default arguments of \code{cv.glmnet} can be changed by passing a named list containing these as argument \code{args.complexity}.
+Note that only penalized Cox PH (\code{family="cox"}) and logistic regression models (\code{family="binomial"}) are sensible for prediction error
+evaluation with package \code{peperr}.
+\end{Details}
+%
+\begin{Value}
+Scalar value giving the optimal lambda.
+\end{Value}
+%
+\begin{Author}\relax
+Thomas Hielscher \bsl{}
+\email{t.hielscher@dkfz.de}
+\end{Author}
+%
+\begin{References}\relax
+Friedman, J., Hastie, T. and Tibshirani, R. (2008)
+\emph{Regularization Paths for Generalized Linear Models via Coordinate
+Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\\{}
+\emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\\{}
+\url{http://www.jstatsoft.org/v33/i01/}\\{}
+Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
+\emph{Regularization Paths for Cox's Proportional Hazards Model via
+Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
+1-13}\\{}
+\url{http://www.jstatsoft.org/v39/i05/}\\{}
+Porzelius, C., Binder, H., and Schumacher, M. (2009) 
+\emph{Parallelized prediction error estimation for evaluation of high-dimensional models,
+Bioinformatics, Vol. 25(6), 827-829.}
+\end{References}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{peperr}{peperr}}, \code{\LinkA{cv.glmnet}{cv.glmnet}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{EPSGO}{  Finds an optimal solution  }{EPSGO}
+\aliasA{Direct}{EPSGO}{Direct}
+\aliasA{ExpImprovement}{EPSGO}{ExpImprovement}
+\keyword{models}{EPSGO}
+\keyword{multivariate}{EPSGO}
+\keyword{graphs}{EPSGO}
+\keyword{iteration}{EPSGO}
+\keyword{optimize}{EPSGO}
+%
+\begin{Description}\relax
+Finds an optimal solution for the Q.func function.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+EPSGO(Q.func, bounds,  round.n=5, parms.coding="none", fminlower=0, flag.find.one.min =FALSE,
+			show=c("none", "final", "all"), N= NULL, maxevals = 500,  
+	    pdf.name=NULL,  pdf.width=12,  pdf.height=12,   my.mfrow=c(1,1), 
+	    verbose=TRUE, seed=123,  ...  )
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{Q.func}]  name of the function to be  minimized. 
+\item[\code{bounds}]  bounds for parameters
+\item[\code{round.n}]  number of digits after comma, default: 5          
+\item[\code{parms.coding}]  parmeters coding: none  or log2, default: none.  
+\item[\code{fminlower}]  minimal value for the function Q.func, default is 0.     
+\item[\code{flag.find.one.min}]   do you want to find one min value and stop? Default: FALSE 
+\item[\code{show}]   show plots of  DIRECT algorithm:    none, final iteration, all iterations. Default: none  
+\item[\code{N}]  define the number of start points, see details. 
+\item[\code{maxevals}]  the maximum number of DIRECT function evaluations, default: 500.   
+\item[\code{pdf.name}] pdf name        
+\item[\code{pdf.width}]  default 12 
+\item[\code{pdf.height}]  default 12 
+\item[\code{my.mfrow}]  default c(1,1) 
+\item[\code{verbose}]  verbose? default TRUE. 
+\item[\code{seed}]  seed 
+\item[\code{...}]  additional argument(s) 
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+if the number of start points (N)  is not defined by the user, it will be defined dependent on the dimensionality of the parameter space.
+N=10D+1, where  D is the number of parameters, but for high dimensional parameter space with more than 6 dimensions,  
+the initial set is restricted to 65. However for one-dimensional parameter space the N is set to 21 due to stability reasons.
+
+The idea of EPSGO (Efficient Parameter Selection via Global Optimization): Beginning
+from an intial Latin hypercube sampling containing N starting points we train
+an Online GP, look for the point with the maximal expected 	improvement, sample there and update the Gaussian Process(GP). Thereby
+it is not so important that GP really correctly 	models the error surface of the SVM in parameter space, but
+that it can give a us information about potentially interesting 	points in parameter space where we should sample next.
+We continue with sampling points until some convergence criterion is met.
+
+DIRECT is a sampling algorithm which requires no knowledge of the objective function gradient.
+Instead, the algorithm samples points in the domain, and uses the information it has obtained to decide where to
+search next. The DIRECT algorithm will globally converge to the maximal value of the objective function. The name
+DIRECT comes from the shortening of the phrase 'DIviding RECTangles', which describes the way the algorithm moves
+towards the optimum.  
+
+The code source was adopted from MATLAB originals, special thanks to Holger Froehlich.
+\end{Details}
+%
+\begin{Value}
+\begin{ldescription}
+\item[\code{fmin }] minimal value of Q.func on the interval defined by bounds. 
+\item[\code{xmin }] coreesponding parameters for the minimum
+\item[\code{iter }] number of iterations
+\item[\code{neval }]   number of visited points 
+\item[\code{maxevals }]   the maximum number of DIRECT function evaluations 
+\item[\code{seed }]   seed
+\item[\code{bounds}]  bounds for parameters
+\item[\code{Q.func }]   name of the function to be  minimized. 
+\item[\code{points.fmin }]   the set of points with the same fmin 
+\item[\code{Xtrain }]   visited points 
+\item[\code{Ytrain }]   the output of Q.func at visited points Xtrain 
+\item[\code{gp.seed }]  seed for Gaussian Process 
+\item[\code{model.list }]  detailed information of the search process 
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+ Natalia Becker natalia.becker at dkfz.de 
+\end{Author}
+%
+\begin{References}\relax
+Froehlich, H. and Zell, A. (2005) "Effcient parameter selection for support vector
+machines in classification and regression via model-based global optimization"
+\emph{In Proc. Int. Joint Conf. Neural Networks,  1431-1438 }.
+\end{References}
+\inputencoding{utf8}
+\HeaderA{fit.glmnet}{Interface function for fitting a penalized regression model with \code{glmnet}}{fit.glmnet}
+\keyword{models}{fit.glmnet}
+\keyword{penalized regression}{fit.glmnet}
+%
+\begin{Description}\relax
+Interface for fitting penalized regression models for binary of survival endpoint using \code{glmnet}, conforming to the requirements for argument \code{fit.fun} in \code{peperr} call. 
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+fit.glmnet(response, x, cplx, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{response}] a survival object (with \code{Surv(time, status)}, or a binary vector with entries 0 and 1).
+\item[\code{x}] \code{n*p} matrix of covariates.
+\item[\code{cplx}] lambda penalty value.
+\item[\code{...}] additional arguments passed to \code{glmnet} call such as \code{family}.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+Function is basically a wrapper for \code{glmnet} of package \pkg{glmnet}.
+Note that only penalized Cox PH (\code{family="cox"}) and logistic regression models (\code{family="binomial"}) are sensible for prediction error
+evaluation with package \code{peperr}.
+\end{Details}
+%
+\begin{Value}
+glmnet object
+\end{Value}
+%
+\begin{Author}\relax
+Thomas Hielscher \bsl{}
+\email{t.hielscher@dkfz.de}
+\end{Author}
+%
+\begin{References}\relax
+Friedman, J., Hastie, T. and Tibshirani, R. (2008)
+\emph{Regularization Paths for Generalized Linear Models via Coordinate
+Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\\{}
+\emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\\{}
+\url{http://www.jstatsoft.org/v33/i01/}\\{}
+Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
+\emph{Regularization Paths for Cox's Proportional Hazards Model via
+Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
+1-13}\\{}
+\url{http://www.jstatsoft.org/v39/i05/}\\{}
+Porzelius, C., Binder, H., and Schumacher, M. (2009) 
+\emph{Parallelized prediction error estimation for evaluation of high-dimensional models,
+Bioinformatics, Vol. 25(6), 827-829.}
+\end{References}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{peperr}{peperr}}, \code{\LinkA{glmnet}{glmnet}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{get.cofn.int.search}{Get coefficients for a model }{get.cofn.int.search}
+\keyword{system}{get.cofn.int.search}
+%
+\begin{Description}\relax
+Get coefficients for a model after applying interval search for tuning parameters 
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+get.cofn.int.search(model)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{model}]  an object as returned by the function \code{summary.int.search}.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+named vector of non-zero coeficients for the optimal lambda
+\end{Value}
+%
+\begin{Author}\relax
+Natalia Becker  \bsl{}
+\email{natalia.becker@dkfz.de}
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{EPSGO}{EPSGO}}, \code{\LinkA{summary.int.search}{summary.int.search}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{PLL.coxnet}{Predictive partial log-likelihood for glmnet Cox PH model fit}{PLL.coxnet}
+\keyword{models}{PLL.coxnet}
+\keyword{penalized regression}{PLL.coxnet}
+\keyword{survival}{PLL.coxnet}
+%
+\begin{Description}\relax
+Extracts the predictive partial log-likelihood from a glmnet Cox PH model fit.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+PLL.coxnet(object, newdata, newtime, newstatus, complexity, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{object}] fitted model of class \code{coxnet}.
+\item[\code{newdata}] \code{n\_new*p} matrix of covariates.
+\item[\code{newtime}] \code{n\_new}-vector of censored survival times.
+\item[\code{newstatus}] \code{n\_new}-vector of survival status, coded with 0 and .1
+\item[\code{complexity}] lambda penalty value.
+\item[\code{...}] additional arguments, not used.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+Used by function \code{peperr}, if function \code{fit.glmnet} and \code{family="cox"} is used for model fit, which gives a class \code{coxnet} object.
+This is basically a wrapper based on the \code{coxnet.deviance} function from package \code{glmnet}.
+\end{Details}
+%
+\begin{Value}
+Vector of length \code{n\_new}
+\end{Value}
+%
+\begin{Author}\relax
+Thomas Hielscher \bsl{}
+\email{t.hielscher@dkfz.de}
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{plot.peperr.curves}{Plot method for prediction error curves of a peperr object}{plot.peperr.curves}
+\keyword{models}{plot.peperr.curves}
+\keyword{regression}{plot.peperr.curves}
+\keyword{survival}{plot.peperr.curves}
+%
+\begin{Description}\relax
+Plots individual and aggregated prediction error estimates based on bootstrap samples.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plot.peperr.curves(x, at.risk=TRUE, allErrors=FALSE,...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] \code{peperr} object.
+\item[\code{at.risk}] number at risk to be display. default is TRUE.
+\item[\code{allErrors}] Display .632, no information and average out-of-bag error in addition. default is FALSE.
+\item[\code{...}] additional arguments, not used.
+
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function is literally taken from \code{plot.peperr} in the \code{peperr} package.
+The display of prediction error curves is adapted to allow for numbers at risk.
+\end{Details}
+%
+\begin{Author}\relax
+Thomas Hielscher 
+\email{t.hielscher@dkfz.de}
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{peperr}{peperr}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+
+# example from glmnet package
+set.seed(10101)
+library(glmnet)
+library(survival)
+library(peperr)
+
+N=1000;p=30
+nzc=p/3
+x=matrix(rnorm(N*p),N,p)
+beta=rnorm(nzc)
+fx=x[,seq(nzc)]
+hx=exp(fx)
+ty=rexp(N,hx)
+tcens=rbinom(n=N,prob=.3,size=1)# censoring indicator
+y=Surv(ty,1-tcens)
+
+peperr.object <- peperr(response=y, x=x, 
+                        fit.fun=fit.glmnet, args.fit=list(family="cox"), 
+                        complexity=complexity.glmnet,  
+                        args.complexity=list(family="cox",nfolds=10),
+                        indices=resample.indices(n=N, method="sub632", sample.n=10))
+
+plot.peperr.curves(peperr.object)
+# peperr
+plot(peperr.object)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{plot.summary.int.search}{Plot Summary object for interval search models}{plot.summary.int.search}
+\aliasA{plot.points.int.search}{plot.summary.int.search}{plot.points.int.search}
+\keyword{plot}{plot.summary.int.search}
+%
+\begin{Description}\relax
+Produces a plot for summary object of a fitted interval search model.
+Plot 'visited' points against iteration steps. start.N points are initial points selected before interval search starts.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plot.summary.int.search(summary.int)
+plot.points.int.search(summary.int, start.N=21)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{summary.int}] 
+an object as returned by the function \code{summary.int.search}.
+
+\item[\code{start.N}] 
+number of initial points, default 21.
+
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Author}\relax
+Natalia Becker  \bsl{}
+\email{natalia.becker@dkfz.de}
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{EPSGO}{EPSGO}}, \code{\LinkA{summary.int.search}{summary.int.search}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{plotstabpath}{function to plot a stability path }{plotstabpath}
+\keyword{stability selection}{plotstabpath}
+%
+\begin{Description}\relax
+Given a desired family-wise error rate (FWER) and a stability path calculated with \code{stability.path} the function selects an stable set of features and plots the stability path and the corresponding regularization path.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plotstabpath(x, fwer=0.5,pi_thr=0.6, xvar=c("lambda", "norm", "dev"), col.all="black", col.sel="red", ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] 
+an object of class "stabpath" as returned by the function \code{stability.path}.
+
+\item[\code{fwer}] 
+the desired family-wise error rate (fwer), e.g. the probability that at least one feature in the estimated set of stable features has been falsely selected. 
+
+\item[\code{pi\_thr}] 
+the threshold used for the stability selection, should be in the range of \$0.5 > pi\_thr < 1\$.  
+
+\item[\code{xvar}] 
+the variable used for the xaxis, e.g. for "lambda" the selection probabilities are plotted along the log of the penalization parameters,
+for "norm" along the L1-norm and for "dev" along the fraction of explained deviance.
+
+\item[\code{col.all}] 
+the color used for the variables that are not in the estimated stable set   
+
+\item[\code{col.sel}] 
+the color used for the variables in the estimated stable set
+
+\item[\code{...}] 
+further arguments that are passed to matplot
+
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+a list of four objects
+\begin{ldescription}
+\item[\code{stable}] 
+a vector giving the positions of the estimated stable variables 
+
+\item[\code{lambda}] 
+the penalization parameter used for the stability selection 
+
+\item[\code{lpos}] 
+the position of the penalization parameter in the regularization path
+
+\item[\code{fwer}] 
+the controlled family-wise error rate (fwer), e.g. the probability that at least one feature in the estimated set of stable features     has been falsely selected.
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+Martin Sill \bsl{}
+\email{m.sill@dkfz.de}
+\end{Author}
+%
+\begin{References}\relax
+Meinshausen N. and B\bsl{}"uhlmann P. (2010), Stability Selection, Journal of the Royal Statistical Society: Series B (Statistical Methodology) Volume 72, Issue 4, pages 417???473.
+\end{References}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{stability.selection}{stability.selection},\LinkA{stability.path}{stability.path}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+#gaussian
+set.seed(1234)
+x=matrix(rnorm(100*1000,0,1),100,1000)
+y <- x[1:100,1:1000]%*%c(rep(2,5),rep(-2,5),rep(.1,990))
+res <- stability.path(y,x,weakness=1,mc.cores=2)
+plotstabpath(res,fwer=.5)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{predictProb.coxnet}{Extract predicted survival probabilities from a glmnet fit}{predictProb.coxnet}
+\keyword{models}{predictProb.coxnet}
+\keyword{penalized regression}{predictProb.coxnet}
+\keyword{survival}{predictProb.coxnet}
+%
+\begin{Description}\relax
+Extracts predicted survival probabilities from survival model fitted by glmnet, providing an interface as required by \code{pmpec}. 
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+predictProb.coxnet(object, x, times, complexity, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{object}] a fitted model of class \code{glmnet}.
+\item[\code{x}] \code{n*p} matrix of covariates.
+\item[\code{times}] vector of evaluation time points.
+\item[\code{complexity}] lambda penalty value.
+\item[\code{...}] additional arguments, currently not used.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Matrix with probabilities for each evaluation time point in \code{times} (columns) and each new observation (rows). 
+\end{Value}
+%
+\begin{Author}\relax
+Thomas Hielscher \bsl{}
+\email{t.hielscher@dkfz.de}
+\end{Author}
+%
+\begin{References}\relax
+Friedman, J., Hastie, T. and Tibshirani, R. (2008)
+\emph{Regularization Paths for Generalized Linear Models via Coordinate
+Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\\{}
+\emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\\{}
+\url{http://www.jstatsoft.org/v33/i01/}\\{}
+Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
+\emph{Regularization Paths for Cox's Proportional Hazards Model via
+Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
+1-13}\\{}
+\url{http://www.jstatsoft.org/v39/i05/}\\{}
+Porzelius, C., Binder, H., and Schumacher, M. (2009) 
+\emph{Parallelized prediction error estimation for evaluation of high-dimensional models,
+Bioinformatics, Vol. 25(6), 827-829.}
+\end{References}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{peperr}{peperr}}, \code{\LinkA{glmnet}{glmnet}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{predictProb.glmnet}{Extract predicted survival probabilities from a glmnet fit}{predictProb.glmnet}
+\keyword{models}{predictProb.glmnet}
+\keyword{penalized regression}{predictProb.glmnet}
+\keyword{survival}{predictProb.glmnet}
+%
+\begin{Description}\relax
+Extracts predicted survival probabilities from survival model fitted by glmnet, providing an interface as required by \code{pmpec}. 
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+predictProb.glmnet(object, x, times, complexity, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{object}] a fitted model of class \code{glmnet}.
+\item[\code{x}] \code{n*p} matrix of covariates.
+\item[\code{times}] vector of evaluation time points.
+\item[\code{complexity}] lambda penalty value.
+\item[\code{...}] additional arguments, currently not used.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Matrix with probabilities for each evaluation time point in \code{times} (columns) and each new observation (rows). 
+\end{Value}
+%
+\begin{Author}\relax
+Thomas Hielscher \bsl{}
+\email{t.hielscher@dkfz.de}
+\end{Author}
+%
+\begin{References}\relax
+Friedman, J., Hastie, T. and Tibshirani, R. (2008)
+\emph{Regularization Paths for Generalized Linear Models via Coordinate
+Descent},   \url{http://www.stanford.edu/~hastie/Papers/glmnet.pdf}\\{}
+\emph{Journal of Statistical Software, Vol. 33(1), 1-22 Feb 2010}\\{}
+\url{http://www.jstatsoft.org/v33/i01/}\\{}
+Simon, N., Friedman, J., Hastie, T., Tibshirani, R. (2011)
+\emph{Regularization Paths for Cox's Proportional Hazards Model via
+Coordinate Descent, Journal of Statistical Software, Vol. 39(5)
+1-13}\\{}
+\url{http://www.jstatsoft.org/v39/i05/}\\{}
+Porzelius, C., Binder, H., and Schumacher, M. (2009) 
+\emph{Parallelized prediction error estimation for evaluation of high-dimensional models,
+Bioinformatics, Vol. 25(6), 827-829.}
+\end{References}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{peperr}{peperr}}, \code{\LinkA{glmnet}{glmnet}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{stability.path}{Stability path for glmnet models}{stability.path}
+\keyword{stability selection}{stability.path}
+%
+\begin{Description}\relax
+The function calculates the stability path for glmnet models, e.g. the selection probabilities of the features along the range of regularization parameters.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+stability.path(y,x,size=0.632,steps=100,weakness=1,mc.cores=getOption("mc.cores", 2L),...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{y}] 
+response variable. Like for the glment function: Quantitative for \code{family="gaussian"} or
+\code{family="poisson"} (non-negative counts). For
+\code{family="binomial"} should be either a factor with two
+levels, or a two-column matrix of counts or proportions. For
+\code{family="multinomial"}, can be a \code{nc>=2} level factor, or a
+matrix with \code{nc} columns of counts or proportions. For
+\code{family="cox"}, \code{y} should be a two-column matrix with
+columns named 'time' and 'status'. The latter is a binary
+variable, with '1' indicating death, and '0' indicating right
+censored. The function \code{Surv()} in package \code{survival}
+produces such a matrix
+
+\item[\code{x}] 
+input matrix. Like for the glmnet function:
+of dimension nobs x nvars; each row is an
+observation vector. Can be in sparse matrix format (inherit
+from class \code{"sparseMatrix"} as in package \code{Matrix}; not yet
+available for \code{family="cox"})
+
+\item[\code{size}] 
+proportion of samples drawn in every subsample used for the stability selection.
+
+\item[\code{steps}] 
+number of subsamples used for the stability selection.
+
+\item[\code{weakness}] 
+weakness parameter used for the randomised lasso as described in Meinshausen and B\bsl{}"uhlmann (2010). 
+For each subsample the features are reweighted by a random weight uniformly sampled in [weakness,1].
+This additional randomisation leads to a more consistent estimation of the stable set of features.
+
+\item[\code{mc.cores}] 
+number of cores used for the parallelization. For unix like system the parallelization is done by forking using the function \code{mclapply}. For windows systems socket cluster are used. 
+
+\item[\code{...}] 
+further arguments that are passed to the \code{glmnet} function. 
+
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+an object of class "stabpath", which is a list of three objects
+\begin{ldescription}
+\item[\code{fit}] 
+the fit object of class "glmnet" as returned from the glmnet function when applied to the complete data set.
+
+\item[\code{stabpath}] 
+a matrix which represents the stability path.
+
+\item[\code{qs}] 
+a vector holding the values of the average number of non-zero coefficients w.r.t to the lambdas in the regularization path.
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+Martin Sill 
+\email{m.sill@dkfz.de}
+\end{Author}
+%
+\begin{References}\relax
+Meinshausen N. and B\bsl{}"uhlmann P. (2010), Stability Selection, Journal of the Royal Statistical Society: Series B (Statistical Methodology) Volume 72, Issue 4, pages 417???473.
+\end{References}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{glmnet}{glmnet},\LinkA{stability.selection}{stability.selection},\LinkA{plotstabpath}{plotstabpath}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+#gaussian
+set.seed(1234)
+x <- matrix(rnorm(100*1000,0,1),100,1000)
+y <- x[1:100,1:1000]%*% c(rep(2,5),rep(-2,5),rep(.1,990))
+res <- stability.path(y,x,weakness=1,mc.cores=2)
+plotstabpath(res)
+
+#binomial
+y=sample(1:2,100,replace=TRUE)
+res <- stability.path(y,x,weakness=1,mc.cores=2,family="binomial")
+plotstabpath(res)
+    
+#multinomial
+y=sample(1:4,100,replace=TRUE)
+res <- stability.path(y,x,weakness=1,mc.cores=2,family="multinomial")
+plotstabpath(res)
+    
+#poisson
+N=100; p=1000
+nzc=5
+x=matrix(rnorm(N*p),N,p)
+beta=rnorm(nzc)
+f = x[,seq(nzc)]%*%beta
+mu=exp(f)
+y=rpois(N,mu)
+res <- stability.path(y,x,weakness=1,mc.cores=2,family="poisson")
+plotstabpath(res)
+
+#Cox
+library(survival)
+set.seed(10101)
+N=100;p=1000
+nzc=p/3
+x=matrix(rnorm(N*p),N,p)
+beta=rnorm(nzc)
+fx=x[,seq(nzc)]%*%beta/3
+hx=exp(fx)
+ty=rexp(N,hx)
+tcens=rbinom(n=N,prob=.3,size=1)
+y=cbind(time=ty,status=1-tcens)
+res <- stability.path(y,x,weakness=1,mc.cores=2,family="cox")
+plotstabpath(res)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{stability.selection}{function to estimate a stable set of variables  }{stability.selection}
+\keyword{stability selection}{stability.selection}
+%
+\begin{Description}\relax
+Given a desired family-wise error rate (FWER) and a stability path calculated with \code{stability.path} the function selects a stable set of features.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+stability.selection(x,fwer,pi_thr=0.6)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] 
+an object of class "stabpath" as returned by the function \code{stability.path}.
+
+\item[\code{fwer}] 
+the desired family-wise error rate (fwer), e.g. the probability that at least one feature in the estimated set of stable features has been falsely selected. 
+
+\item[\code{pi\_thr}] 
+the threshold used for the stability selection, should be in the range of \$0.5 > pi\_thr < 1\$.  
+
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+a list of four objects
+\begin{ldescription}
+\item[\code{stable}] 
+a vector giving the positions of the estimated stable variables 
+
+\item[\code{lambda}] 
+the penalization parameter used for the stability selection 
+
+\item[\code{lpos}] 
+the position of the penalization parameter in the regularization path
+
+\item[\code{fwer}] 
+the controlled family-wise error rate (fwer), e.g. the probability that at least one feature in the estimated set of stable features     has been falsely selected.
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+Martin Sill \bsl{}
+\email{m.sill@dkfz.de}
+\end{Author}
+%
+\begin{References}\relax
+Meinshausen N. and B\bsl{}"uhlmann P. (2010), Stability Selection, Journal of the Royal Statistical Society: Series B (Statistical Methodology) Volume 72, Issue 4, pages 417???473.
+\end{References}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{plotstabpath}{plotstabpath},\LinkA{stability.path}{stability.path}}
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+#gaussian
+set.seed(1234)
+x=matrix(rnorm(100*1000,0,1),100,1000)
+y <- x[1:100,1:1000]%*%c(rep(2,5),rep(-2,5),rep(.1,990))
+res <- stability.path(y,x,weakness=1,mc.cores=2)
+stability.selection(res,fwer=.5)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{summary.int.search}{Summary method for interval search models}{summary.int.search}
+\keyword{summary}{summary.int.search}
+%
+\begin{Description}\relax
+Produces a summary of a fitted interval search model
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+summary.int.search(fit,digits = max(3, getOption("digits") - 3), verbose=TRUE,first.n=5)
+
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{fit}]  an object as returned by the function \code{EPSGO}.
+\item[\code{digits}]  digits after the comma 
+\item[\code{verbose}]  default set to TRUE.  
+\item[\code{first.n}]  show first.n entries , default 5. 
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list of following elements 
+\begin{ldescription}
+\item[\code{info}] 
+a data frame of four objects for optimal models\\{}
+\begin{description}
+  
+\item[alpha] a vector of alphas 
+\item[lambda] a vector of  penalization parameter lambda
+\item[deviances]     a vector of deviances  
+\item[n.features] a vector of number of features selected in each optimal model 
+
+\end{description}
+
+ 
+\item[\code{opt.alpha}]  an optimal value for alpha
+\item[\code{opt.lambda}] an optimal value for lambda
+\item[\code{opt.error}]  an optimal value for error, hier minimal diviance
+\item[\code{opt.models}]   a list of optimal models with the same optimal error 
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+Natalia Becker  \bsl{}
+\email{natalia.becker@dkfz.de}
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{EPSGO}{EPSGO}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{tune.glmnet.interval}{  Wrapper function for \code{glmnet} objects.    }{tune.glmnet.interval}
+\keyword{models}{tune.glmnet.interval}
+\keyword{multivariate}{tune.glmnet.interval}
+\keyword{iteration}{tune.glmnet.interval}
+\keyword{optimize}{tune.glmnet.interval}
+%
+\begin{Description}\relax
+Wrapper function for \code{glmnet} objects used by \code{EPSGO} function.
+This function is  mainly used within the function \code{\LinkA{EPSGO}{EPSGO}}  
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+tune.glmnet.interval(parms, x, y,
+                     weights, 
+                     offset = NULL, 
+                     lambda = NULL, 
+                     type.measure = c("mse", "deviance", "class", "auc", "mae"),
+                     seed=12345, 
+                     nfolds = 10, 
+                     foldid=NULL, 
+                     grouped = TRUE, 
+                     type.min=c("lambda.min", "lambda.1se"),
+                     family,
+                     verbose=FALSE,
+                     ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{parms}] tuning parameter alpha for \code{glmnet} object
+\item[\code{x,y}] x is a matrix where each row refers to a sample a each
+column refers to a gene; y is a factor which includes the class for
+each sample
+\item[\code{weights}] observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation
+\item[\code{offset}] A vector of length nobs that is included in the linear predictor (a nobs x nc matrix for the "multinomial" family). Useful for the "poisson" family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is NULL. If supplied, then values must also be supplied to the predict function.
+\item[\code{lambda}] A user supplied lambda sequence. Typical usage is to have the program compute its own lambda sequence based on nlambda and lambda.min.ratio. Supplying a value of lambda overrides this. WARNING: use with care. Do not supply a single value for lambda (for predictions after CV use predict() instead). Supply instead a decreasing sequence of lambda values. glmnet relies on its warms starts for speed, and its often faster to fit a whole path than compute a single fit.
+\item[\code{type.measure}] loss to use for cross-validation. Currently five options, not all available for all models. The default is type.measure="deviance", which uses squared-error for gaussian models (a.k.a type.measure="mse" there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. type.measure="class" applies to binomial and multinomial logistic regression only, and gives misclassification error. type.measure="auc" is for two-class logistic regression only, and gives area under the ROC curve. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models except the "cox"; they measure the deviation from the fitted mean to the response.
+\item[\code{seed}] seed
+\item[\code{nfolds}] number of cross-validation's folds, default 10.
+\item[\code{foldid}] an optional vector of values between 1 and nfold identifying what fold each observation is in. If supplied, nfold can be missing.
+\item[\code{grouped}]  This is an experimental argument, with default TRUE, and can be ignored by most users. For all models except the "cox", this refers to computing nfolds separate statistics, and then using their mean and estimated standard error to describe the CV curve. If grouped=FALSE, an error matrix is built up at the observation level from the predictions from the nfold fits, and then summarized (does not apply to type.measure="auc"). For the "cox" family, grouped=TRUE obtains the CV partial likelihood for the Kth fold by subtraction; by subtracting the log partial likelihood evaluated on the full dataset from that evaluated on the on the (K-1)/K dataset. This makes more efficient use of risk sets. With grouped=FALSE the log partial likelihood is computed only on the Kth fold
+\item[\code{type.min}] parameter for chosing optimal model: 'lambda.min'- value of lambda that gives minimum mean cross-validated error (cvm).
+'lambda.1se' - largest value of lambda such that error is within one standard error of the minimum.
+\item[\code{family}] family of the model, i.e. cox, glm,...
+\item[\code{verbose}] verbose  
+\item[\code{...}] Further parameters
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+\begin{ldescription}
+\item[\code{q.val }] minimal value of Q.func on the interval defined by bounds. Here, q.val is  minimum mean cross-validate               d error (cvm)
+\item[\code{model }]  model list
+\begin{itemize}
+
+\item alpha -  optimal alpha
+\item lambda - optimal lambda
+\item nfolds - cross-validation's folds
+\item cvreg -  \code{cv.glmnet} object for optimal alpha 
+\item fit - \code{glmnet} object for optimal alpha and optimal lambda 
+
+\end{itemize}
+ 
+
+
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+Natalia Becker  natalia.becker at dkfz.de 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{EPSGO}{EPSGO}}
+\end{SeeAlso}
+\printindex{}
+\end{document}
