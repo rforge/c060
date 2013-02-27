@@ -1,4 +1,4 @@
-\documentclass[nojss]{jss}
+\documentclass{jss}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -434,16 +434,6 @@ plotstabpath(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
 \end{figure}
 
-Note that an FWER threshold of 0.5 is unusually high. For this data set the use of smaller, more conventional thresholds, e.g. 0.05 or 0.1, will result in an empty set of stable features. The stability path can be visualized by the function \code{plot.stabpath}, which will call \code{stability.selection} to identify stable features and highlight them in the plot.
-
-\begin{figure}
-<<stabilitySelection3, echo=T, results=hide, fig=TRUE>>=
-par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
-plotstabpath(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
-@
-\caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
-\end{figure}
-
 \clearpage
 \subsection{Parameter tuning for the elastic net Cox model}
 In the previous sections we have seen that the lasso-penalized Cox model does not seem to perform very well in terms of predicting overall survival for the AML data set. 
@@ -495,7 +485,7 @@ if (file.exists(".Rdata/fit_interval_search.RData")) {
 The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{fit$model.list[[1]]$model$nfolds}-fold cross-validated penalized (partial) log likelihood function of the model is minimal.  The wrapper function \\
 \code{tune.glmnet.interval} calculates partial log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$. The parameter space of tuning parameter  $\alpha$ is an interval $\left(0,1\right)$.
 
-The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. Thus, the two-dimensional parameter space for tuning parameters \left(\alpha,\lambda\right)$ has the form $\left(0, 1\right) \times \mathbb{R}_+$.
+The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. Thus, the two-dimensional parameter space for tuning parameters $\left(\alpha,\lambda\right)$ has the form $\left(0, 1\right) \times \mathbb{R}_+$.
 For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\texttt{type.min ='lambda.1se'}).
 
 
