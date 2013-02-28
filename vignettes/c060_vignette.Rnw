@@ -159,11 +159,11 @@ p_{\alpha,\lambda}(|\beta_j|)= \lambda\times (\alpha |\beta_j| + (1-\alpha)\frac
 \end{equation}
 Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many features, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
-\subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
+\paragraph{The interval-search algorithm to select the optimal elastic net parameter combination}
 The elastic net penalty function contains two tuning parameters which are data-dependent and hence cannot be set to some \emph{a priori} values. The challenge is to find a set of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross-validated loss function of the model is minimal.
 
 
-\paragraph{Interval search}
+
 The commonly used fixed grid search has its major disadvantage in the systematic check of the penalized log likelihood deviance in each point of the grid. The grid density affects the accuracy and the time complexity of the algorithm.  Furthermore, the choice of the grid is highly arbitrary and the solution depends on the choice of grid as well as on grid density. 
 
 \Citet{froehlich2005} proposed an 
@@ -458,11 +458,12 @@ The required objects and parameters for finding elastic net Cox model with optim
   foldid <- my.balanced.folds(class.column.factor=y[,2], cross.outer=nfolds)
 @
 
-The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross-validated penalized (partial) log likelihood function of the model is minimal.  The wrapper function \\
-\code{tune.glmnet.interval} calculates partial log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$. The parameter space of tuning parameter  $\alpha$ is an interval (0,1].
 
-The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. Thus, the two-dimensional parameter space for tuning parameters $\left(\alpha,\lambda\right)$ has the form $\left(0, 1\right) \times \mathbb{R}_+$.
-For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\texttt{type.min ='lambda.1se'}).
+The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross-validated penalized (partial) log likelihood deviance of the model is minimal.  The wrapper function \\
+\code{tune.glmnet.interval} calculates partial log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$.
+
+The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\texttt{type.min ='lambda.1se'}).
+
 
 
 <<interval_search_cox_show, echo=TRUE, eval=FALSE>>=
