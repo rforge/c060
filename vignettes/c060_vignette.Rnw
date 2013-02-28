@@ -424,7 +424,7 @@ The function \code{stability.selection} can be called to estimate the stable set
 stability.selection(spath,fwer=0.5)$stable
 @
 
-Note that an FWER threshold of 0.5 is unusually high. For this data set the use of smaller, more conventional thresholds, e.g. 0.05 or 0.1, will result in an empty set of stable features. The stability path can be visualized by the function \code{plot.stabpath}, which will call \code{stability.selection} to identify stable features and highlight them in the plot.
+Note that an FWER threshold of 0.5 is unusually high. For this data set the use of smaller, more conventional thresholds, e.g. 0.05 or 0.1, will result in an empty set of stable features. We provide a  \code{plot} function to visualize the stability path. This function calls \code{stability.selection} to estimate stable features and indicates them in the plot.
 
 \begin{figure}
 <<stabilitySelection3, echo=T, results=hide, fig=TRUE>>=
