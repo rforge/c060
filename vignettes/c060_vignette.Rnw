@@ -388,15 +388,15 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
 @
 
 Individual bootstrap results can be visualized with the \code{plot.peperr} function from the \pkg{peperr} package showing the selected complexity parameters, 
-out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again an algorithm specific wrapper (here \code{PLL.coxnet}) needs to be defined. In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package which allows to display the number still at risk (\code{plot.peperr.curves}) as shown in Figure \ref{fig:pec}. By default, the $.632+$ is calculated and displayed. Displaying also the $.632$ estimator, the no-information error rate and the average out-of-bag bootstrap error is optional in \code{plot.peperr.curves}. 
+out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again an algorithm specific wrapper (here \code{PLL.coxnet}) needs to be defined. In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package which allows to display the number still at risk and pointwise bootstrap quantiles (\code{plot.peperr.curves}) as shown in Figure \ref{fig:pec}. By default, the $.632+$ is calculated and displayed. Displaying also the $.632$ estimator, the no-information error rate and the average out-of-bag bootstrap error is optional in \code{plot.peperr.curves}. 
 
 \begin{figure}
 \begin{center}
 <<peperrPlot, echo=T, results=hide, fig=TRUE>>=
-plot.peperr.curves(obj, at.risk=T, allErrors=FALSE)
+plot.peperr.curves(obj)
 @
 \end{center}
-\caption{Prediction error curves based on time-dependent Brier score for the lasso-penalized Cox PH regression model applied to the AML data set (evaluation time points reflect days). The gray lines show the prediction error curves of 1000 bootstrap samples. The other lines show the prediction error curves of the null model (estimated by the Kaplan-Meier estimator without covariate information), the full apparent error estimates (i.e. the errors as estimated when applying the model to the entire training data set), and the .632+ bootstrap error estimates.}
+\caption{Prediction error curves based on time-dependent Brier score for the lasso-penalized Cox PH regression model applied to the AML data set (evaluation time points reflect days). The gray area indicates the pointwise 2.5\% and 97.5\% quantiles of the 1000 out-of-bag bootstrap samples. The other lines show the prediction error curves of the null model (estimated by the Kaplan-Meier estimator without covariate information), the full apparent error estimates (i.e. the errors as estimated when applying the model to the entire training data set), and the .632+ bootstrap error estimates.}
 \label{fig:pec}
 \end{figure}
 
