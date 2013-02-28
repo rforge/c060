@@ -428,7 +428,7 @@ Note that an FWER threshold of 0.5 is unusually high. For this data set the use 
 
 \begin{figure}
 <<stabilitySelection3, echo=T, results=hide, fig=TRUE>>=
-plotstabpath(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
+plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 @
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
 \end{figure}
