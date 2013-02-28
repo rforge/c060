@@ -1,4 +1,4 @@
-\documentclass{jss}
+\documentclass[nojss]{jss}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,7 +16,7 @@
 \usepackage{hyperref}
 \usepackage{longtable}
 \usepackage{color}
-\usepackage{pst-all}
+%usepackage{pst-all}
 
 % please place your own definitions here and don't use \def but
 % \newcommand{}{}
@@ -149,27 +149,22 @@ and described a technique, called the lasso for ``least absolute shrinkage and s
 The $L_1$-penalty has the advantage over the $L_2$-penalty of shrinking some of the coefficients to zero, i.e. it performs automatic feature selection.
 
 \subsection{The elastic net}
-\Citet{zou05} introduced the elastic net, which employs a combination of the $L_1$- and $L_2$-penalty
-\begin{equation}\label{enet}
-p_{\lambda_1,\lambda_2}(|\beta_j|)=\lambda_1 | \beta_j | + \lambda_2 \beta_j ^2.
-\end{equation}
-\Citet{zou05} rescale the initial solutions from the optimization of the doubly-penalized log-likelihood function by the factor $1 + \lambda^2$, in order to reduce the effect of the double shrinkage.
-Like lasso the elastic net performs automatic feature selection by setting some coefficient estimates to zero.
+\Citet{zou05} introduced the elastic net, which employs a combination of the $L_1$- and $L_2$-penalty. Like lasso the elastic net performs automatic feature selection by setting some coefficient estimates to zero.
 But the additional $L_2$-penalty term distributes the weight to more features, such that the elastic net tends to select more features than the lasso. 
 This is especially the case in situations with high correlation, where the lasso would select only one feature of a set of highly correlated features, while the ridge penalty would give them equal weight.
 
 Throughout this manuscript we use an alternative parametrization of the elastic net penalty function equivalently to the formulation used in the \pkg{glmnet} package:
-\begin{equation}\label{enet2}
+  \begin{equation}\label{enet2}
 p_{\alpha,\lambda}(|\beta_j|)= \lambda\times (\alpha |\beta_j| + (1-\alpha)\frac{1}{2} \beta_j^2).
 \end{equation}
 Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many features, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
-The elastic net penalty function contrains two tuning parameters which are data-dependent and hence cannot be set to some \emph{a priori} values. The challenge is to find a set of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross-validated loss function of the model is minimal.
+The elastic net penalty function contains two tuning parameters which are data-dependent and hence cannot be set to some \emph{a priori} values. The challenge is to find a set of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross-validated loss function of the model is minimal.
 
 
 \paragraph{Interval search}
-The standard used fixed grid search has its major disadvantage in the systematic check of the penalized log likelihood deviance in each point of the grid. The grid density affects the accurancy and the time complexity of the algorithm.  Furthermore, the choice of the grid is highly arbitrary and does guarantee that the algorithm will not get stuck in a local optimum. 
+The commonly used fixed grid search has its major disadvantage in the systematic check of the penalized log likelihood deviance in each point of the grid. The grid density affects the accuracy and the time complexity of the algorithm.  Furthermore, the choice of the grid is highly arbitrary and the solution depends on the choice of grid as well as on grid density. 
 
 \Citet{froehlich2005} proposed an 
 efficient algorithm for finding a global optimum on the tuning parameter space 
@@ -177,14 +172,19 @@ called Efficient Parameter Selection via Global Optimization (EPSGO). The main i
 
 
 The interval search can be divided into two phases. In the initial phase, a set of uniformly distributed points is randomly selected throughout the parameter space. Then, in the iteration phase, the algorithm learns the Gaussian process model from the points which have already been visited. By adding new points one updates the Gaussian process model.
-New points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}. The EPSGO algorithm stops when one of the stopping criteria is met. 
-The stopping criteria is either convergence of the algorithm or no change of the optimum during the last ten iterations. THe EPSGO algorithm has been implemented in a R package \pkg{penalizedSVM} \citet{becker2009}.
+New points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}. The EPSGO algorithm stops when one of the stopping criteria is met, i.e. if either convergence of the algorithm has been reached or if there was no change in the solution during the last ten iterations.
 
 
 \Citet{froehlich2005} showed that the algorithm is robust against local minima. 
-One can observe an immense improvement in the training time for the Gaussian process model compared to that of the underlying regression task \citep{froehlich2005}. This is because the number of training points for the Gaussian process (and hence the number of evaluations of the loss function surface of the regression model) mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points on the grid for the regression model.
+One can observe an immense improvement in the training time for the Gaussian process model compared to more commonly used fixed grid search methods \citep{froehlich2005}. This is because the number of training points for the Gaussian process (and hence the number of evaluations of the loss function surface of the regression model) mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points on the grid for the regression model.
 
-Summing up,  the EPSGO algorithm provides two main advantages: robustness against local minima and time improvement in comparison to a dense grid search.
+Summing up, the EPSGO algorithm provides two main advantages when compared to grid search methods: 
+  \begin{itemize}
+\item Robustness against starting values: EPSGO solutions are not dependent on an arbitrary choice of a grid.
+\item Scalability of accuracy improvements: The accuracy of EPSGO solutions can be easily improved without the need for a massive increase in computing time implied by an increase in the grid density.
+\end{itemize}
+
+
 
 \subsection{Stability selection}
 The penalized regression models that we have described above are typically used to find sparse models with good predictive performance. In contrast, the stability selection proposed by \citet{MeinshausenBuehlmann2010} aims to find stable features which show strong association with the outcome. 
@@ -228,7 +228,7 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 library(cacheSweave)
 library(Biobase)
 library(genefilter)
-#library(GEOquery)
+library(GEOquery)
 library(limma)
 library(xtable)
 library(survival)
@@ -433,54 +433,33 @@ plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
 \end{figure}
 
+
+
 \clearpage
 \subsection{Parameter tuning for the elastic net Cox model}
+
+
 In the previous sections we have seen that the lasso-penalized Cox model does not seem to perform very well in terms of predicting overall survival for the AML data set. 
 The lasso model identified as the optimal model by 10-fold cross-validation is very sparse and contains only \Sexpr{length(cofn)} features.
-Furthermore, we have observed that these features are not very stable and 4 out of them do not even remain in the set of selected features when the amount of regularization is decreased and more features start to enter the model. Thus, the $.632+$-bootstrap estimated prediction error curve indicates that the prognostic value of the lasso model does not seem to be very good.
+Furthermore, we have observed that these features are not very stable and 4 out of them do not even remain in the set of selected features when the amount of regularization is decreased and more features start to enter the model.
 
-In this section we fit an elastic net model instead of lasso to the same data set. As outlined above, fitting an elastic net model require the simultaneous tuning of two parameters $\alpha$ and $\lambda$. For this computationally challenging task, we provide an efficient implementation in \proglang{R} function \code{EPSGO} using the interval search algorithm.
+In this section we fit an elastic net model instead of lasso to the same data set. As outlined above, fitting an elastic net model requires the simultaneous tuning of two parameters $\alpha$ and $\lambda$. For this computationally challenging task, we use the interval search algorithm in an efficient implementation in \proglang{R} function \code{EPSGO}. The EPSGO algorithm was originally implemented for support vector machines in the \proglang{R} package \pkg{penalizedSVM} \citep{becker2009}. Here we provide an implementation for \code{glmnet} and in addition summary and plot functions to illustrate the interval search results.
 
-<<interval_search_cox, echo=FALSE, results=hide>>=
-if (file.exists(".Rdata/fit_interval_search.RData")) {
-    load(".Rdata/fit_interval_search.RData") 
-} else {
+
+The required objects and parameters for finding elastic net Cox model with optimal parameters are listed below:
+<<interval_search_setup,results=hide>>=
   x <- t(exprs(eset))
   y <- cbind(time=pData(geo_exprs_data)$os,status=pData(geo_exprs_data)$os_status)
 
-  # bounds for alpha [0,1]
   bounds <- t(data.frame(alpha=c(0, 1)))
-  colnames(bounds) <- c("lower", "upper")  
-
-  nfolds = 10
-  # fix folds for each model
-  my.seed<-1234
-  set.seed(my.seed)
-  foldid <- my.balanced.folds(class.column.factor=y[,2], cross.outer=nfolds)
   
-  print("start interval search")
-  fit <- EPSGO(Q.func="tune.glmnet.interval", 
-             bounds=bounds, 
-             parms.coding="none", 
-             show = "none", 
-             N = NULL,   
-             seed = my.seed, 
-             fminlower = -100,
-             # Q.func arguments
-             x = x, y = y, family = "cox", 
-             foldid = foldid,
-             type.min = "lambda.1se",
-             type.measure = "deviance",
-             verbose = TRUE)
-  #names(fit)
-  save(fit,  file=".Rdata/fit_interval_search.RData") 
-}  
-
-
+  nfolds = 10
+  set.seed(1234)
+  foldid <- my.balanced.folds(class.column.factor=y[,2], cross.outer=nfolds)
 @
 
-The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{fit$model.list[[1]]$model$nfolds}-fold cross-validated penalized (partial) log likelihood function of the model is minimal.  The wrapper function \\
-\code{tune.glmnet.interval} calculates partial log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$. The parameter space of tuning parameter  $\alpha$ is an interval $\left(0,1\right)$.
+The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross-validated penalized (partial) log likelihood function of the model is minimal.  The wrapper function \\
+\code{tune.glmnet.interval} calculates partial log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$. The parameter space of tuning parameter  $\alpha$ is an interval (0,1].
 
 The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. Thus, the two-dimensional parameter space for tuning parameters $\left(\alpha,\lambda\right)$ has the form $\left(0, 1\right) \times \mathbb{R}_+$.
 For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\texttt{type.min ='lambda.1se'}).
@@ -492,25 +471,54 @@ For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of 
              parms.coding="none", 
              seed = 1234, 
              fminlower = -100,
-             # Q.func arguments
-          	 x = x, y = y, family = "cox", 
+             x = x, y = y, family = "cox", 
              foldid = foldid,
              type.min = "lambda.1se",
              type.measure = "deviance")
 @
 
-Summary information can be extracted from the \texttt{fit} object using  \code{summary.int.search} function.
-<<interval_search_cox_extract, echo=TRUE, results=hide>>=
-summary.int<-summary.int.search(fit,verbose=TRUE)
+
+<<interval_search_cox, echo=FALSE, results=hide>>=
+if (file.exists(".Rdata/fit_interval_search.RData")) {
+  load(".Rdata/fit_interval_search.RData") 
+} else {
+  print("start interval search")
+  fit <- EPSGO(Q.func="tune.glmnet.interval", 
+             bounds=bounds, 
+             parms.coding="none", 
+             show = "none", 
+             N = NULL,   
+             seed = 1234, 
+             fminlower = -100,
+             # Q.func arguments
+             x = x, y = y, family = "cox", 
+             foldid = foldid,
+             type.min = "lambda.1se",
+             type.measure = "deviance",
+             verbose = TRUE)
+  #names(fit)
+  save(fit,  file=".Rdata/fit_interval_search.RData") 
+}  
 @
 
-At the initial step we sample 21 points in the parameter space. Those points are randomly distributed and uniformly cover the whole interval [0,1]. A Gaussian process model is trained based on these initial points. Then, iteratively, new points are added to the Gaussian process model in order to find an optimal combination of tuning parameter values. In total, \Sexpr{nrow(summary.int$info)} iterations were needed to reach the optimum. 
+
+
+Summary information can be extracted from the \texttt{fit} object using  \code{summary.int.search} function.
+<<interval_search_cox_extract,echo=FALSE,results=hide>>=
+summary.int<-summary.int.search(fit,verbose = FALSE)
+@
+
+<<interval_search_cox_extract_show>>=
+summary.int.search(fit,verbose = TRUE)
+@
+
+At the initial step we sample 21 points in the parameter space. Those points are randomly distributed and uniformly cover the whole interval 
+(0,1]. A Gaussian process model is trained based on these initial points. Then, iteratively, new points are added to the Gaussian process model in order to find an optimal combination of tuning parameter values. In total, \Sexpr{nrow(summary.int$info)} iterations were needed to reach the optimum. 
 
 
 
 <<interval_search_cox_fit_opt, echo=FALSE,results=hide>>=
 #select the model with optimal parameters from the object fit
-#
 opt.model<-summary.int$opt.models[[1]]
 cofn<-get.cofn.int.search(opt.model)
 @
@@ -523,21 +531,20 @@ names(cofn.lasso) %in% names(cofn)
 @
 
 \begin{figure}
-<<interval_search_cox_out_plot1, echo=F, results=hide, fig=TRUE,height=8,width=8>>=
-#c060:::plot.summary.int.search(summary.int)
+<<interval_search_cox_out_plot1, results=hide, fig=TRUE,height=8,width=8>>=
 plot.summary.int.search(summary.int)
 @
-\caption{\label{fig:interval_search1} Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The dashed red lines highlight the optimal point with minimal partial log likelihood deviance. }
+\caption{\label{fig:interval_search1} Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The dashed red lines highlight the final solution with minimal partial log likelihood deviance. }
 \end{figure}
 
-Figure~\ref{fig:interval_search1} illustrates the relationship between both tuning parameters $\alpha$ and $\lambda$ for the 'visited' points in the parameter space. The partial log likelihood deviance is  color-coded with black for small values and gray for large values.  The number of features selected  inthe corresponding model is written near each point. 
+Figure~\ref{fig:interval_search1} illustrates the relationship between both tuning parameters $\alpha$ and $\lambda$ for the 'visited' points in the parameter space. The partial log likelihood deviance is  color-coded with black for small values and gray for large values.  The number of features selected  in the corresponding model is written near each point. 
 To distinguish between initial and iteration points, the initial points are plotted as  squares and iteration points as circles. One can observed that the iteration points were chosen in the regions with lower deviance values.
 
 The distribution of initial points (iteration=0) and visited points (iteration>0) in the parameter space is plotted in Figure~\ref{fig:interval_search2}.
-This plot shows nicely that the interval search algorithm does not sequentially cover the entire parameter space, but rather quickly finds promising regions and draws new samples there. The optimal model contains with mininmal log-likelihood dieviance is found for $\alpha$ =\Sexpr{summary.int$opt.alpha} $\log\lambda$ = \Sexpr{log(summary.int$opt.lambda)} and highlighted as a vertical line.
+This plot shows nicely that the interval search algorithm does not sequentially cover the entire parameter space, but rather quickly finds promising regions and draws new samples there. The optimal model contains with mininmal log-likelihood dieviance is found for $\alpha$ = \Sexpr{round(summary.int$opt.alpha,3)} $\log\lambda$ = \Sexpr{round(log(summary.int$opt.lambda),3)} and highlighted as a vertical line.
 
 \begin{figure}
-<<interval_search_cox_out_plot2, echo=FALSE, results=hide, fig=TRUE,height=8,width=8>>=
+<<interval_search_cox_out_plot2, results=hide, fig=TRUE,height=8,width=8>>=
 plot.points.int.search(summary.int) 
 @
 \caption{\label{fig:interval_search2} The distribution of initial and visited points of the interval search plotted in chronological order. The interval search is employed to identify the optimal parameter value combination ($\alpha$,$\lambda$) for the elastic net Cox model fitted to the AML data set.}
