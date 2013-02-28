@@ -428,7 +428,6 @@ Note that an FWER threshold of 0.5 is unusually high. For this data set the use 
 
 \begin{figure}
 <<stabilitySelection3, echo=T, results=hide, fig=TRUE>>=
-par(mar=c(4,4,2,1), mgp=c(2.5,1,0))
 plotstabpath(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 @
 \caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
@@ -441,8 +440,6 @@ The lasso model identified as the optimal model by 10-fold cross-validation is v
 Furthermore, we have observed that these features are not very stable and 4 out of them do not even remain in the set of selected features when the amount of regularization is decreased and more features start to enter the model. Thus, the $.632+$-bootstrap estimated prediction error curve indicates that the prognostic value of the lasso model does not seem to be very good.
 
 In this section we fit an elastic net model instead of lasso to the same data set. As outlined above, fitting an elastic net model require the simultaneous tuning of two parameters $\alpha$ and $\lambda$. For this computationally challenging task, we provide an efficient implementation in \proglang{R} function \code{EPSGO} using the interval search algorithm.
-
-
 
 <<interval_search_cox, echo=FALSE, results=hide>>=
 if (file.exists(".Rdata/fit_interval_search.RData")) {
