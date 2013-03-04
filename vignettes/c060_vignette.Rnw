@@ -385,7 +385,7 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
                RNG="fixed", seed=0815, cpus=3, parallel=T, clustertype="SOCK", 
                load.list=list(packages=c("c060")), 
                indices=resample.indices(n=dim(eset)[2],
-               sample.n=10, method="sub632"))
+               sample.n=1000, method="sub632"))
 @
 
 Individual bootstrap results can be visualized with the \code{plot.peperr} function from the \pkg{peperr} package showing the selected complexity parameters, 
@@ -394,7 +394,8 @@ out-of-bag prediction error curves as well as the prediction error integrated ov
 \begin{figure}
 \begin{center}
 <<peperrPlot, echo=T, results=hide, fig=TRUE>>=
-plot.peperr.curves(obj)
+plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
+                   bootQuants=TRUE, bootQuants.level=0.95, leg.cex=0.7)
 @
 \end{center}
 \caption{Prediction error curves based on time-dependent Brier score for the lasso-penalized Cox PH regression model applied to the AML data set (evaluation time points reflect days). The gray area indicates the pointwise 2.5\% and 97.5\% quantiles of the 1000 out-of-bag bootstrap samples. The other lines show the prediction error curves of the null model (estimated by the Kaplan-Meier estimator without covariate information), the full apparent error estimates (i.e. the errors as estimated when applying the model to the entire training data set), and the .632+ bootstrap error estimates.}
@@ -537,7 +538,7 @@ names(cofn.lasso) %in% names(cofn)
 <<interval_search_cox_out_plot1, results=hide, fig=TRUE,height=8,width=8>>=
 plot.summary.int.search(summary.int)
 @
-\caption{\label{fig:interval_search1} Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The dashed red lines highlight the final solution with minimal partial log likelihood deviance. }
+\caption{\label{fig:interval_search1} Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The red lines highlight the final solution with minimal partial log likelihood deviance. }
 \end{figure}
 
 Figure~\ref{fig:interval_search1} illustrates the relationship between both tuning parameters $\alpha$ and $\lambda$ for the 'visited' points in the parameter space. The partial log likelihood deviance is  color-coded with black for small values and gray for large values.  The number of features selected  in the corresponding model is written near each point. 
