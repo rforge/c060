@@ -159,7 +159,7 @@ p_{\alpha,\lambda}(|\beta_j|)= \lambda\times (\alpha |\beta_j| + (1-\alpha)\frac
 \end{equation}
 Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many features, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
-\paragraph{The interval-search algorithm to select the optimal elastic net parameter combination}
+\subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
 The elastic net penalty function contains two tuning parameters which are data-dependent and hence cannot be set to some \emph{a priori} values. The challenge is to find a set of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross-validated loss function of the model is minimal.
 
 
@@ -451,22 +451,21 @@ In this section we fit an elastic net model instead of lasso to the same data se
 The required objects and parameters for finding elastic net Cox model with optimal parameters are listed below:
 <<interval_search_setup,results=hide>>=
   x <- t(exprs(eset))
-  y <- cbind(time=pData(geo_exprs_data)$os
-             ,status=pData(geo_exprs_data)$os_status)
+  y <- cbind(time=pData(geo_exprs_data)$os,status=pData(geo_exprs_data)$os_status)
 
   bounds <- t(data.frame(alpha=c(0, 1)))
+  colnames(bounds)<-c("lower","upper")
   
   nfolds = 10
   set.seed(1234)
   foldid <- my.balanced.folds(class.column.factor=y[,2], cross.outer=nfolds)
 @
 
+The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross-validated penalized (partial) log likelihood function of the model is minimal.  The wrapper function \\
+\code{tune.glmnet.interval} calculates partial log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$. The parameter space of tuning parameter  $\alpha$ is an interval $\left(0,1\right)$.
 
-The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross-validated penalized (partial) log likelihood deviance of the model is minimal.  The wrapper function \\
-\code{tune.glmnet.interval} calculates partial log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$.
-
-The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\texttt{type.min ='lambda.1se'}).
-
+The second tuning parameter $\lambda>0$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. Thus, the two-dimensional parameter space for tuning parameters $\left(\alpha,\lambda\right)$ has the form $\left(0, 1\right) \times \mathbb{R}_+$.
+For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\texttt{type.min ='lambda.1se'}).
 
 
 <<interval_search_cox_show, echo=TRUE, eval=FALSE>>=
@@ -538,7 +537,7 @@ names(cofn.lasso) %in% names(cofn)
 <<interval_search_cox_out_plot1, results=hide, fig=TRUE,height=8,width=8>>=
 plot.summary.int.search(summary.int)
 @
-\caption{\label{fig:interval_search1} Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The red lines highlight the final solution with minimal partial log likelihood deviance. }
+\caption{\label{fig:interval_search1} Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The dashed red lines highlight the final solution with minimal partial log likelihood deviance. }
 \end{figure}
 
 Figure~\ref{fig:interval_search1} illustrates the relationship between both tuning parameters $\alpha$ and $\lambda$ for the 'visited' points in the parameter space. The partial log likelihood deviance is  color-coded with black for small values and gray for large values.  The number of features selected  in the corresponding model is written near each point. 
