@@ -290,7 +290,7 @@ Our goal is to develop a prognostic model for patient overall survival based on 
 %\clearpage
 \begin{figure}[H]
 \begin{center}
-<<glmnet, echo=F, results=hide, fig=TRUE, height=5>>=
+<<glmnet, echo=F, results=hide, fig=TRUE, height=7>>=
 set.seed(1234)
 cvres <- cv.glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), x=t(exprs(eset)), family="cox", nfolds=10)
 res <- cvres$glmnet.fit
@@ -505,7 +505,6 @@ if (file.exists(".Rdata/fit_interval_search.RData")) {
 Summary information can be extracted from the \texttt{fit} object using the \code{summary} function.
 <<interval_search_cox_extract_show>>=
 sumint <- summary(fit, verbose=TRUE)
-print(sumint)
 @
 
 At the initial step we sample 21 points in the parameter space. Those points are randomly distributed and uniformly cover the whole interval 
