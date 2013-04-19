@@ -40,7 +40,7 @@
 
 %% an abstract and keywords
 \Abstract{
-We have developed the \proglang{R} package \pkg{c060} with the aim of improving \proglang{R} software functionality for high-dimensional risk prediction modelling,
+We have developed the \proglang{R} package \pkg{c060} \citep{c060} with the aim of improving \proglang{R} software functionality for high-dimensional risk prediction modelling,
 e.g., for prognostic modelling of survival data using high-throughput genomic data. 
 Penalized regression models provide a statistically appealing way of building risk prediction models from high-dimensional data.
 The popular CRAN package \pkg{glmnet} package \citep{glmnet} implements an efficient algorithm for fitting penalized Cox and generalized linear models.
@@ -111,7 +111,7 @@ Computational efficiency is an important requirement of the software to make app
 We provide \proglang{R} functions to perform stability selection \citep{MeinshausenBuehlmann2010} in a computationally efficient way which allows to select the most stable features at a given Type I error level. We have also implemented an approach to select the optimal parameter combination ($\alpha$, $\lambda$) for elastic-net penalties using an interval-search algorithm \citep{froehlich2005} which is often faster and more accurate than a standard grid search \citep{Jones1998}. Another very useful addition for real-life applications of \pkg{glmnet} \citep{glmnet} for building risk-prediction models is the provision of wrapper functions to allow the computation of resampling-based prediction errors within the framework of the \proglang{R} package \pkg{peperr} \citep{Porz2009}. The \pkg{peperr} package makes it computationally feasible to assess the
 predictive accuracy of a penalized regression model via resampling methods even for very large-scale applications by employing parallel computing. We also provide the possibility to speed up stability selection by parallel computing using the functionalities of the \proglang{R} base package \pkg{parallel} \citep{R11}.
 
-The software is available as \proglang{R} package \pkg{c060} on \proglang{R}-forge (URL \url{http://c060.r-forge.r-project.org}, version 0.2 at time of manuscript submission) and has been submitted to CRAN (URL \url{http://cran.r-project.org}).
+The software is available as \proglang{R} package \pkg{c060} on CRAN (URL \url{http://cran.r-project.org/web/packages/c060/}, version 0.2 at time of manuscript submission).
 
 \section{Methods and algorithms}
 
@@ -288,9 +288,9 @@ For the sake of convenience we reduce the total number of \Sexpr{nrow(geo_exprs_
 Our goal is to develop a prognostic model for patient overall survival based on the gene expression data. The purpose of this modelling exercise is not just to fit a prognostic model that is capable of predicting overall survival rates, but we also want to find out which gene expression features are most relevant for this task. Traditionally, this problem is solved by feature selection methods and we start our data analysis exercise by fitting the lasso-penalized Cox model, which provides automatic feature selection.
 
 %\clearpage
-\begin{figure}[H]
+\begin{figure}[t!]
 \begin{center}
-<<glmnet, echo=F, results=hide, fig=TRUE, height=7>>=
+<<glmnet, echo=F, results=hide, fig=TRUE, height=4>>=
 set.seed(1234)
 cvres <- cv.glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), x=t(exprs(eset)), family="cox", nfolds=10)
 res <- cvres$glmnet.fit
@@ -304,7 +304,6 @@ names(cofn) <- names.cof[which(cof!=0)]
 \end{center}
 \caption{\label{fig:cvlasso}Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
 \end{figure}
-
 
 We can apply the \code{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ values with a data-derived range of values:
 <<glmnet0, echo=TRUE, results=hide>>=
@@ -321,9 +320,9 @@ cofn.lasso <- cofn
 
 The selected features are highlighted as red lines in the coefficient paths shown in Figure~\ref{fig:coefpath} illustrating the development of the regression coefficient estimates with increasing regularization. While the selected \Sexpr{length(cofn)} features are the only features selected at the optimal $\lambda$ value, they do not remain among the features with largest effect sizes when the penalty is reduced and thus more and more coefficients start to enter the model. In fact, for 4 out of the \Sexpr{length(cofn)} features the coefficient estimates go back down to zero for small values of $\log\lambda$, indicating that these features get replaced by other gene expression features in very large models.
 
-\begin{figure}[t!]
+\begin{figure}[H]
 \begin{center}
-<<glmnet3, echo=F, results=hide, fig=TRUE, height=8, width=8>>=
+<<glmnet3, echo=F, results=hide, fig=TRUE, height=7, width=7>>=
 bet <- res$beta[match(names(cofn), rownames(res$beta)),]
 par(mar=c(4,4,2.5,1), mgp=c(2.5,1,0), mfrow=c(2,2))
 
@@ -386,14 +385,13 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
 Bootstrap results can be visualized with the \code{plot.peperr} function from the \pkg{peperr} package showing the selected complexity parameters, 
 out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again an algorithm specific wrapper (here \code{PLL.coxnet}) needs to be defined. In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package which allows to display the number still at risk and pointwise bootstrap quantiles (\code{Plot.peperr.curves}) as shown in Figure~\ref{fig:pec}. By default, the $.632+$ is calculated and displayed. Displaying also the $.632$ estimator, the no-information error rate and the average out-of-bag bootstrap error is optional in \code{Plot.peperr.curves}. \\
 
-<<peperrPlot1, echo=T, results=hide, fig=FALSE,height=8,width=8,eval=FALSE>>=
+<<peperrPlot1, echo=T, results=hide, fig=FALSE,eval=FALSE>>=
 Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
                    bootQuants=TRUE, bootQuants.level=0.95, leg.cex=0.7)
 @
-
-\begin{figure}[H]
+\begin{figure}[t!]
 \begin{center}
-<<peperrPlot2, echo=F, results=hide, fig=TRUE,height=8,width=8>>=
+<<peperrPlot2, echo=F, results=hide, fig=TRUE,height=7,width=7>>=
 Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
                    bootQuants=TRUE, bootQuants.level=0.95, leg.cex=0.7)
 @
@@ -408,7 +406,9 @@ calculation for the \pkg{glmnet} algorithm, and defined AUC under the ROC curve 
 For binary responses, the \pkg{peperr} package does not quite provide the same modular flexibility 
 as for time-to-event endpoints. The predicted class probability is calculated within the generic performance/aggregation function by calling the algorithm-specific predict function. Whenever a new algorithm is incorporated, the generic aggregation function needs to be adapted accordingly.
 
+
 %\clearpage
+
 \subsection{Stability selection}
 
 We use stability selection to identify prognostic features which have a relevant influence on the survival times of the patients in the AML data set and to control Type I errors to ensure that the features identified are truly associated with the survival times. To calculate the stability path for the $L_1$-penalized Cox regression we use the function \code{stability.path} from our \proglang{R} package. 
@@ -430,7 +430,7 @@ Note that an FWER threshold of 0.5 is unusually high. For this data set the use 
 
 \begin{figure}[t!]
 \begin{center}
-<<stabilitySelection3, echo=T, results=hide, fig=TRUE,height=8,width=8>>=
+<<stabilitySelection3, echo=T, results=hide, fig=TRUE,height=7,width=7>>=
 plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 @
 \end{center}
