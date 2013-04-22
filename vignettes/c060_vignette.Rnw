@@ -288,9 +288,9 @@ For the sake of convenience we reduce the total number of \Sexpr{nrow(geo_exprs_
 Our goal is to develop a prognostic model for patient overall survival based on the gene expression data. The purpose of this modelling exercise is not just to fit a prognostic model that is capable of predicting overall survival rates, but we also want to find out which gene expression features are most relevant for this task. Traditionally, this problem is solved by feature selection methods and we start our data analysis exercise by fitting the lasso-penalized Cox model, which provides automatic feature selection.
 
 %\clearpage
-\begin{figure}[t!]
-\begin{center}
-<<glmnet, echo=F, results=hide, fig=TRUE, height=4>>=
+%\begin{figure}[H]
+%\begin{center}
+<<glmnet, echo=F, results=hide, fig=FALSE, height=4>>=
 set.seed(1234)
 cvres <- cv.glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), x=t(exprs(eset)), family="cox", nfolds=10)
 res <- cvres$glmnet.fit
@@ -301,9 +301,9 @@ names.cof <- rownames(cof)
 cofn <- cof[which(cof!=0)]
 names(cofn) <- names.cof[which(cof!=0)]
 @
-\end{center}
-\caption{\label{fig:cvlasso}Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
-\end{figure}
+%\end{center}
+%\caption{\label{fig:cvlasso}Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with %minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
+%\end{figure}
 
 We can apply the \code{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ values with a data-derived range of values:
 <<glmnet0, echo=TRUE, results=hide>>=
@@ -311,7 +311,8 @@ fit <- glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status),
               x=t(exprs(eset)), family="cox")
 @
  
-In order to determine the optimal lasso penalty parameter value, we perform 10-fold cross-validation using the \code{cv.glmnet} function. The loss function, i.e., the cross-validated partial log-likelihood deviance, is shown in Figure~\ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. The penalty parameter value minimizing the loss function is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} ($\log\lambda =$\Sexpr{round(log(cvres$lambda.min), 3)}) and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features and lasso regression coefficient estimates:
+In order to determine the optimal lasso penalty parameter value, we perform 10-fold cross-validation using the \code{cv.glmnet} function. %The loss function, i.e., the cross-validated partial log-likelihood deviance, is shown in Figure~\ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. 
+The penalty parameter value minimizing the loss function, i.e., the cross-validated partial log-likelihood deviance, is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} ($\log\lambda =$\Sexpr{round(log(cvres$lambda.min), 3)}) and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features and lasso regression coefficient estimates:
 <<glmnet2, echo=F, results=verbatim>>=
 print(cofn, digits=3)
 cofn.lasso <- cofn
@@ -348,7 +349,9 @@ abline(v=res$dev.ratio[match(cvres$lambda.min, cvres$lambda)], lty=3)
 abline(v=res$dev.ratio[match(cvres$lambda.1se, cvres$lambda)], lty=3)
 @
 \end{center}
-\caption{\label{fig:coefpath}Coefficient paths for lasso-penalized Cox PH regression models applied to the AML data set. The features with highlighted paths have non-zero coefficients in the model with the optimal $\lambda$ value as determined by ten-fold cross-validation. The dotted vertical have the same meaning as in Figure~\ref{fig:cvlasso}. The top plots show the coefficient path scaled to reflect $\log(\lambda)$ on the x-axis (top left: full path, top right: zoomed in to only show the selected features). The bottom plots show the coefficient paths relative to the $L_1$-norms of the estimated coefficient vector (left) and to the fraction of the null partial log-likelihood deviance explained (right).}
+\caption{\label{fig:coefpath}Coefficient paths for lasso-penalized Cox PH regression models applied to the AML data set. The features with highlighted paths have non-zero coefficients in the model with the optimal $\lambda$ value as determined by ten-fold cross-validation. %The dotted vertical have the same meaning as in Figure~\ref{fig:cvlasso}. 
+The top plots show the coefficient path scaled to reflect $\log(\lambda)$ on the x-axis (top left: full path, top right: zoomed in to only show the selected features). The bottom plots show the coefficient paths relative to the $L_1$-norms of the estimated coefficient vector (left) and to the fraction of the null partial log-likelihood deviance explained (right).
+The dotted vertical lines indicate the $\lambda$ values with minimal deviance and with the largest $\lambda$ value within one standard deviation of the minimal deviance.}
 \end{figure}
 
 \subsection{Assessment of prediction performance with resampling-based prediction errors}
@@ -379,7 +382,7 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
                RNG="fixed", seed=0815, cpus=3, parallel=T, clustertype="SOCK", 
                load.list=list(packages=c("c060")), 
                indices=resample.indices(n=dim(eset)[2],
-               sample.n=10, method="sub632"))
+               sample.n=1000, method="sub632"))
 @
 
 Bootstrap results can be visualized with the \code{plot.peperr} function from the \pkg{peperr} package showing the selected complexity parameters, 
@@ -391,7 +394,7 @@ Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
 @
 \begin{figure}[t!]
 \begin{center}
-<<peperrPlot2, echo=F, results=hide, fig=TRUE,height=7,width=7>>=
+<<peperrPlot2, echo=F, results=hide, fig=TRUE,height=5,width=5>>=
 Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
                    bootQuants=TRUE, bootQuants.level=0.95, leg.cex=0.7)
 @
@@ -428,13 +431,17 @@ stability.selection(spath,fwer=0.5)$stable
 
 Note that an FWER threshold of 0.5 is unusually high. For this data set the use of smaller, more conventional thresholds, e.g., 0.05 or 0.1, will result in an empty set of stable features. We provide a  \code{plot} function to visualize the stability path. This function calls \code{stability.selection} to estimate stable features and indicates them in the plot (Figure~\ref{stab:path}).
 
+<<stabilitySelection3, echo=T, results=hide, fig=FALSE,height=7,width=7>>=
+plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
+@
+
 \begin{figure}[t!]
 \begin{center}
-<<stabilitySelection3, echo=T, results=hide, fig=TRUE,height=7,width=7>>=
+<<stabilitySelection4, echo=F, results=hide, fig=TRUE,height=7,width=7>>=
 plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 @
 \end{center}
-\caption{\label{fig:stabpath}Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
+\caption{Coefficient and stability paths for lasso penalized Cox PH regression model applied to the AML data set. The feature with highlighted path is the only stable feature found by stability selection with FWER=0.5 and $\hat\Pi >0.6$.}
 \label{stab:path}
 \end{figure}
 

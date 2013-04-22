@@ -143,7 +143,7 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
                RNG="fixed", seed=0815, cpus=3, parallel=T, clustertype="SOCK", 
                load.list=list(packages=c("c060")), 
                indices=resample.indices(n=dim(eset)[2],
-               sample.n=10, method="sub632"))
+               sample.n=1000, method="sub632"))
 
 
 ###################################################
@@ -181,7 +181,13 @@ plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 
 
 ###################################################
-### code chunk number 14: interval_search_setup
+### code chunk number 14: stabilitySelection4
+###################################################
+plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
+
+
+###################################################
+### code chunk number 15: interval_search_setup
 ###################################################
   x <- t(exprs(eset))
   y <- cbind(time=pData(geo_exprs_data)$os,status=pData(geo_exprs_data)$os_status)
@@ -195,7 +201,7 @@ plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 
 
 ###################################################
-### code chunk number 15: interval_search_cox_show (eval = FALSE)
+### code chunk number 16: interval_search_cox_show (eval = FALSE)
 ###################################################
 ##   fit <- EPSGO(Q.func="tune.glmnet.interval", 
 ##              bounds=bounds, 
@@ -209,7 +215,7 @@ plot(spath, fwer=0.5, pi_thr=0.6, xvar="lambda", col.all="gray")
 
 
 ###################################################
-### code chunk number 16: interval_search_cox
+### code chunk number 17: interval_search_cox
 ###################################################
 if (file.exists(".Rdata/fit_interval_search.RData")) {
   load(".Rdata/fit_interval_search.RData") 
@@ -234,13 +240,13 @@ if (file.exists(".Rdata/fit_interval_search.RData")) {
 
 
 ###################################################
-### code chunk number 17: interval_search_cox_extract_show
+### code chunk number 18: interval_search_cox_extract_show
 ###################################################
 sumint <- summary(fit, verbose=TRUE)
 
 
 ###################################################
-### code chunk number 18: interval_search_cox_fit_opt
+### code chunk number 19: interval_search_cox_fit_opt
 ###################################################
 #select the model with optimal parameters from the object fit
 opt.model <- sumint$opt.models[[1]]
@@ -248,20 +254,20 @@ cofn <- get.cofn.int.search(opt.model)
 
 
 ###################################################
-### code chunk number 19: interval_search_cox_check_overlap_stability
+### code chunk number 20: interval_search_cox_check_overlap_stability
 ###################################################
 names(cofn.lasso) %in% names(cofn)
 '206932_at' %in% names(cofn)
 
 
 ###################################################
-### code chunk number 20: interval_search_cox_out_plot1
+### code chunk number 21: interval_search_cox_out_plot1
 ###################################################
 plot(sumint)
 
 
 ###################################################
-### code chunk number 21: interval_search_cox_out_plot2
+### code chunk number 22: interval_search_cox_out_plot2
 ###################################################
 plot(sumint,type="points") 
 
