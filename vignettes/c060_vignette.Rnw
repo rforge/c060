@@ -241,13 +241,13 @@ setCacheDir("cache")
 @
 
 <<GEOdataGSE12417, echo=F, results=hide>>=
-if (file.exists(".Rdata/expressionSet.Rdata")) {
-    load(".Rdata/expressionSet.Rdata") 
+if (file.exists("./Rdata/expressionSet.Rdata")) {
+    load("./Rdata/expressionSet.Rdata") 
 } else {
     library(GEOquery)
     
-    dir.create(".GEOdata",showWarnings = FALSE)
-    dir.create(".Rdata",showWarnings = FALSE)
+    dir.create("./GEOdata",showWarnings = FALSE)
+    dir.create("./Rdata",showWarnings = FALSE)
     
     # download processed data files from url or if available get data from locally saved copies
     geo_exprs_data  <- getGEO("GSE12417", destdir=".GEOdata",AnnotGPL=T)[[1]]
@@ -263,8 +263,8 @@ if (file.exists(".Rdata/expressionSet.Rdata")) {
     rownames(clin.df) <- rownames(pData(geo_exprs_data))
     pData(geo_exprs_data) <- clin.df
 
-    save(geo_exprs_data, file=".Rdata/expressionSet.Rdata")  
-    unlink(".GEOdata", recursive=TRUE) #delete GEOdata
+    save(geo_exprs_data, file="./Rdata/expressionSet.Rdata")  
+    unlink("./GEOdata", recursive=TRUE) #delete GEOdata
 } 
 @
 
@@ -487,8 +487,8 @@ The second tuning parameter $\lambda$ will be found for each given $\alpha$ via 
 
 
 <<interval_search_cox, echo=FALSE, results=hide>>=
-if (file.exists(".Rdata/fit_interval_search.RData")) {
-  load(".Rdata/fit_interval_search.RData") 
+if (file.exists("./Rdata/fit_interval_search.RData")) {
+  load("./Rdata/fit_interval_search.RData") 
 } else {
   print("start interval search")
   fit <- EPSGO(Q.func="tune.glmnet.interval", 
@@ -505,7 +505,7 @@ if (file.exists(".Rdata/fit_interval_search.RData")) {
              type.measure = "deviance",
              verbose = TRUE)
   #names(fit)
-  save(fit,  file=".Rdata/fit_interval_search.RData") 
+  save(fit,  file="./Rdata/fit_interval_search.RData") 
 }  
 @
 
@@ -520,7 +520,7 @@ At the initial step we sample 21 points in the parameter space. Those points are
 <<interval_search_cox_fit_opt, echo=FALSE,results=hide>>=
 #select the model with optimal parameters from the object fit
 opt.model <- sumint$opt.models[[1]]
-cofn <- get.cofn.int.search(opt.model)
+cofn <- coef.opt.intsearch(opt.model)
 @
 
 The final elastic-net model contains \Sexpr{length(cofn)} selected features, which obviously reflects much less sparsity than the final lasso model.
