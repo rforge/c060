@@ -1,28 +1,5 @@
-% This file was created with JabRef 2.9.2.
+% This file was created with JabRef 2.7.
 % Encoding: UTF-8
-
-@ARTICLE{bovelstad07,
-  author = {B{\o}velstad, H M M and Nyg\r{a}rd, S and St{\o}rvold, H L L. and
-	Aldrin, M and Borgan, O and Frigessi, A and Lingj{\ae}rde, O C C.
-	},
-  title = {Predicting Survival from Microarray Data - a Comparative Study.},
-  journal = {Bioinformatics},
-  year = {2007},
-  volume = {23},
-  pages = {2080--2087},
-  date-modified = {2009-11-10 16:31:32 +0100}
-}
-
-@ARTICLE{becker2009,
-  author = {Becker, N and Werft, W and Toedt, G and  Lichter, P and Benner, A},
-  title = {\pkg{penalizedSVM}: A \proglang{R}-package for Feature Selection SVM Classification.},
-  journal = {Bioinformatics},
-  year = {2009},
-  volume = {25},
-  pages = {1711--1712},
-  owner = {becker},
-  timestamp = {2013.02.15}
-}
 
 @MANUAL{penSVM,
   title = {\pkg{penalizedSVM}: Feature Selection SVM Using Penalty Functions},
@@ -32,6 +9,17 @@
   url = {http://CRAN.R-project.org/package=penalizedSVM}
 }
 
+@ARTICLE{becker2009,
+  author = {Becker, N and Werft, W and Toedt, G and Lichter, P and Benner, A},
+  title = {\pkg{penalizedSVM}: A \proglang{R}-package for Feature Selection
+	SVM Classification.},
+  journal = {Bioinformatics},
+  year = {2009},
+  volume = {25},
+  pages = {1711--1712},
+  owner = {becker},
+  timestamp = {2013.02.15}
+}
 
 @ARTICLE{benner2010,
   author = {Benner, A. and Zucknick, M. and Hielscher, T. and Ittrich, C. and
@@ -54,6 +42,26 @@
   volume = {7},
   number = {1},
   article = {12}
+}
+
+@MANUAL{timeROC,
+  title = {timeROC: Time-dependent ROC curve and AUC for censored survival data},
+  author = {Paul Blanche},
+  year = {2013},
+  note = {R package version 0.2},
+  url = {http://CRAN.R-project.org/package=timeROC}
+}
+
+@ARTICLE{bovelstad07,
+  author = {B{\o}velstad, H M M and Nyg\r{a}rd, S and St{\o}rvold, H L L. and
+	Aldrin, M and Borgan, O and Frigessi, A and Lingj{\ae}rde, O C C.
+	},
+  title = {Predicting Survival from Microarray Data - a Comparative Study.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {2080--2087},
+  date-modified = {2009-11-10 16:31:32 +0100}
 }
 
 @ARTICLE{cox:1972,
@@ -127,6 +135,16 @@
   pages = {101--148}
 }
 
+@ARTICLE{friedman07,
+  author = {Friedman, J. and Hastie, T. and H{\"o}fling, H. and Tibshirani, R.},
+  title = {{Pathwise coordinate optimization}},
+  journal = {The Annals of Applied Statistics},
+  year = {2007},
+  volume = {1},
+  pages = {302--332},
+  number = {2}
+}
+
 @MANUAL{glmnet,
   title = {\pkg{glmnet}: Lasso and Elastic-Net Regularized Generalized Linear
 	Models},
@@ -134,66 +152,6 @@
   year = {2013},
   note = {\proglang{R}~package version~1.9-5},
   url = {http://CRAN.R-project.org/package=glmnet}
-}
-
-@MANUAL{s4vd,
-  title = {\pkg{s4vd}: Biclustering via sparse singular value decomposition incorporating stability selection
-  Models},
-  author = {Martin Sill and Sebastian Kaiser},
-  year = {2011},
-  note = {\proglang{R}~package version~1.0},
-  url = {http://CRAN.R-project.org/package=s4vd}
-}
-
-@article{sill2011robust,
-  title={Robust biclustering by sparse singular value decomposition incorporating stability selection},
-  author={Sill, Martin and Kaiser, Sebastian and Benner, Axel and Kopp-Schneider, Annette},
-  journal={Bioinformatics},
-  volume={27},
-  number={15},
-  pages={2089--2097},
-  year={2011},
-  publisher={Oxford Univ Press}
-}
-
-@MANUAL{mboost,
-  title = {\pkg{mboost}: Model-Based Boosting},
-  author = {Torsten Hothorn and Peter Buehlmann and Thomas Kneib and Matthias Schmid and Benjamin Hofner and Fabian Sobotka and Fabian Scheipl},
-  year = {2013},
-  note = {\proglang{R}~package version~2.2-3},
-  url = {http://CRAN.R-project.org/package=mboost}
-}
-
-@MANUAL{penalized,
-  title = {\pkg{penalized}: L1 (lasso and fused lasso) and L2 (ridge) penalized estimation in GLMs and in the Cox model},
-  author = {Jelle Goeman and Rosa Meijer and Nimisha Chaturvedi},
-  year = {2012},
-  note = {\proglang{R}~package version~0.9-42},
-  url = {http://CRAN.R-project.org/package=penalized}
-}
-
-@MANUAL{BioMark,
-  title = {\pkg{BioMark}: Find biomarkers in two-class discrimination problems},
-  author = {Ron Wehrens and Pietro Franceschi},
-  year = {2012},
-  note = {\proglang{R}~package version~0.4.1},
-  url = {http://CRAN.R-project.org/package=BioMark}
-}
-
-@MANUAL{lol,
-  title = {\pkg{BioMark}: Lots Of Lasso},
-  author = {Yinyin Yuan},
-  year = {2011},
-  note = {\proglang{R}~package version~1.10.0},
-  url = {http://www.bioconductor.org/packages/2.13/bioc/html/lol.html}
-}
-
-@MANUAL{c060,
-  title = {\pkg{c060}: Extended Inference for Lasso and Elastic-Net Regularized Cox and Generalized Linear Models},
-  author = {Martin Sill and Thomas Hielscher and Natalia Becker and Manuela Zucknick},
-  year = {2013},
-  note = {\proglang{R}~package version~0.2},
-  url = {http://CRAN.R-project.org/package=c060}
 }
 
 @ARTICLE{FHT2010,
@@ -210,11 +168,21 @@
 
 @INPROCEEDINGS{froehlich2005,
   author = {Froehlich, H. and Zell, A.},
-  title = {Efficient Parameter Selection for Support Vector Machines in 
-Classification	and Regression via Model-Based Global Optimization},
+  title = {Efficient Parameter Selection for Support Vector Machines in Classificationand
+	Regression via Model-Based Global Optimization},
   booktitle = {Proceedings of the International Joint Conference of Neural Networks},
   year = {2005},
   pages = {1431--1438}
+}
+
+@ARTICLE{Fu98,
+  author = {Fu, Wenjiang J.},
+  title = {{Penalized Regressions: The Bridge versus the Lasso}},
+  journal = {Journal of Computational and Graphical Statistics},
+  year = {1998},
+  volume = {7},
+  pages = {397--416},
+  number = {3}
 }
 
 @ARTICLE{Bioconductor,
@@ -241,6 +209,15 @@ Classification	and Regression via Model-Based Global Optimization},
   publisher = {Wiley Online Library}
 }
 
+@MANUAL{penalized,
+  title = {\pkg{penalized}: L1 (lasso and fused lasso) and L2 (ridge) penalized
+	estimation in GLMs and in the Cox model},
+  author = {Jelle Goeman and Rosa Meijer and Nimisha Chaturvedi},
+  year = {2012},
+  note = {\proglang{R}~package version~0.9-42},
+  url = {http://CRAN.R-project.org/package=penalized}
+}
+
 @ARTICLE{graf99,
   author = {Erika Graf and Claudia Schmoor and Willi Sauerbrei and Martin Schumacher},
   title = {Assessment and Comparison of Prognostic Classification Schemes for
@@ -251,6 +228,41 @@ Classification	and Regression via Model-Based Global Optimization},
   pages = {2529--2545},
   number = {17--18},
   key = {248}
+}
+
+@MANUAL{survivalROC,
+  title = {survivalROC: Time-dependent ROC curve estimation from censored survival
+	data},
+  author = {Patrick J. Heagerty and packaging by Paramita Saha-Chaudhuri},
+  year = {2013},
+  note = {R package version 1.0.3},
+  url = {http://CRAN.R-project.org/package=survivalROC}
+}
+
+@MANUAL{risksetROC,
+  title = {risksetROC: Riskset ROC curve estimation from censored survival data},
+  author = {Patrick J. Heagerty and packaging by Paramita Saha-Chaudhuri},
+  year = {2012},
+  note = {R package version 1.0.4},
+  url = {http://CRAN.R-project.org/package=risksetROC}
+}
+
+@MANUAL{mboost,
+  title = {\pkg{mboost}: Model-Based Boosting},
+  author = {Torsten Hothorn and Peter Buehlmann and Thomas Kneib and Matthias
+	Schmid and Benjamin Hofner and Fabian Sobotka and Fabian Scheipl},
+  year = {2013},
+  note = {\proglang{R}~package version~2.2-3},
+  url = {http://CRAN.R-project.org/package=mboost}
+}
+
+@MANUAL{caret,
+  title = {caret: Classification and Regression Training},
+  author = {Max Kuhn. Contributions from Jed Wing and Steve Weston and Andre
+	Williams and Chris Keefer and Allan Engelhardt and Tony Cooper},
+  year = {2013},
+  note = {R package version 5.17-7},
+  url = {http://CRAN.R-project.org/package=caret}
 }
 
 @ARTICLE{Jones1998,
@@ -295,6 +307,18 @@ Classification	and Regression via Model-Based Global Optimization},
   pages = {4193--4201}
 }
 
+@ARTICLE{MIG2012,
+  author = {Ulla B. Mogensen and Hemant Ishwaran and Thomas A. Gerds},
+  title = {Evaluating Random Forests for Survival Analysis Using Prediction
+	Error Curves},
+  journal = {Journal of Statistical Software},
+  year = {2012},
+  volume = {50},
+  pages = {1--23},
+  number = {11},
+  url = {http://www.jstatsoft.org/v50/i11/}
+}
+
 @MANUAL{peperr,
   title = {\pkg{peperr}: Parallelised Estimation of Prediction Error},
   author = {Christine Porzelius and Harald Binder},
@@ -314,16 +338,6 @@ Classification	and Regression via Model-Based Global Optimization},
   number = {6}
 }
 
-@MANUAL{R11,
-  title = {\proglang{R}: A Language and Environment for Statistical Computing},
-  author = {\proglang{R} Development Core Team},
-  organization = {\proglang{R} Foundation for Statistical Computing},
-  address = {Vienna, Austria},
-  year = {2011},
-  note = {{ISBN} 3-900051-07-0},
-  url = {http://www.R-project.org/}
-}
-
 @ARTICLE{schumacher07,
   author = {Martin Schumacher and Harald Binder and Thomas Gerds},
   title = {Assessment of Survival Prediction Models Based on Microarray Data},
@@ -333,6 +347,37 @@ Classification	and Regression via Model-Based Global Optimization},
   pages = {1768--1774},
   number = {14},
   keywords = {microarray, prediction, survival}
+}
+
+@MANUAL{c060,
+  title = {\pkg{c060}: Extended Inference for Lasso and Elastic-Net Regularized
+	Cox and Generalized Linear Models},
+  author = {Martin Sill and Thomas Hielscher and Natalia Becker and Manuela Zucknick},
+  year = {2013},
+  note = {\proglang{R}~package version~0.2},
+  url = {http://CRAN.R-project.org/package=c060}
+}
+
+@MANUAL{s4vd,
+  title = {\pkg{s4vd}: Biclustering via sparse singular value decomposition
+	incorporating stability selection Models},
+  author = {Martin Sill and Sebastian Kaiser},
+  year = {2011},
+  note = {\proglang{R}~package version~1.0},
+  url = {http://CRAN.R-project.org/package=s4vd}
+}
+
+@ARTICLE{sill2011robust,
+  author = {Sill, Martin and Kaiser, Sebastian and Benner, Axel and Kopp-Schneider,
+	Annette},
+  title = {Robust biclustering by sparse singular value decomposition incorporating
+	stability selection},
+  journal = {Bioinformatics},
+  year = {2011},
+  volume = {27},
+  pages = {2089--2097},
+  number = {15},
+  publisher = {Oxford Univ Press}
 }
 
 @ARTICLE{simon2011,
@@ -345,6 +390,16 @@ Classification	and Regression via Model-Based Global Optimization},
   pages = {1--13},
   number = {5},
   url = {http://www.jstatsoft.org/v39/i05/}
+}
+
+@MANUAL{R11,
+  title = {\proglang{R}: A Language and Environment for Statistical Computing},
+  author = {\proglang{R} Development Core Team},
+  organization = {\proglang{R} Foundation for Statistical Computing},
+  address = {Vienna, Austria},
+  year = {2011},
+  note = {{ISBN} 3-900051-07-0},
+  url = {http://www.R-project.org/}
 }
 
 @ARTICLE{tibshirani97,
@@ -398,6 +453,22 @@ Classification	and Regression via Model-Based Global Optimization},
   number = {5A}
 }
 
+@MANUAL{BioMark,
+  title = {\pkg{BioMark}: Find biomarkers in two-class discrimination problems},
+  author = {Ron Wehrens and Pietro Franceschi},
+  year = {2012},
+  note = {\proglang{R}~package version~0.4.1},
+  url = {http://CRAN.R-project.org/package=BioMark}
+}
+
+@MANUAL{lol,
+  title = {\pkg{BioMark}: Lots Of Lasso},
+  author = {Yinyin Yuan},
+  year = {2011},
+  note = {\proglang{R}~package version~1.10.0},
+  url = {http://www.bioconductor.org/packages/2.13/bioc/html/lol.html}
+}
+
 @ARTICLE{zou05,
   author = {Zou, H. and Hastie, T.},
   title = {Regularization and Variable Selection via the Elastic-Net},
@@ -406,26 +477,4 @@ Classification	and Regression via Model-Based Global Optimization},
   volume = {67(2)},
   pages = {301--320}
 }
-
-@article{friedman07,
-  author = {Friedman, J. and Hastie, T. and H{\"o}fling, H. and Tibshirani, R.},
-  journal = {The Annals of Applied Statistics},
-  number = {2},
-  pages = {302--332},
-  title = {{Pathwise coordinate optimization}},
-  volume = 1,
-  year = 2007
-}
-
-
-@ARTICLE{Fu98,
-  author = {Fu, Wenjiang J.},
-  title = {{Penalized Regressions: The Bridge versus the Lasso}},
-  journal = {Journal of Computational and Graphical Statistics},
-  year = {1998},
-  volume = {7},
-  pages = {397--416},
-  number = {3} 
-}
-
 
