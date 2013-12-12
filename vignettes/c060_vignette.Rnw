@@ -497,7 +497,7 @@ if (file.exists(".Rdata/fit_interval_search.RData")) {
   load(".Rdata/fit_interval_search.RData") 
 } else {
   print("start interval search")
-  fit <- EPSGO(Q.func="tune.glmnet.interval", 
+  fit <- EPSGO(Q.func="tune.glmnet.interval",  
              bounds=bounds, 
              parms.coding="none", 
              show = "none", 
