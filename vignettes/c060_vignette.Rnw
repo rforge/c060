@@ -585,7 +585,7 @@ Function & Description \\
 \code{plot.summary.int.search} &Plot Summary object for interval search models\\
 \hline
 \end{tabular}
-\caption{\label{tab:functions} Overview of available functions. The first block shows functions to calculate and visualize resampling based prediction error curves for penalized Cox models. The second block shows all provided functions to perform interval search and the last block functions to perform stability selection.}
+\caption{\label{tab:functions} Overview of available functions. The first block shows functions to calculate and visualize resampling based prediction errors for penalized Cox and binomial models. The second block shows all provided functions to perform interval search and the last block functions to perform stability selection.}
 \end{table}
 \end{center}
 %\clearpage
