@@ -552,6 +552,7 @@ Function & Description \\
 \code{aggregation.auc} & Determine the area under the ROC curve for a fitted model\\
 \code{complexity.glmnet} & Interface for determination of penalty lambda in penalized regression model via cross-validation\\ 
 \code{fit.glmnet} & Interface function for fitting a penalized regression model with 'glmnet'\\
+\code{plot.coef.glmnet} & Plot the glmnet coefficient path and highlight the path of a pre-specified set of variables\\
 \code{plot.peperr.curves} & Plot method for prediction error curves of a peperr object\\
 \code{predictProb.coxnet} &  Extract predicted survival probabilities from a coxnet fit \\
 \code{predictProb.glmnet} & Extract predicted survival probabilities from a glmnet fit \\
