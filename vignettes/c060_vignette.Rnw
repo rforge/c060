@@ -211,7 +211,7 @@ In case no independent validation data are available, resampling-based predictio
 The $.632+$ estimator balances both estimators, and additionally accounts for the relative overfitting based on the no-information error rate.
 Further, in our application the $.632+$ bootstrap estimator is calculated based on subsampling (with replacement) rather than classical sampling wihout replacement, as that has been demonstrated to lead to more accurate estimates in a high-dimensional context \citep{BS2008}.
 
-<<setup, echo=F, results=hide>>=
+<<setup, echo=FALSE, results=hide>>=
 rm(list=ls())
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 #setwd("./vignettes")
@@ -242,7 +242,7 @@ dir.create("figures",showWarnings = FALSE)
 setCacheDir("cache")
 @
 
-<<GEOdataGSE12417, echo=F, results=hide>>=
+<<GEOdataGSE12417, echo=FALSE, results=hide>>=
 if (file.exists(".Rdata/expressionSet.Rdata")) {
     load(".Rdata/expressionSet.Rdata") 
 } else {
@@ -270,7 +270,7 @@ if (file.exists(".Rdata/expressionSet.Rdata")) {
 } 
 @
 
-<<preprocessData, echo=F, results=hide>>=
+<<preprocessData, echo=FALSE, results=hide>>=
 # unspecific filtering: select most varying probe sets
 nfeatures <- 10000
 rowvars    <- rowVars(exprs(geo_exprs_data))
@@ -299,7 +299,7 @@ In order to determine the optimal lasso penalty parameter value, we perform 10-f
 
 \begin{figure}[H]
 \begin{center}
-<<glmnet, echo=T, results=hide, fig=T, height=4>>=
+<<glmnet, echo=TRUE, results=hide, fig=TRUE, height=4>>=
 set.seed(1234)
 cvres <- cv.glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), 
                    x=t(exprs(eset)), family="cox", nfolds=10)
@@ -310,14 +310,14 @@ plot(cvres)
 \caption{\label{fig:cvlasso}Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
 \end{figure}
 
-<<glmnet0, echo=F, results=hide>>=
+<<glmnet0, echo=FALSE, results=hide>>=
 cof <- coef(res, s=cvres$lambda.min)
 names.cof <- rownames(cof)
 cofn <- cof[which(cof!=0)]
 names(cofn) <- names.cof[which(cof!=0)]
 @
 The loss function, i.e., the cross-validated partial log-likelihood deviance, is shown in Figure~\ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. The penalty parameter value minimizing the loss function, i.e., the cross-validated partial log-likelihood deviance, is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} ($\log\lambda =$\Sexpr{round(log(cvres$lambda.min), 3)}) and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features and lasso regression coefficient estimates:
-<<glmnet2, echo=F, results=verbatim>>=
+<<glmnet2, echo=FALSE, results=verbatim>>=
 print(cofn, digits=3)
 cofn.lasso <- cofn
 #cofn.ix <- predict(res, type="nonzero", s=cvres$lambda.min)
@@ -325,32 +325,13 @@ cofn.lasso <- cofn
 
 The selected features are highlighted as red lines in the coefficient paths shown in Figure~\ref{fig:coefpath} illustrating the development of the regression coefficient estimates with increasing regularization. While the selected \Sexpr{length(cofn)} features are the only features selected at the optimal $\lambda$ value, they do not remain among the features with largest effect sizes when the penalty is reduced and thus more and more coefficients start to enter the model. In fact, for 4 out of the \Sexpr{length(cofn)} features the coefficient estimates go back down to zero for small values of $\log\lambda$, indicating that these features get replaced by other gene expression features in very large models.
 
+<<glmnet3, echo=TRUE, results=hide, fig=FALSE, eval=FALSE>>=
+plot.coef.glmnet(cvfit=cvres, betas=names(cofn))
+@
 \begin{figure}[H]
 \begin{center}
-<<glmnet3, echo=F, results=hide, fig=TRUE, height=7, width=7>>=
-bet <- res$beta[match(names(cofn), rownames(res$beta)),]
-par(mar=c(4,4,2.5,1), mgp=c(2.5,1,0), mfrow=c(2,2))
-
-plot(res, xvar="lambda", col="gray")
-glmnet:::plotCoef(bet, lambda = res$lambda, df = res$df, dev = res$dev.ratio, xvar = "lambda", add=TRUE, col="red")
-abline(v=log(cvres$lambda.min), lty=3)
-abline(v=log(cvres$lambda.1se), lty=3)
-
-glmnet:::plotCoef(bet, lambda = res$lambda, df = res$df, dev = res$dev.ratio, xvar = "lambda", add=FALSE, col="red")
-abline(v=log(cvres$lambda.min), lty=3)
-abline(v=log(cvres$lambda.1se), lty=3)
-
-norm <- apply(abs(res$beta), 2, sum)
-plot(res, xvar="norm", col="gray")
-glmnet:::plotCoef(bet, xvar = "norm", add=TRUE, col="red",
-                  norm = norm, lambda = res$lambda, df = res$df, dev = res$dev.ratio)
-abline(v=norm[match(cvres$lambda.min, cvres$lambda)], lty=3)
-abline(v=norm[match(cvres$lambda.1se, cvres$lambda)], lty=3)
-
-plot(res, xvar="dev", col="gray")
-glmnet:::plotCoef(bet, lambda = res$lambda, df = res$df, dev = res$dev.ratio, xvar = "dev", add=TRUE, col="red")
-abline(v=res$dev.ratio[match(cvres$lambda.min, cvres$lambda)], lty=3)
-abline(v=res$dev.ratio[match(cvres$lambda.1se, cvres$lambda)], lty=3)
+<<glmnet4, echo=FALSE, results=hide, fig=TRUE, height=7, width=7>>=
+plot.coef.glmnet(cvfit=cvres, betas=names(cofn))
 @
 \end{center}
 \caption{\label{fig:coefpath}Coefficient paths for lasso-penalized Cox PH regression models applied to the AML data set. The features with highlighted paths have non-zero coefficients in the model with the optimal $\lambda$ value as determined by ten-fold cross-validation. %The dotted vertical have the same meaning as in Figure~\ref{fig:cvlasso}. 
@@ -375,15 +356,15 @@ Also, additional arguments can be passed directly to the \pkg{glmnet} call by sp
 Here, we include patient's age as a mandatory model feature into the prognostic model, i.e., age is not subject to penalization, and 
 run the calculation on 3 CPUs in parallel using a socket cluster set-up. 
 
-<<peperrMandatoryParallel, echo=T, results=hide, cache=T>>=
+<<peperrMandatoryParallel, echo=TRUE, results=hide, cache=T>>=
 obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
                x=data.frame(eset$age,t(exprs(eset))),
-               fit.fun=fit.glmnet, args.fit=list(standardize=F, family="cox",
+               fit.fun=fit.glmnet, args.fit=list(standardize=FALSE, family="cox",
                penalty.factor=rep(0:1, times=c(1,dim(eset)[1]))),
                complexity=complexity.glmnet, 
-               args.complexity=list(standardize=F, nfolds=10, family="cox", 
+               args.complexity=list(standardize=FALSE, nfolds=10, family="cox", 
                penalty.factor=rep(0:1, times=c(1,dim(eset)[1]))),
-               RNG="fixed", seed=0815, cpus=3, parallel=T, clustertype="SOCK", 
+               RNG="fixed", seed=0815, cpus=3, parallel=TRUE, clustertype="SOCK", 
                load.list=list(packages=c("c060")), 
                indices=resample.indices(n=dim(eset)[2],
                sample.n=10, method="sub632"))
@@ -392,13 +373,13 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
 Bootstrap results can be visualized with the \code{plot.peperr} function from the \pkg{peperr} package showing the selected complexity parameters, 
 out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again an algorithm specific wrapper (here \code{PLL.coxnet}) needs to be defined. In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package which allows to display the number still at risk and pointwise bootstrap quantiles (\code{Plot.peperr.curves}) as shown in Figure~\ref{fig:pec}. By default, the $.632+$ is calculated and displayed. Displaying also the $.632$ estimator, the no-information error rate and the average out-of-bag bootstrap error is optional in \code{Plot.peperr.curves}. \\
 
-<<peperrPlot1, echo=T, results=hide, fig=FALSE,eval=FALSE>>=
+<<peperrPlot1, echo=TRUE, results=hide, fig=FALSE,eval=FALSE>>=
 Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
                    bootQuants=TRUE, bootQuants.level=0.95, leg.cex=0.7)
 @
 \begin{figure}[t!]
 \begin{center}
-<<peperrPlot2, echo=F, results=hide, fig=TRUE,height=5,width=5>>=
+<<peperrPlot2, echo=FALSE, results=hide, fig=TRUE,height=5,width=5>>=
 Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
                    bootQuants=TRUE, bootQuants.level=0.95, leg.cex=0.7)
 @
@@ -425,7 +406,7 @@ So far implementations of stability selection can be found in the packages \pkg{
 Here we use stability selection to identify prognostic features which have a relevant influence on the survival times of the patients in the AML data set and to control Type I errors to ensure that the features identified are truly associated with the survival times.
 To calculate the stability path for the $L_1$-penalized Cox regression we use the function \code{stabpath} from our \proglang{R} package. Via the \code{weakness} argument of the function \code{stabpath} it is possible to induce additional randomization by reweighting the penalization of each feature. In brief, in each subsampling step the individual penalization of each feature is randomized such that it lies in the range of $[\lambda,\lambda/\kappa]$, where $\kappa$ is represented by the \code{weakness} parameter which indicates the amount of this additional randomization. The weights $w_{i},\cdots,w_{p}$ to reweight each $\lambda_{i}$ by $\lambda_{i}/w_{i}$ are generated by sampling from a uniform distribution, i.e. $w_{i} \sim \mathcal{U}(\kappa,1)$. \citet{MeinshausenBuehlmann2010} call this additional randomization 'randomized lasso' and showed that it greatly improves the variable selection performance of the stability selection. The function \code{stabpath} draws subsets and calculates in parallel the stability path, e.g., the selection probabilities of each feature along the range of possible penalization parameter values. For parallelization we use the package \pkg{parallel}, which has been a base package since \proglang{R} version 2.14.0. On Unix-like systems the parallelization is done by forking via the function \code{mclapply} whereas under Windows systems socket clusters are used. 
 
-<<stabilitySelection1, echo=T, results=verbatim>>=
+<<stabilitySelection1, echo=TRUE, results=verbatim>>=
 y <- cbind(time=pData(eset)$os, status=pData(eset)$os_status)
 set.seed(1234)
 spath <- stabpath(y=y, x=t(exprs(eset)), mc.cores=2,
@@ -435,7 +416,7 @@ spath <- stabpath(y=y, x=t(exprs(eset)), mc.cores=2,
 
 After calculating the stability path, the function \code{stabsel} can be called to estimate the stable set of features. Controlling a per-family error rate (PFER) of $1$, e.g., expecting one falsely selected feature, the estimated set of stable features comprises a single feature (with $\hat\Pi>0.6$).
 
-<<stabilitySelection2, echo=T, results=verbatim>>=
+<<stabilitySelection2, echo=TRUE, results=verbatim>>=
 stabsel(spath, error=1, type="pfer", pi_thr=0.6)$stable
 @
 
@@ -443,7 +424,7 @@ Alternativly, the \code{stabsel} function allows to control the per-comparison w
 
 \begin{figure}[t!]
 \begin{center}
-<<stabilitySelection3, echo=F, results=hide, fig=TRUE,height=7,width=7>>=
+<<stabilitySelection3, echo=FALSE, results=hide, fig=TRUE,height=7,width=7>>=
 plot(spath, error=1, type="pfer", pi_thr=0.6, xvar="lambda", col.all="gray")
 @
 \end{center}
