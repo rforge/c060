@@ -451,7 +451,7 @@ The required objects and parameters for finding elastic-net Cox model with optim
   
   nfolds = 10
   set.seed(1234)
-  foldid <- my.balanced.folds(class.column.factor=y[,2], cross.outer=nfolds)
+  foldid <- balancedFolds(class.column.factor=y[,2], cross.outer=nfolds)
 @
 
 The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross-validated penalized (partial) log likelihood deviance of the model is minimal.  The wrapper function \\
