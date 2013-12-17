@@ -111,7 +111,7 @@ Computational efficiency is an important requirement of the software to make app
 We provide \proglang{R} functions to perform stability selection \citep{MeinshausenBuehlmann2010} in a computationally efficient way which allows to select the most stable features at a given Type I error level. We have also implemented an approach to select the optimal parameter combination ($\alpha$, $\lambda$) for elastic-net penalties using an interval-search algorithm \citep{froehlich2005} which is often faster and more accurate than a standard grid search \citep{Jones1998}. Another very useful addition for real-life applications of \pkg{glmnet} \citep{glmnet} for building risk-prediction models is the provision of wrapper functions to allow the computation of resampling-based prediction errors within the framework of the \proglang{R} package \pkg{peperr} \citep{Porz2009}. The \pkg{peperr} package makes it computationally feasible to assess the
 predictive accuracy of a penalized regression model via resampling methods even for very large-scale applications by employing parallel computing. We also provide the possibility to speed up stability selection by parallel computing using the functionalities of the \proglang{R} base package \pkg{parallel} \citep{R11}.
 
-Stability selection is currently defined for gaussian, binomial, poisson, multinomial and cox models, interval search for ...., prediction error curves for cox models and classification errors for
+Stability selection and interval search are currently defined for gaussian, binomial, poisson, multinomial and cox models,  prediction error curves for cox models and classification errors for
 binomial models. Since all functions are basically wrapped around the \pkg{glmnet} fitting or cross-validation function call, the type of response is always specified with the \code{family} argument. 
 
 The software is available as \proglang{R} package \pkg{c060} on CRAN (URL \url{http://cran.r-project.org/web/packages/c060/}, version 0.2 at time of manuscript submission).
@@ -228,8 +228,8 @@ library(glmnet)
 require(penalizedSVM)
 library(parallel) #for stabilityselection.R
 library(peperr) #for peperr_glmnet.R
-library(tgp) #for EPSGO.R
-library(mlegp) #for EPSGO.R
+#library(tgp) #for EPSGO.R
+#library(mlegp) #for EPSGO.R
 library(pamr) #for tune.glmnet.interval.R
 library(lattice) # for plotting 
 
@@ -461,7 +461,7 @@ The second tuning parameter $\lambda$ will be found for each given $\alpha$ via 
 
 
 <<interval_search_cox_show, echo=TRUE, eval=FALSE>>=
-  fit <- EPSGO(Q.func="tune.glmnet.interval", 
+  fit <- epsgo(Q.func="tune.glmnet.interval", 
              bounds=bounds, 
              parms.coding="none", 
              seed = 1234, 
@@ -478,7 +478,7 @@ if (file.exists(".Rdata/fit_interval_search.RData")) {
   load(".Rdata/fit_interval_search.RData") 
 } else {
   print("start interval search")
-  fit <- EPSGO(Q.func="tune.glmnet.interval",  
+  fit <- epsgo(Q.func="tune.glmnet.interval",  
              bounds=bounds, 
              parms.coding="none", 
              show = "none", 
@@ -540,6 +540,9 @@ plot(sumint,type="points")
 \end{center}
 \caption{\label{fig:interval_search2} The distribution of initial and visited points of the interval search plotted in chronological order. The interval search is employed to identify the optimal parameter value combination ($\alpha$,$\lambda$) for the elastic-net Cox model fitted to the AML data set.}
 \end{figure}
+
+To our knowledge, the interval search approach have not been applied as an extension of glmnet so far. The only one application of this approach was in our other R package 'penalizedSVM' dealing with feature selection by classification with Support Vector Machines. 
+
 
 \begin{center}
 \begin{table}
