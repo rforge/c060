@@ -1,14 +1,21 @@
-export(stability.path,
-       plotstabpath,
-       stability.selection,
+import(glmnet, survival, parallel,  peperr, penalizedSVM, lattice)
+
+export(stabpath,
+       stabsel,
        aggregation.auc,
        complexity.glmnet,
        fit.glmnet,
-       PLL.coxnet,
-       plot.peperr.curves,
-       predictProb.glmnet,
-    predictProb.coxnet,
-    EPSGO,
-       tune.glmnet.interval,my.balanced.folds)
+       Plot.peperr.curves,
+       epsgo,
+       tune.glmnet.interval,
+       balancedFolds,
+       coef.optmodel
+       )
 
-
+S3method("print","stabpath")
+S3method("plot","stabpath")
+S3method("PLL","coxnet")
+S3method("predictProb","glmnet")
+S3method("predictProb","coxnet")
+S3method("summary","intsearch")
+S3method("plot","sum.intsearch")

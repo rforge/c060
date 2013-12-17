@@ -8,6 +8,7 @@ tune.glmnet.interval<-function(parms, x, y,
                                          foldid=NULL, 
                                          grouped = TRUE, 
                                          type.min=c("lambda.min", "lambda.1se"),
+                                         family,
                                          verbose=FALSE,
                                          ...){
   
@@ -24,14 +25,14 @@ tune.glmnet.interval<-function(parms, x, y,
    
   # find optimal lambda for given alpha
   set.seed(seed)
-  cv<-cv.glmnet(x=x,y=y,family=family,  
+  cv<-cv.glmnet(x=x,y=y, family=family,
                 alpha=alpha,
                 offset = NULL,
                 lambda = NULL, 
                 type.measure =type.measure,
                 nfolds = nfolds, 
                 foldid = foldid,
-                grouped = grouped)
+                grouped = grouped )
   
   
   opt.lambda<-ifelse(type.min=="lambda.min", cv$lambda.min, cv$lambda.1se )
@@ -41,28 +42,16 @@ tune.glmnet.interval<-function(parms, x, y,
   
   #  3. fit  the model for given alpha and opt.lambda ########################################################
   # fit the model for given alpha and opt.lambda
-  fit<-glmnet(x=x,y=y,family=family,
+  fit<-glmnet(x=x,y=y,
+              family=family,
               alpha=alpha, 
-              lambda=opt.lambda)
+              lambda=opt.lambda )
   
    
-   ret<-list(q.val=q.val, model=list(alpha=alpha, lambda=opt.lambda, cvreg=cv, fit=fit) ) 
+   ret<-list(q.val=q.val, model=list(alpha=alpha, lambda=opt.lambda, nfolds=nfolds, cvreg=cv, fit=fit) ) 
   
   return(ret)
 }
 
-#stolen from MCREstimate package
-# used for stratified(balanced) classification or regression
-my.balanced.folds <- function(class.column.factor, cross.outer)
-{
-  # get balanced folds from pamr
-  sampleOfFolds  <- get("balanced.folds",envir=asNamespace("pamr"))(class.column.factor, nfolds=cross.outer)
-  permutated.cut <- rep(0,length(class.column.factor))
-  for (sample in 1:cross.outer)
-  {
-    cat(sample,"\n")
-    permutated.cut[sampleOfFolds[[sample]]] <- sample
-  }
-  return(permutated.cut)
-}
+
 

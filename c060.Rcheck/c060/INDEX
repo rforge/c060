@@ -1,23 +1,28 @@
-EPSGO                   Finds an optimal solution
 PLL.coxnet              Predictive partial log-likelihood for glmnet
                         Cox PH model fit
+Plot.peperr.curves      Plot method for prediction error curves of a
+                        peperr object
 aggregation.auc         Determine the area under the ROC curve for a
                         fitted model
+balancedFolds           Function producing stratified/ balanced folds
+                        for cross validation
+coef.optmodel           Get coefficients for a model
 complexity.glmnet       Interface for determination of penalty lambda
                         in penalized regression model via
                         cross-validation
+epsgo                   Finds an optimal solution
 fit.glmnet              Interface function for fitting a penalized
                         regression model with 'glmnet'
-plot.peperr.curves      Plot method for prediction error curves of a
-                        peperr object
-plot.summary.int.search
-                        Plot Summary object for interval search models
-plotstabpath            function to plot a stability path
+plot.coef.glmnet        function to highlight the path of a
+                        pre-specified set of variables within the
+                        coefficient path
+plot.stabpath           function to plot a stability path
+plot.sum.intsearch      Plot Summary object for interval search models
 predictProb.coxnet      Extract predicted survival probabilities from a
                         glmnet fit
 predictProb.glmnet      Extract predicted survival probabilities from a
                         glmnet fit
-stability.path          Stability path for glmnet models
-stability.selection     function to estimate a stable set of variables
-summary.int.search      Summary method for interval search models
+stabpath                Stability path for glmnet models
+stabsel                 function to estimate a stable set of variables
+summary.intsearch       Summary method for interval search models
 tune.glmnet.interval    Wrapper function for 'glmnet' objects.

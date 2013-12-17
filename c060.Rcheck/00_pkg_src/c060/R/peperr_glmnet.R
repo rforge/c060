@@ -1,6 +1,6 @@
 ###############################################################
 # baseline survival/ hazard Breslow estimator
-# function essentially based on gbm:::basehaz.gbm
+# function essentially based on gbm::basehaz.gbm
 ###############################################################
 basesurv <- function (response, lp, times.eval = NULL, centered = FALSE)
 {
@@ -28,7 +28,7 @@ basesurv <- function (response, lp, times.eval = NULL, centered = FALSE)
 
 fit.glmnet <- function (response, x, cplx, ...) 
 {
-    require(glmnet)
+    #require(glmnet)
     res <- NULL
     tryerr <- try(res <- glmnet(y = response, x = data.matrix(x), lambda = cplx,  ...), silent=TRUE)
 
@@ -41,7 +41,7 @@ fit.glmnet <- function (response, x, cplx, ...)
 
 complexity.glmnet <- function (response, x, full.data, ...) 
 {
-    require(glmnet)
+    #require(glmnet)
     lambda <- NULL
     tryerr <- try(cv <- cv.glmnet(y = response, x = data.matrix(x),  ...), silent=TRUE)
     
@@ -51,9 +51,9 @@ complexity.glmnet <- function (response, x, full.data, ...)
     lambda
 }
 
-predictProb.coxnet <- predictProb.glmnet <- function (object, x, times, complexity,  ...) 
+predictProb.coxnet <- predictProb.glmnet <- function (object, response, x, times, complexity,  ...) 
 {
-    require(glmnet)    
+    #require(glmnet)    
     lp       <- as.numeric(predict(object, newx=data.matrix(x),s=complexity, type="link"))
     basesurv <- basesurv(object$response,object$linear.predictor, sort(unique(times)))
     p        <- exp(exp(lp) %*% -t(basesurv$cumBaseHaz))
@@ -65,8 +65,8 @@ predictProb.coxnet <- predictProb.glmnet <- function (object, x, times, complexi
 
 PLL.coxnet <- function(object, newdata, newtime, newstatus, complexity, ...) 
 {
-   require(glmnet)
-   PLL <- glmnet:::coxnet.deviance(pred = NULL, Surv(newtime,newstatus), x = data.matrix(newdata), offset = NULL, weights = NULL, beta = coef(object,s=complexity)) 
+   #require(glmnet)
+   PLL <- glmnet::coxnet.deviance(pred = NULL, Surv(newtime,newstatus), x = data.matrix(newdata), offset = NULL, weights = NULL, beta = coef(object,s=complexity)) 
    PLL / -2
 }
 
@@ -155,11 +155,11 @@ aggregation.auc <- function (full.data = NULL, response, x, model, cplx = NULL,
     }
     type <- match.arg(type)
     if (type == "apparent") {
-        auc <- glmnet:::auc(response,probs)
+        auc <- glmnet::auc(response,probs)
     }
     if (type == "noinf") {
         resp.mat <- matrix(response, length(response),  length(response), byrow = TRUE)
-        auc      <- mean(apply(resp.mat, 1, function(d) glmnet:::auc(d,probs)))
+        auc      <- mean(apply(resp.mat, 1, function(d) glmnet::auc(d,probs)))
     }
     auc
 }
@@ -168,38 +168,56 @@ aggregation.auc <- function (full.data = NULL, response, x, model, cplx = NULL,
 ### plot pecs        ###
 ########################
 
-plot.peperr.curves <- function(x,at.risk=TRUE,allErrors=FALSE, ...) {
+Plot.peperr.curves <- function(x,at.risk=TRUE,allErrors=FALSE,  bootRuns=FALSE, bootQuants=TRUE, bootQuants.level=0.95, leg.cex=0.7, ...) {
   
-  require(peperr)
+  #require(peperr)
 
+  if (bootRuns) bootQuants <- FALSE
+  
   plot(x$attribute, x$null.model, type = "n", las=1,
        col = "blue", xlab = "Evaluation time points", 
        ylab = "Prediction error", main = "Prediction error curves", 
        ylim = c(0, max(perr(x), x$full.apparent, x$null.model) + 0.1))
   
-  if (length(x$sample.error) > 1) {
+  if (length(x$sample.error) > 1 & bootRuns==TRUE) {
     for (i in 1:(length(x$sample.error))) {
       lines(x$attribute, x$sample.error[[i]], type = "l", col = "light grey", lty = 1)
     }
   }
+
+  if (length(x$sample.error) > 1 & bootQuants==TRUE) {
+    boots  <- do.call("rbind",x$sample.error)
+    quants <- apply(boots, 2, function(d) quantile(d, probs=c((1-bootQuants.level)/2,1 - (1-bootQuants.level)/2)))
+    polygon(c(x$attribute,rev(x$attribute)),c(quants[1,],rev(quants[2,])), col="light grey", border="light grey")
+  }
   
   if (allErrors==FALSE) {
      lines(x$attribute, x$null.model, type = "l", col = "blue", lwd = 2, lty = 1)
-     lines(x$attribute, perr(x, "632p"), type = "l", col= "black", lty = 2, lwd = 2)
-     lines(x$attribute, x$full.apparent, type = "l", col = "red", lty = 3, lwd = 2)
-     legend(x = "topleft", col = c("blue", "black", "red", "light grey"), lwd=c(2,2,2,1), 
-            lty = c(1:3, 1), legend = c("Null model", ".632+ estimate", "Full apparent", "Bootstrap samples"))
+     lines(x$attribute, perr(x, "632p"), type = "l", col= "black", lty = 1, lwd = 2)
+     lines(x$attribute, x$full.apparent, type = "l", col = "red", lty = 1, lwd = 2)
+     if (bootRuns==TRUE) {
+       legend(x = "topleft", col = c("blue", "black", "red", "light grey"), lwd=c(2,2,2,1), cex=leg.cex,
+            lty = 1, legend = c("Null model", ".632+ estimate", "Full apparent", "Bootstrap samples"))
+     } else {
+       legend(x = "topleft", col = c("blue", "black", "red"), lwd=c(2,2,2), cex=leg.cex,
+              lty = 1, legend = c("Null model", ".632+ estimate", "Full apparent"))
+     }   
   }
 
   if (allErrors==TRUE) {
     lines(x$attribute, x$null.model, type = "l", col = "blue", lwd = 2, lty = 1)
-    lines(x$attribute, perr(x, "632p"), type = "l", col= "black", lty = 2, lwd = 2)
-    lines(x$attribute, perr(x, "632"), type = "l", col= "brown", lty = 3, lwd = 2)
-    lines(x$attribute, perr(x, "NoInf"), type = "l", col= "green", lty = 4, lwd = 2)
-    lines(x$attribute, perr(x, "resample"), type = "l", col= "dark grey", lty = 5, lwd = 2)
-    lines(x$attribute, x$full.apparent, type = "l", col = "red", lty = 6, lwd = 2)
-    legend(x = "topleft", ncol=2, col = c("blue", "black","brown","green","dark grey","red", "light grey"), lwd=c(2,2,2,2,2,2,1), 
-           lty = c(1:6, 1), legend = c("Null model", ".632+ estimate",".632 estimate", "No Information","Out-of-bag average","Full apparent", "Bootstrap samples"))
+    lines(x$attribute, perr(x, "632p"), type = "l", col= "black", lty = 1, lwd = 2)
+    lines(x$attribute, perr(x, "632"), type = "l", col= "brown", lty = 1, lwd = 2)
+    lines(x$attribute, perr(x, "NoInf"), type = "l", col= "green", lty = 1, lwd = 2)
+    lines(x$attribute, perr(x, "resample"), type = "l", col= "dark grey", lty = 1, lwd = 2)
+    lines(x$attribute, x$full.apparent, type = "l", col = "red", lty = 1, lwd = 2)
+    if (bootRuns==TRUE) {
+      legend(x = "topleft", ncol=2, col = c("blue", "black","brown","green","dark grey","red", "light grey"), lwd=c(2,2,2,2,2,2,1), cex=leg.cex,
+           lty = 1, legend = c("Null model", ".632+ estimate",".632 estimate", "No Information","Out-of-bag average","Full apparent", "Bootstrap samples"))
+    } else {
+      legend(x = "topleft", ncol=2, col = c("blue", "black","brown","green","dark grey","red"), lwd=c(2,2,2,2,2,2), cex=leg.cex,
+             lty = 1, legend = c("Null model", ".632+ estimate",".632 estimate", "No Information","Out-of-bag average","Full apparent"))
+    }
   }
   
   if (at.risk) {
