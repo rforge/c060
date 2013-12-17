@@ -561,13 +561,13 @@ Function & Description \\
 \code{stabsel} & estimates a stable set of variables and allows to control the PFER, PCER or FWER\\
 \code{plot.stabpath} & displays stability path and indicates estimated stable features\\
 \hline
-\code{EPSGO}              &Finds an optimal solution\\
-\code{summary.int.search}  &Summary method for interval search models\\
+\code{epsgo}              &Finds an optimal solution\\
+\code{summary.intsearch}  &Summary method for interval search models\\
 \code{tune.glmnet.interval} &Wrapper function for 'glmnet' objects.\\
-\code{plot.summary.int.search} &Plot Summary object for interval search models\\
+\code{plot.sum.intsearch} &Plot Summary object for interval search models\\
 \hline
 \end{tabular}
-\caption{\label{tab:functions} Overview of available functions. The first block shows functions to calculate and visualize resampling based prediction errors for penalized Cox and binomial models. The second block shows all provided functions to perform interval search and the last block functions to perform stability selection.}
+\caption{\label{tab:functions} Overview of available functions. The first block shows functions to calculate and visualize resampling based prediction errors for penalized Cox and binomial models. The second block shows all provided functions to perform stability selection  and the last block functions to perform interval search.}
 \end{table}
 \end{center}
 %\clearpage
