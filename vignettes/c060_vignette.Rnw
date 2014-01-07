@@ -91,6 +91,7 @@ Although we focus on a survival data application of penalized Cox models in this
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE}
+%\SweaveOpts{concordance=TRUE}
 
 \section{Introduction}
 \label{intro}
@@ -307,7 +308,8 @@ res <- cvres$glmnet.fit
 plot(cvres)
 @
 \end{center}
-\caption{\label{fig:cvlasso}Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
+\caption{Cross-validated partial log-likelihood deviance, including upper and lower standard deviations, as a function of $\log{\lambda}$ for the AML data set. The dotted vertical lines indicate the $\lambda$ values with minimal deviance (left) and with the largest $\lambda$ value within one standard deviation of the minimal deviance (right).}
+\label{fig:cvlasso}
 \end{figure}
 
 <<glmnet0, echo=FALSE, results=hide>>=
@@ -523,7 +525,8 @@ names(cofn.lasso) %in% names(cofn)
 plot(sumint)
 @
 \end{center}
-\caption{\label{fig:interval_search1} Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic-net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The solid red lines highlight the final solution with minimal partial log likelihood deviance. }
+\caption{Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic-net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The solid red lines highlight the final solution with minimal partial log likelihood deviance. }
+\label{fig:interval_search1}
 \end{figure}
 
 Figure~\ref{fig:interval_search1} illustrates the relationship between both tuning parameters $\alpha$ and $\lambda$ for the 'visited' points in the parameter space. The partial log likelihood deviance is  color-coded with black for small values and gray for large values.  The number of features selected  in the corresponding model is written near each point. 
@@ -538,7 +541,8 @@ This plot shows nicely that the interval search algorithm does not sequentially 
 plot(sumint,type="points") 
 @
 \end{center}
-\caption{\label{fig:interval_search2} The distribution of initial and visited points of the interval search plotted in chronological order. The interval search is employed to identify the optimal parameter value combination ($\alpha$,$\lambda$) for the elastic-net Cox model fitted to the AML data set.}
+\caption{The distribution of initial and visited points of the interval search plotted in chronological order. The interval search is employed to identify the optimal parameter value combination ($\alpha$,$\lambda$) for the elastic-net Cox model fitted to the AML data set.}
+\label{fig:interval_search2}
 \end{figure}
 
 To our knowledge, the interval search approach have not been applied as an extension of glmnet so far. The only one application of this approach was in our other R package 'penalizedSVM' dealing with feature selection by classification with Support Vector Machines. 
@@ -551,26 +555,28 @@ To our knowledge, the interval search approach have not been applied as an exten
 \hline                        
 Function & Description \\
 \hline
-\code{PLL.coxnet} & Predictive partial log-likelihood for glmnet Cox PH model fit\\ 
+\code{plot.coef.glmnet} & Plot the \code{glmnet} coefficient path and highlight the path of a pre-specified set of variables\\
+\hline
+\code{PLL.coxnet} & Predictive partial log-likelihood for \code{glmnet} Cox PH model fit\\ 
 \code{aggregation.auc} & Determine the area under the ROC curve for a fitted model\\
-\code{complexity.glmnet} & Interface for determination of penalty lambda in penalized regression model via cross-validation\\ 
-\code{fit.glmnet} & Interface function for fitting a penalized regression model with 'glmnet'\\
-\code{plot.coef.glmnet} & Plot the glmnet coefficient path and highlight the path of a pre-specified set of variables\\
-\code{plot.peperr.curves} & Plot method for prediction error curves of a peperr object\\
-\code{predictProb.coxnet} &  Extract predicted survival probabilities from a coxnet fit \\
-\code{predictProb.glmnet} & Extract predicted survival probabilities from a glmnet fit \\
+\code{complexity.glmnet} & Interface for determination of penalty \code{lambda} in \code{glmnet} models via cross-validation\\ 
+\code{fit.glmnet} & Interface function for fitting a penalized regression model with \code{glmnet}\\
+\code{plot.peperr.curves} & Plot method for prediction error curves of a \code{peperr} object\\
+\code{predictProb.coxnet} &  Extract predicted survival probabilities from a \code{coxnet} fit \\
+\code{predictProb.glmnet} & Extract predicted survival probabilities from a \code{glmnet} fit \\
 \hline
-\code{stabpath} & calculates the stability path for gaussian, binomial, poisson, multinomial and cox \code{glmnet} models\\
-\code{stabsel} & estimates a stable set of variables and allows to control the PFER, PCER or FWER\\
-\code{plot.stabpath} & displays stability path and indicates estimated stable features\\
+\code{stabpath} & Calculate the stability path for gaussian, binomial, poisson, multinomial and Cox \code{glmnet} models\\
+\code{stabsel} & Estimate a stable set of variables and allows to control the PFER, PCER or FWER\\
+\code{plot.stabpath} & Display stability path and indicates estimated stable features\\
 \hline
-\code{epsgo}              &Finds an optimal solution\\
+\code{epsgo}              &Efficient Parameter Selection via Global Optimization\\
 \code{summary.intsearch}  &Summary method for interval search models\\
-\code{tune.glmnet.interval} &Wrapper function for 'glmnet' objects.\\
-\code{plot.sum.intsearch} &Plot Summary object for interval search models\\
+\code{tune.glmnet.interval} &Wrapper function to apply \code{epsgo} to  \code{glmnet} objects\\
+\code{plot.sum.intsearch} &Plot \code{sum.intsearch} objects generated by \code{summary.intsearch}\\
 \hline
 \end{tabular}
-\caption{\label{tab:functions} Overview of available functions. The first block shows functions to calculate and visualize resampling based prediction errors for penalized Cox and binomial models. The second block shows all provided functions to perform stability selection  and the last block functions to perform interval search.}
+\caption{Overview of available functions.}
+\label{tab:functions}
 \end{table}
 \end{center}
 %\clearpage
