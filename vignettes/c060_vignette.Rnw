@@ -28,7 +28,7 @@
 \definecolor{gradbegin}{rgb}{0.6,0.1,0.6} % purple
 
 \author{Martin Sill\\
-\And Thomas Hielscher\\ \hspace{3.95 cm} Divison of Biostatistics \\  \hspace{4.3 cm} German Cancer Research Center
+\And Thomas Hielscher\\ \hspace{3.95 cm} Divison of Biostatistics (C060) \\  \hspace{4.3 cm} German Cancer Research Center, heidelberg
 \And Natalia Becker\\
 \And Manuela Zucknick\\}
 \title{\pkg{c060}: Extended Inference with Lasso and Elastic-Net Regularized Cox and Generalized Linear Models}
@@ -47,9 +47,9 @@ The popular CRAN package \pkg{glmnet} package \citep{glmnet} implements an effic
 However, in practical applications the data analysis will typically not stop at the point where the model has been fitted. One is for example often interested in the stability
 of selected features and in assessing the prediction performance of a model and we provide functions to deal with both of these tasks. Our \proglang{R} functions are computationally
 efficient and offer the possibility of speeding up computing time through parallel computing. Another feature which can drastically reduce computing time is an efficient interval-search algorithm,
-which we have implemented for selecting the optimal parameter combination for elastic-net penalties. These functions have been useful in our daily work at the
+which we have implemented for selecting the optimal parameter combination for elastic net penalties. These functions have been useful in our daily work at the
 Biostatistics department (C060) of the German Cancer Research Center where prognostic modelling of patient survival data is of particular interest.
-Although we focus on a survival data application of penalized Cox models in this article, the functions in our \proglang{R} package are in general applicable to all types of regression models implemented in the \pkg{glmnet} package, except for prediction error curves, which are only defined for survival data.
+Although we focus on a survival data application of penalized Cox models in this article, the functions in our \proglang{R} package are in general applicable to all types of regression models implemented in the \pkg{glmnet} package, with the exception of prediction error curves, which are specific to time-to-event data.
 
 }
 \Keywords{\pkg{glmnet}, penalized log-likelihood method, stability selection, interval search, prediction error}
@@ -96,31 +96,31 @@ Although we focus on a survival data application of penalized Cox models in this
 \section{Introduction}
 \label{intro}
 
-Penalized regression models provide a statistically appealing method to build prediction models from high-dimensional data sources, where it is the aim to simultaneously select features and to fit the model \citep{fan2010,benner2010}. Since the introduction of the lasso for linear regression models \citep{tibshirani96}, the methodology has been extended to generalized linear regression models and time-to-event endpoints \citep{tibshirani97} among others. In addition to the well-known $L_1$-norm (lasso) and $L_2$-norm (ridge) penalty functions, various other penalties have been proposed in recent years to select features and/or estimate their effects. In particular, we will use the elastic-net penalty function \citep{zou05}, which is a linear combination of the $L_1$- and $L_2$-norms.
+Penalized regression models provide a statistically appealing method to build prediction models from high-dimensional data sources, where it is the aim to simultaneously select features and to fit the model \citep{fan2010,benner2010}. Since the introduction of the lasso for linear regression models \citep{tibshirani96}, the methodology has been extended to generalized linear regression models and time-to-event endpoints \citep{tibshirani97} among others. In addition to the well-known $L_1$-norm (lasso) and $L_2$-norm (ridge) penalty functions, various other penalties have been proposed in recent years to select features and/or estimate their effects. In particular, we will use the elastic net penalty function \citep{zou05}, which is a linear combination of the $L_1$- and $L_2$-norms.
 
 With ever increasing data, the properties of the algorithm used for fitting the model have become almost as important as the statistical model itself. 
 \citet{FHT2010} proposed a coordinate descent algorithm for generalized linear regression models, which has since then been extended to penalized Cox proportional hazards (PH) regression models \citep{simon2011}. Due to its efficiency this algorithm is considered one of the state-of-the-art
-approaches to estimate penalized regression models with lasso, ridge or elastic-net penalty terms, especially in high-dimensional data scenarios. 
-First references about coordinate descent algorithms date back to \citet{Fu98} and \citet{friedman07}.
+approaches to estimate penalized regression models with lasso, ridge or elastic net penalty terms, especially in high-dimensional data scenarios. 
+First references about coordinate descent algorithms date back to \citet{Fu98}. %and \citet{friedman07}.
 
 This algorithm has been implemented in \proglang{R} \citep{R11} in the \pkg{glmnet} package \citep{glmnet}. The package provides functions to tune and fit regression models, plot the results, and make predictions. However, in practical applications, where often an independent validation data set is lacking, some additional features and routines are desirable as part of a complete data analysis. We have assembled some functions that enhance the existing functionality of the \pkg{glmnet} package or
-allow to use it within the framework of other existing \proglang{R} packages. These functions have been useful in our daily work in our daily work at the
-Biostatistics department (C060) of the German Cancer Research Center where prognostic modelling of patient survival data is of particular interest. Therefore, for illustration purposes we focus on penalized Cox PH regression models in this article. But the \proglang{R} functions are applicable to all types of regression models implemented in the \pkg{glmnet} package.
+allow to use it within the framework of other existing \proglang{R} packages. These functions have been useful in our daily work at the
+Biostatistics department (C060) of the German Cancer Research Center where prognostic modelling of patient survival data is of particular interest. Therefore, for illustration purposes we focus on penalized Cox PH regression models in this article. But the \proglang{R} functions are generally applicable to all types of regression models implemented in the \pkg{glmnet} package.
 
 Computational efficiency is an important requirement of the software to make applications feasible for real-life data analysis tasks in fields such as molecular oncology, where one aims to develop sparse risk prediction models based on very large numbers of molecular features measured with high-throughput technologies such as microarrays or next-generation sequencing. Therefore, we provide functionality to speed up computations, in particular through parallel computing.
 
-We provide \proglang{R} functions to perform stability selection \citep{MeinshausenBuehlmann2010} in a computationally efficient way which allows to select the most stable features at a given Type I error level. We have also implemented an approach to select the optimal parameter combination ($\alpha$, $\lambda$) for elastic-net penalties using an interval-search algorithm \citep{froehlich2005} which is often faster and more accurate than a standard grid search \citep{Jones1998}. Another very useful addition for real-life applications of \pkg{glmnet} \citep{glmnet} for building risk-prediction models is the provision of wrapper functions to allow the computation of resampling-based prediction errors within the framework of the \proglang{R} package \pkg{peperr} \citep{Porz2009}. The \pkg{peperr} package makes it computationally feasible to assess the
+We provide \proglang{R} functions to perform stability selection \citep{MeinshausenBuehlmann2010} in a computationally efficient way which allows to select the most stable features at a given Type I error level. We have also implemented an approach to select the optimal parameter combination ($\alpha$, $\lambda$) for elastic net penalties using an interval-search algorithm \citep{froehlich2005} which is often faster and more accurate than a standard grid search \citep{Jones1998}. Another very useful addition for real-life applications of \pkg{glmnet} for building risk-prediction models is the provision of wrapper functions to allow the computation of resampling-based prediction errors within the framework of the \proglang{R} package \pkg{peperr} \citep{Porz2009}. The \pkg{peperr} package makes it computationally feasible to assess the
 predictive accuracy of a penalized regression model via resampling methods even for very large-scale applications by employing parallel computing. We also provide the possibility to speed up stability selection by parallel computing using the functionalities of the \proglang{R} base package \pkg{parallel} \citep{R11}.
 
-Stability selection and interval search are currently defined for gaussian, binomial, poisson, multinomial and cox models,  prediction error curves for cox models and classification errors for
-binomial models. Since all functions are basically wrapped around the \pkg{glmnet} fitting or cross-validation function call, the type of response is always specified with the \code{family} argument. 
+Stability selection and interval search are currently defined for Gaussian, binomial, Poisson, multinomial and Cox models,  prediction error curves for Cox models and classification errors for
+binomial models. Since all functions are basically wrapped around the \pkg{glmnet} fitting or cross-validation function calls, the type of response is always specified by the \code{family} argument. 
 
-The software is available as \proglang{R} package \pkg{c060} on CRAN (URL \url{http://cran.r-project.org/web/packages/c060/}, version 0.2 at time of manuscript submission).
+The software is available as \proglang{R} package \pkg{c060} on CRAN (URL \url{http://cran.r-project.org/web/packages/c060/}, version 0.2 at time of manuscript publication) and on R-forge (URL \url{https://r-forge.r-project.org/projects/c060/}, version 0.2-2 at the time of publication).
 
 \section{Methods and algorithms}
 
 \subsection{Penalized generalized linear models and Cox models}\label{methods:penalized}
-An efficient implementation for fitting generalized linear models and Cox proportional hazards models with regularization by the lasso or elastic-net penalty terms is provided by the \proglang{R} package \pkg{glmnet}. This implementation uses a coordinate descent algorithm for fitting the models for specified values of penalty parameters $\lambda > 0$ and $\alpha \in (0,1]$. The computation of an entire regularization path across a range of values $\Lambda = \{\lambda_1,\lambda_2...,\lambda_K\}$ at fixed $\alpha$ with \pkg{glmnet} is generally very fast, because previously computed solutions for $\{\lambda_1,...,\lambda_{k-1}\}$ are used as 'hot' starting values for the computation of $\lambda_k$. This implies that it is often more efficient to compute the models for the entire regularization path of $\Lambda$ rather than just individual models. We use this feature in all of our implemented algorithms to make most use of the computational speed of \pkg{glmnet}.
+An efficient implementation for fitting generalized linear models and Cox proportional hazards models with regularization by the lasso or elastic net penalty terms is provided by the \proglang{R} package \pkg{glmnet}. This implementation uses a coordinate descent algorithm for fitting the models for specified values of penalty parameters $\lambda > 0$ and $\alpha \in (0,1]$. The computation of an entire regularization path across a range of values $\Lambda = \{\lambda_1,\lambda_2...,\lambda_K\}$ at fixed $\alpha$ with \pkg{glmnet} is generally very fast, because previously computed solutions for $\{\lambda_1,...,\lambda_{k-1}\}$ are used as 'hot' starting values for the computation of $\lambda_k$. This implies that it is often more efficient to compute the models for the entire regularization path of $\Lambda$ rather than just individual models. We use this feature in all of our implemented algorithms to make most use of the computational speed of \pkg{glmnet}.
 
 Models are fitted by maximizing the penalized log-likelihood function for generalized linear models and the penalized partial log-likelihood for Cox models. The penalized (partial) log-likelihood function is given by
 \begin{equation}\label{pen.part.likelihood}
@@ -148,21 +148,21 @@ p_{\lambda}(|\beta_j|)=\lambda | \beta_j |
 and described a technique, called the lasso for ``least absolute shrinkage and selection operator'', for parameter estimation.
 The $L_1$-penalty has the advantage over the $L_2$-penalty of shrinking some of the coefficients to zero, i.e., it performs automatic feature selection.
 
-\subsection{The elastic-net}
-\Citet{zou05} introduced the elastic-net, which employs a combination of the $L_1$- and $L_2$-penalty. Like lasso the elastic-net performs automatic feature selection by setting some coefficient estimates to zero.
-But the additional $L_2$-penalty term distributes the weight to more features, such that the elastic-net tends to select more features than the lasso. 
-This is especially the case in situations with high correlation, where the lasso would select only one feature of a set of highly correlated features, while the ridge penalty would give them equal weight.
+\subsection{The elastic net}
+\Citet{zou05} introduced the elastic net, which employs a combination of the $L_1$- and $L_2$-penalty. Like lasso the elastic net performs automatic feature selection by setting some coefficient estimates to zero.
+But the additional $L_2$-penalty term distributes the weight to more features, so that the elastic net tends to select more features than the lasso. 
+This is especially the case in situations with high correlation, since the lasso would select only one feature of a set of perfectly correlated features, while the ridge penalty would give them equal weight.
 
-Throughout this manuscript we use an alternative parametrization of the elastic-net penalty function equivalently to the formulation used in the \pkg{glmnet} package:
+Throughout this manuscript we use the same parametrization of the elastic net penalty function as the formulation used in the \pkg{glmnet} package:
   \begin{equation}\label{enet2}
 p_{\alpha,\lambda}(|\beta_j|)= \lambda\times (\alpha |\beta_j| + (1-\alpha)\frac{1}{2} \beta_j^2).
 \end{equation}
 Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative to the $L_2$ penalty. Small $\alpha$ values will result in models with many features, getting closer to the non-sparse ridge solution as $\alpha$ tends to zero.
 
-\subsubsection{The interval-search algorithm to select the optimal elastic-net parameter combination}
-The elastic-net penalty function contains two tuning parameters which are data-dependent and hence cannot be set to some \emph{a priori} values. The challenge is to find a set of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross-validated loss function of the model is minimal.
+\subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
+The elastic net penalty function contains two tuning parameters which are data-dependent and hence cannot be set to some \emph{a priori} values. The challenge is to find a set of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross-validated loss function of the model is minimal.
 
-The commonly used fixed grid search has its major disadvantage in the systematic check of the penalized log likelihood deviance in each point of the grid. The grid density affects the accuracy and the time complexity of the algorithm.  Furthermore, the choice of the grid is highly arbitrary and the solution depends on the choice of grid as well as on grid density. 
+The commonly used fixed grid search has its major disadvantage in the need to systematicically compute the penalized log likelihood deviance at each point of the grid, which implies that the grid density affects the accuracy and the time complexity of the algorithm. Furthermore, the choice of the grid is highly arbitrary and the solution depends on the choice of grid as well as on grid density. 
 
 \Citet{froehlich2005} proposed an efficient algorithm for finding a global optimum on the tuning parameter space 
 called Efficient Parameter Selection via Global Optimization (EPSGO). The main idea of the algorithm is to treat the task of finding the optimal tuning parameter values as a global optimization problem. For that purpose one learns a Gaussian process model of the loss function surface in parameter space and samples systematically at points where the so-called expected improvement criterion reaches the maximum. 
@@ -171,7 +171,7 @@ The interval search can be divided into two phases. In the initial phase, a set 
 New points in the parameter space are sampled by using the expected improvement criterion as described by \citet{Jones1998}. The EPSGO algorithm stops when one of the stopping criteria is met, i.e., if either convergence of the algorithm has been reached or if there was no change in the solution during the last ten iterations.
 
 \Citet{froehlich2005} showed that the algorithm is robust against local minima. 
-One can observe an immense improvement in the training time for the Gaussian process model compared to more commonly used fixed grid search methods \citep{froehlich2005}. This is because the number of training points for the Gaussian process (and hence the number of evaluations of the loss function surface of the regression model) mainly depends on the dimensionality of the parameter space, which is very small compared to the number of training points on the grid.
+One can observe an immense improvement in the training time for the Gaussian process model compared to more commonly used fixed grid search methods \citep{froehlich2005}. This is because the number of training points for the Gaussian process (and hence the number of evaluations of the loss function surface of the regression model) mainly depends on the dimensionality of the tuning parameter space, which is very small compared to the number of training points on the grid.
 
 Summing up, the EPSGO algorithm provides two main advantages when compared to grid search methods: 
 \begin{itemize}
@@ -191,13 +191,13 @@ Then according to Theorem 1 in \citet{MeinshausenBuehlmann2010}, the expected nu
 \begin{equation}\label{stab}
 E(V) \leq \frac{1}{(2\pi_{thr}-1)} \frac{q^{2}_{\Lambda}}{p},
 \end{equation}
-where $q_{\Lambda}$ is the average of the number of non-zero coefficients w.r.t. to the drawn subsamples.  
-Interpreting Equation~\ref{stab} the expected number of falsely selected features decreases by either reducing the average number of selected features $q_{\Lambda}$ or by increasing the threshold $\pi_{thr}$. Suppose that $\pi_{thr}$ is fixed, then $E(V)$ can be controlled by limiting $q_{\Lambda}$ by the length of the regularization path $\Lambda$. In multiple testing the expected number of falsely selected features is also known as the per-family error rate (PFER) and if divided by the total number of features $p$ will become the per-comparison error rate (PCER) \citep{Dudoit2003}. The stability selection allows to control these Type I error rates. For instance, suppose the threshold $\pi_{thr} = 0.8$ is fixed, then choosing $\Lambda$ such that $q_{\Lambda} \leq \sqrt{0.6p}$ will control $E(V)\leq 1$. Moreover, by choosing $\Lambda$ so that $q_{\Lambda} \leq \sqrt{0.6p\alpha}$ will control the family wise error rate (FWER) at level $\alpha$, $P(V>0) \leq \alpha$.
-As mentioned before, according to \citet{FHT2010} the coordinate descent algorithm implemented in the \pkg{glmnet} package is most efficient regarding the computational time, when used to calculate a whole regularization path. To utilize this property our algorithm calculates the stability path by first generating subsets by subsampling and then calculating for each subsample the regularization path using the coordinate descent algorithm. The resulting regularization paths are then averaged to form the stability path. Furthermore, since the calculations of the regularization paths for each subset are independent of each other, the algorithm can easily be parallelized using the package \pkg{parallel}. %In parallel computing such easily to parallelize  embarrassingly parallel computations.    
+where $q_{\Lambda}$ is the average of the number of non-zero coefficients with respect to the drawn subsamples.  
+Equation~\ref{stab} shows that the bound on expected number of falsely selected features can be decreased by either reducing the average number of selected features $q_{\Lambda}$ or by increasing the threshold $\pi_{thr}$. Suppose that $\pi_{thr}$ is fixed, then $E(V)$ can be controlled by limiting $q_{\Lambda}$ by the length of the regularization path $\Lambda$. In multiple testing the expected number of falsely selected features is also known as the per-family error rate (PFER) and if divided by the total number of features $p$ will become the per-comparison error rate (PCER) \citep{Dudoit2003}. The stability selection allows to control these Type I error rates. For instance, suppose the threshold $\pi_{thr} = 0.8$ is fixed, then choosing $\Lambda$ such that $q_{\Lambda} \leq \sqrt{0.6p}$ will control $E(V)\leq 1$. Moreover, choosing $\Lambda$ so that $q_{\Lambda} \leq \sqrt{0.6p\alpha}$ will control the family-wise error rate (FWER) at level $\alpha$, $P(V>0) \leq \alpha$.
+As mentioned before, according to \citet{FHT2010} the coordinate descent algorithm implemented in the \pkg{glmnet} package is most efficient regarding the computational time, when used to calculate the full regularization path. To utilize this property our algorithm calculates the stability path by first generating subsets by subsampling and then calculating for each subsample the regularization path using the coordinate descent algorithm. The resulting regularization paths are then averaged to form the stability path. Furthermore, since the calculations of the regularization paths for each subset are independent of each other, the algorithm can easily be parallelized using the package \pkg{parallel}. %In parallel computing such easily to parallelize  embarrassingly parallel computations.    
 
 \subsection{Prediction error curves for survival models}
 
-The time-dependent Brier score \citep{graf99} can be used to assess and compare the prediction accuracy of prognostic models.
+The time-dependent Brier score \citep{graf99} can be used to assess and compare the prediction accuracy of prognostic models for time-to-event endpoints.
 The Brier score at time point $t$ is a weighted mean squared error between predicted survival probability and observed survival status.
 Weighting depends on the estimated censoring distribution to account for the observations under risk \citep{gerds2006}. Computing the error for each time point over the entire follow-up horizon yields a predicton error curve. As a reference we use prediction errors based on the Kaplan-Meier curves estimated without any covariate information. 
 
@@ -206,11 +206,11 @@ The empirical time-dependent Brier score $BS(t)$ is defined as a function of tim
 BS(t) = \frac{1}{n}\sum_{i=1}^{n}{\left[\frac{\hat{S}(t|x_i)^2I(t_i\leq t \wedge \delta_i=1)}{\hat{G}(t_i)} + \frac{(1-\hat{S}(t|x_i))^2I(t_i>t)}{\hat{G}(t)}\right]},
 \]
 with individual survival time $t_i$, censoring indicator $\delta_i$ and estimated survival probability $\hat{S}(t|x_i)$ at time $t$ based on the prognostic model given covariate values $x_i$ for subject $i$ out of $n$ patients \citep{graf99}.
-$\hat G(t)$ denotes the Kaplan-Meier estimate of the censoring distribution at time $t$, which is based on the observations $(t_i; 1-\delta_i$), $i = 1,...,n$. $I$ stands for the indicator function. 
+$\hat G(t)$ denotes the Kaplan-Meier estimate of the censoring distribution at time $t$, which is based on the observations $(t_i; 1-\delta_i$), $i = 1,...,n$. $I$ signifies the indicator function. 
 
-In case no independent validation data are available, resampling-based prediction error curves are used to adequately assess the model's prediction accuracy. The $.632+$ bootstrap estimator \citep{efron1997} is commonly used for these applications, which is a weighted sum of the apparent error and the average out-of-bag bootstrap error. For the apparent error  the same data is used to develop the prognostic model and assess its performance. Due to overfitting, this error is far too optimistic, particularly with high-dimensional data. The average out-of-bag bootstrap error is too conservative since only a proportion of the entire data is used to develop the prognostic model in each bootstrap run. 
+In case no independent validation data are available, resampling-based prediction error curves are used to adequately assess the model's prediction accuracy. The $.632+$ bootstrap estimator \citep{efron1997} is commonly used for these applications, which is a weighted mean of the apparent error and the average out-of-bag bootstrap error. For the apparent error  the same data is used to develop the prognostic model and assess its performance. Due to overfitting, this error is far too optimistic, particularly with high-dimensional data. The average out-of-bag bootstrap error is too conservative since only a proportion of the entire data is used to develop the prognostic model in each bootstrap run. 
 The $.632+$ estimator balances both estimators, and additionally accounts for the relative overfitting based on the no-information error rate.
-Further, in our application the $.632+$ bootstrap estimator is calculated based on subsampling (with replacement) rather than classical sampling wihout replacement, as that has been demonstrated to lead to more accurate estimates in a high-dimensional context \citep{BS2008}.
+Further, in our application the $.632+$ bootstrap estimator is calculated based on subsampling (without replacement) rather than classical bootstrap sampling with replacement, as that has been demonstrated to lead to more accurate estimates in a high-dimensional context \citep{BS2008}.
 
 <<setup, echo=FALSE, results=hide>>=
 rm(list=ls())
@@ -283,14 +283,14 @@ eset       <- geo_exprs_data[topprobes,]
 
 \subsection{Data set}
 \nocite{metzeler08}
-In the following we will demonstrate the use of the functions provided with the \pkg{c060} package in an application to a gene expression data set and corresponding clinical data of cytogenetically normal acute myeloid leukemia (AML) patients \citep{metzeler08}. The data can be accessed from the Gene Expression Omnibus (GEO) data repository (\url{http://www.ncbi.nlm.nih.gov/geo}) by the National Center for Biotechnology Information (NCBI). We find the data set under GEO accession number GSE12417. To simulate the typical situation that only one data set is available for model training and evaluation, we only use the data set that was used as validation data in the original publication. This data set contains gene expression data for 79 patient samples measured with Affymetrix HG-U133 Plus 2.0 microarrays. The median survival time of these patients was 17.6 months with a censoring rate of 40\%.
+In the following we will demonstrate the use of the functions provided in the \pkg{c060} package in an application to a gene expression data set and corresponding clinical data of cytogenetically normal acute myeloid leukemia (AML) patients \citep{metzeler08}. The data can be accessed from the Gene Expression Omnibus (GEO) data repository (\url{http://www.ncbi.nlm.nih.gov/geo}) by the National Center for Biotechnology Information (NCBI). We find the data set under GEO accession number GSE12417. To simulate the typical situation that only one data set is available for model training and evaluation, we only use the data set that was used as validation data in the original publication. This data set contains gene expression data for 79 patient samples measured with Affymetrix HG-U133 Plus 2.0 microarrays. The median survival time of these patients was 17.6 months with a censoring rate of 40\%.
 
-For the sake of convenience we reduce the total number of \Sexpr{nrow(geo_exprs_data)} gene expression features that have been measured with the Affymetrix HG-U133 Plus 2.0 microarray technology to the top \Sexpr{nfeatures} features with largest variance across all \Sexpr{ncol(eset)} samples. For all computations the data set is stored as an \code{ExpressionSet} (from Bioconductor package \pkg{Biobase} \citep{Bioconductor}) called \code{eset}. The gene expression data matrix can be accessed through the call \code{exprs(eset)} and overall survival data and other patient-specific data (e.g., patient age) are stored within the \code{phenoData} object \code{pData(eset)}.
+For the sake of convenience we reduce the total number of \Sexpr{nrow(geo_exprs_data)} gene expression features that have been measured with the Affymetrix HG-U133 Plus 2.0 microarray technology to the top \Sexpr{nfeatures} features with largest variance across all \Sexpr{ncol(eset)} samples. For all computations the data set is stored as an \code{ExpressionSet} (from Bioconductor package \pkg{Biobase} \citep{Bioconductor}) called \code{eset}. The gene expression data matrix can be accessed through the call \code{exprs(eset)} and overall survival data and other patient-specific data (e.g., patient age) are stored within the \code{phenoData} object \code{pData(eset)}. Overall survival times are stored in the variable \code{os}, the corresponding survival status variable is called \code{os_status} and the patient age variable is \code{age}.
 
 \subsection{Starting off: Fitting the lasso-penalized Cox model} 
 Our goal is to develop a prognostic model for patient overall survival based on the gene expression data. The purpose of this modelling exercise is not just to fit a prognostic model that is capable of predicting overall survival rates, but we also want to find out which gene expression features are most relevant for this task. Traditionally, this problem is solved by feature selection methods and we start our data analysis exercise by fitting the lasso-penalized Cox model, which provides automatic feature selection.
 
-We can apply the \code{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ values with a data-derived range of values:
+We can apply the \code{glmnet} function to fit a lasso-penalized Cox model to the AML data set. The function call with default penalty parameter settings will fit the lasso model for 100 $\lambda$ values within a data-derived range of values:
 <<glmnet0, echo=TRUE, results=hide>>=
 fit <- glmnet(y=Surv(pData(eset)$os, pData(eset)$os_status), 
               x=t(exprs(eset)), family="cox")
@@ -318,17 +318,18 @@ names.cof <- rownames(cof)
 cofn <- cof[which(cof!=0)]
 names(cofn) <- names.cof[which(cof!=0)]
 @
-The loss function, i.e., the cross-validated partial log-likelihood deviance, is shown in Figure~\ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. The penalty parameter value minimizing the loss function, i.e., the cross-validated partial log-likelihood deviance, is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} ($\log\lambda =$\Sexpr{round(log(cvres$lambda.min), 3)}) and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features and lasso regression coefficient estimates:
+The loss function, i.e., the cross-validated partial log-likelihood deviance, is shown in Figure~\ref{fig:cvlasso} including upper and lower standard deviations as a function of $\log{\lambda}$ for the AML data set. The penalty parameter value minimizing the loss function is $\lambda =$\Sexpr{round(cvres$lambda.min, 3)} ($\log\lambda =$\Sexpr{round(log(cvres$lambda.min), 3)}) and corresponds to a final lasso model with the following \Sexpr{length(cofn)} selected features and corresponding lasso regression coefficient estimates:
 <<glmnet2, echo=FALSE, results=verbatim>>=
 print(cofn, digits=3)
 cofn.lasso <- cofn
 #cofn.ix <- predict(res, type="nonzero", s=cvres$lambda.min)
 @
 
-The selected features are highlighted as red lines in the coefficient paths shown in Figure~\ref{fig:coefpath} illustrating the development of the regression coefficient estimates with increasing regularization. While the selected \Sexpr{length(cofn)} features are the only features selected at the optimal $\lambda$ value, they do not remain among the features with largest effect sizes when the penalty is reduced and thus more and more coefficients start to enter the model. In fact, for 4 out of the \Sexpr{length(cofn)} features the coefficient estimates go back down to zero for small values of $\log\lambda$, indicating that these features get replaced by other gene expression features in very large models.
+The selected features are highlighted as red lines in the coefficient paths shown in Figure~\ref{fig:coefpath}, which illustrate the development of the regression coefficient estimates with increasing regularization. While the selected \Sexpr{length(cofn)} features are the only features selected at the optimal $\lambda$ value, they do not remain among the features with largest effect sizes when the penalty is reduced and thus more and more coefficients start to enter the model. In fact, for 4 out of the \Sexpr{length(cofn)} features the coefficient estimates go back down to zero for small values of $\log\lambda$, indicating that these features get replaced by other gene expression features in very large models.
 
 <<glmnet3, echo=TRUE, results=hide, fig=FALSE, eval=FALSE>>=
-plot.coef.glmnet(cvfit=cvres, betas=names(cofn))
+cof <- coef(res, s=cvres$lambda.min)
+plot.coef.glmnet(cvfit=cvres, betas=rownames(cof)[which(cof!=0)])
 @
 \begin{figure}[H]
 \begin{center}
@@ -344,19 +345,18 @@ The dotted vertical lines indicate the $\lambda$ values with minimal deviance an
 \subsection{Assessment of prediction performance with resampling-based prediction errors}
 \label{pec}
 
-Once the final prognostic model is selected, we need to assess its prediction accuracy for future patients, frequently also in comparison
-with established clinico-pathological prognostic markers. In many applications no independent validation data set is available, thus the same data set needs to be used to both develop and assess the prognostic model. This is even more problematic for high-dimensional data,
-where the risk of overfitting is especially high. Resampling-based methods can be used to unbiasedly estimate the predictive accuracy 
+Once the final prognostic model is selected, the next task is to assess its prediction accuracy for future patients, where one is often particularly interested in a comparison with established clinico-pathological prognostic markers. In many applications no independent validation data set is available, and thus the same data set needs to be used to both develop and assess the prognostic model. This is especially problematic for high-dimensional data,
+where the risk of overfitting is very high. Resampling-based methods can be used to unbiasedly estimate the predictive accuracy 
 of the prognostic model in this situation. This is also called internal validation.
 
-For this purpose the \proglang{R} package \pkg{peperr} \citep{Porz2009,peperr} provides a modular framework for survival and binary endpoints, i.e., prognostic and
-classification models. Wrapper functions for new or customized prediction model algorithms can be defined and passed to the generic call function \code{peperr}.  
+For this purpose the \proglang{R} package \pkg{peperr} \citep{Porz2009,peperr} provides a modular framework for survival and binary endpoints. %, i.e., prognostic and classification models. 
+Wrapper functions for new or customized prediction model algorithms can be defined and passed to the generic call function \code{peperr}.  
 In case of prognostic models for survival endpoints, algorithm-specific wrapper functions are required for model fitting, tuning and prediction. Wrapper functions for selected machine learning approaches are already implemented, but not yet for the \pkg{glmnet} package.
 
-With the \pkg{peperr} package prediction accuracy of survival models is by default assessed with prediction error curves based on the time-dependent Brier score, but it is also possible to define and use customized accuracy measures. We have implemented additional wrapper functions for the \pkg{glmnet} algorithm for fitting (\code{fit.glmnet}) and tuning (\code{complexity.glmnet}) the model, and predicting survival probabilities (\code{predictProb.glmnet}) based on the fitted model and the estimated baseline hazard from the training data. We here want to assess the prognostic value of the $L_1$-penalized Cox PH regression model fitted in the previous section. The $.632+$ subsampling-based bootstrap estimator is calculated using 1000 bootstrap samples. The \pkg{peperr} package is designed for high-dimensional covariates data and allows for various set-ups of parallel computations.
+With the \pkg{peperr} package prediction accuracy of survival models is by default assessed with prediction error curves based on the time-dependent Brier score, but it is also possible to define and use customized accuracy measures. We have implemented additional wrapper functions for the \pkg{glmnet} algorithm for fitting (\code{fit.glmnet}) and tuning (\code{complexity.glmnet}) the model, and predicting survival probabilities (\code{predictProb.glmnet}) based on the fitted model and the estimated baseline hazard from the training data. We here want to assess the prognostic value of the $L_1$-penalized Cox PH regression model fitted in the previous section. The $.632+$ subsampling-based bootstrap estimator is calculated using 1000 bootstrap samples. The \pkg{peperr} package is designed for high-dimensional covariates data and allows for various parallel computation setups.
 Also, additional arguments can be passed directly to the \pkg{glmnet} call by specifing additional arguments for the corresponding fitting and/or tuning procedure.
-Here, we include patient's age as a mandatory model feature into the prognostic model, i.e., age is not subject to penalization, and 
-run the calculation on 3 CPUs in parallel using a socket cluster set-up. 
+Here, we include patient age as a mandatory feature, i.e., age is not subject to penalization, and 
+run the calculation on 3 CPUs in parallel using a socket cluster setup. 
 
 <<peperrMandatoryParallel, echo=TRUE, results=hide, cache=T>>=
 obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
@@ -369,11 +369,11 @@ obj  <- peperr(response=Surv(pData(eset)$os, pData(eset)$os_status),
                RNG="fixed", seed=0815, cpus=3, parallel=TRUE, clustertype="SOCK", 
                load.list=list(packages=c("c060")), 
                indices=resample.indices(n=dim(eset)[2],
-               sample.n=10, method="sub632"))
+               sample.n=1000, method="sub632"))
 @
 
 Bootstrap results can be visualized with the \code{plot.peperr} function from the \pkg{peperr} package showing the selected complexity parameters, 
-out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again an algorithm specific wrapper (here \code{PLL.coxnet}) needs to be defined. In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package which allows to display the number still at risk and pointwise bootstrap quantiles (\code{Plot.peperr.curves}) as shown in Figure~\ref{fig:pec}. By default, the $.632+$ is calculated and displayed. Displaying also the $.632$ estimator, the no-information error rate and the average out-of-bag bootstrap error is optional in \code{Plot.peperr.curves}. \\
+out-of-bag prediction error curves as well as the prediction error integrated over time, and the predictive partial log-likelihood (PLL) values. In order to calculate the predictive PLL values again, an algorithm-specific wrapper (here \code{PLL.coxnet}) needs to be provided. In addition, we provide a slightly modified version of the prediction error curves plot function from the \pkg{peperr} package, which allows the display of the numbers of samples still at risk and pointwise bootstrap quantiles (\code{Plot.peperr.curves}) as shown in Figure~\ref{fig:pec}. By default, the $.632+$ bootstrap estimate is calculated and displayed. Optionally, one can additionaly display the $.632$ estimator, the no-information error rate and the average out-of-bag bootstrap error in \code{Plot.peperr.curves} by setting the option \code{allErrors=TRUE}. \\
 
 <<peperrPlot1, echo=TRUE, results=hide, fig=FALSE,eval=FALSE>>=
 Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
@@ -390,23 +390,18 @@ Plot.peperr.curves(obj, at.risk=TRUE, allErrors=FALSE, bootRuns=FALSE,
 \label{fig:pec}
 \end{figure}
 
-Note, that for classification models, the same wrapper functions for fitting and tuning the model are called.
-Model performance measures for classification tasks shipped with the \pkg{peperr} package are misclassification rate and Brier score. We have extended the functionality of the Brier score (\code{aggregation.brier}) and misclassification rate (\code{aggregation.misclass}) 
-calculation for the \pkg{glmnet} algorithm, and defined AUC under the ROC curve (\code{aggregation.auc}) as an additional performance measure.
-For binary responses, the \pkg{peperr} package does not quite provide the same modular flexibility 
-as for time-to-event endpoints. The predicted class probability is calculated within the generic performance/aggregation function by calling the algorithm-specific predict function. Whenever a new algorithm is incorporated, the generic aggregation function needs to be adapted accordingly.
+Note, that for classification models for binary endpoints, both fitting and tuning of the model are done by the same wrapper function. Therefore for binary responses, the \pkg{peperr} package does not provide quite the same modular flexibility as for time-to-event endpoints. The predicted class probability is calculated within the generic performance/aggregation function by calling the algorithm-specific predict function. Whenever a new algorithm is incorporated, the generic aggregation function needs to be adapted accordingly.
+Model performance measures for classification tasks that are shipped with the \pkg{peperr} package are the misclassification rate and the Brier score. We have extended the functionality of the \pkg{peperr} functions for calculating the Brier score (\code{aggregation.brier}) and the misclassification rate (\code{aggregation.misclass}) to allow their use with the \pkg{glmnet} algorithm. In addition, we have implemented the area under the receiver operating characteristic (ROC) curve (AUC) as an additional performance measure for binary responses (\code{aggregation.auc}). For classification models, there are numerous alternative \proglang{R} and Bioconductor packages available to assess models fitted with \pkg{glmnet}. A good starting point is the package \pkg{caret} \citep{caret}.
 
-An alternative implementation of the time-dependent Brier score can be found in the package \pkg{pec} \citep{MIG2012}. The basic approach is similar to \pkg{peperr}, you have to define a wrapper for each fitting procedure in order to determine the estimated survival probabilities. Similar to \pkg{peperr}, no wrapper for \pkg{glmnet} is provided yet. The main difference is that in \pkg{peperr} the tuning of the hyper-parameter and the fitting procedure are done in two separate steps, which more reflects the usual workflow for high-dimensional data analysis. \pkg{pec} on the other hand provides additional functionalities such as the time-dependent c-index in addition to the Brier score but cannot assess classification models. Of course, prediction accuracy of survival models can be assessed differently. Time-dependent ROC and AUC curves are another approach for which different implementations exist provided for example in \proglang{R} packages \pkg{timeROC} \citep{timeROC}, \pkg{survivalROC} \citep{survivalROC} and \pkg{risksetROC} \citep{risksetROC}. The advantage of \pkg{peperr} and \pkg{pec} over most of the other packages is their easy-to-use resampling setup.
-
-For classification models, there are numerous \proglang{R} and Bioconductor packages available to assess models fitted with \pkg{glmnet}. A good starting point is the package \pkg{caret} \citep{caret}.
+An alternative implementation of the time-dependent Brier score for assessing the prognostic performance of prognostic models for time-to-event endpoints can be found in the package \pkg{pec} \citep{MIG2012}. The basic approach is similar to \pkg{peperr}, i.e. one has to define a wrapper for each fitting procedure in order to determine the estimated survival probabilities. Just as for \pkg{peperr}, no wrapper for \pkg{glmnet} is available yet with the \pkg{pec} package. The main difference of \pkg{peperr} compared to \pkg{pec} is that the tuning of the hyper-parameter and the fitting procedure are done in two separate steps, which reflects the usual workflow for high-dimensional data analysis better. While \pkg{pec} provides additional prediction accuracy measures for survival models, such as the time-dependent c-index, it cannot be used to assess classification models for binary endpoints. One strong point of the implementations of both \pkg{peperr} and \pkg{pec} is their easy-to-use setup for using resampling methods for internal validation. In addition to the use of prediction error curves and time-dependent Brier scores, another popular approach for assessing the prediction accuracy of survival models is the use of time-dependent ROC and AUC curves, for which many implementations exist, for example in \proglang{R} packages \pkg{timeROC} \citep{timeROC}, \pkg{survivalROC} \citep{survivalROC} and \pkg{risksetROC} \citep{risksetROC}. 
 
 %\clearpage
 \subsection{Stability selection}
 
-So far implementations of stability selection can be found in the packages \pkg{s4vd}, \citep{s4vd,sill2011robust}, \pkg{mboost} \citep{mboost}, \pkg{lol} \citep{lol} and \pkg{BioMark} \citep{BioMark}. While in the package \pkg{s4vd} the stability selection is applied to sparse singular value decomposition in the context of biclustering, the \pkg{mboost} package offers stability selection for model based boosting. The implementation in the \pkg{lol} package is based on penalized, generalized linear models available through the package \pkg{penalized} \citep{penalized}.  As both the \pkg{penalized} and the \pkg{glmnet} package offer penalized models for survival, poisson, binary and gaussian response variables, the stability selection in \pkg{lol} is most comparable to our implemetation. Due to the computational efficiency of the coordinate descent algorithm in \pkg{glmnet} it is probably more appropriate for complex resampling methdos like the stability selection. Morevoer, the code for the stability selection in the \pkg{lol} package is not yet parallelized and does not offer the possibility to compute the whole stability path. The \pkg{BioMark} package offers an implementation of the stability selection for partial least squares (PLS), principal component regression (PCR), variable importance of projection (VIP) and logistic and gaussian \pkg{glmnet} models. Until now the \pkg{BioMark} package allows only to calculate selection frequencies and does not provide type I error control nor the 'randomized lasso' as described in \citet{MeinshausenBuehlmann2010}. \\
+So far implementations of stability selection can be found in the packages \pkg{s4vd}, \citep{s4vd,sill2011robust}, \pkg{mboost} \citep{mboost}, \pkg{lol} \citep{lol} and \pkg{BioMark} \citep{BioMark}. While in the package \pkg{s4vd} the stability selection is applied to sparse singular value decomposition in the context of biclustering, the \pkg{mboost} package offers stability selection for model based boosting. The implementation in the \pkg{lol} package is based on penalized generalized linear models and penalized Cox models available through the package \pkg{penalized} \citep{penalized}.  As both the \pkg{penalized} and the \pkg{glmnet} packages offer penalized models for survival, Poisson, binary and Gaussian response variables, the stability selection in \pkg{lol} is comparable to our implemetation. Due to the computational efficiency of the coordinate descent algorithm in \pkg{glmnet} it is more appropriate for complex resampling methods like stability selection. Morevoer, the code for the stability selection in the \pkg{lol} package is not yet parallelized and does not offer the possibility to compute the whole stability path. The \pkg{BioMark} package offers an implementation of stability selection for partial least squares (PLS), principal component regression (PCR), variable importance of projection (VIP) and logistic and Gaussian \pkg{glmnet} models. Until now the \pkg{BioMark} package allows only to calculate selection frequencies and does not provide type I error control nor the 'randomized lasso' as described in \citet{MeinshausenBuehlmann2010}. \\
 
-Here we use stability selection to identify prognostic features which have a relevant influence on the survival times of the patients in the AML data set and to control Type I errors to ensure that the features identified are truly associated with the survival times.
-To calculate the stability path for the $L_1$-penalized Cox regression we use the function \code{stabpath} from our \proglang{R} package. Via the \code{weakness} argument of the function \code{stabpath} it is possible to induce additional randomization by reweighting the penalization of each feature. In brief, in each subsampling step the individual penalization of each feature is randomized such that it lies in the range of $[\lambda,\lambda/\kappa]$, where $\kappa$ is represented by the \code{weakness} parameter which indicates the amount of this additional randomization. The weights $w_{i},\cdots,w_{p}$ to reweight each $\lambda_{i}$ by $\lambda_{i}/w_{i}$ are generated by sampling from a uniform distribution, i.e. $w_{i} \sim \mathcal{U}(\kappa,1)$. \citet{MeinshausenBuehlmann2010} call this additional randomization 'randomized lasso' and showed that it greatly improves the variable selection performance of the stability selection. The function \code{stabpath} draws subsets and calculates in parallel the stability path, e.g., the selection probabilities of each feature along the range of possible penalization parameter values. For parallelization we use the package \pkg{parallel}, which has been a base package since \proglang{R} version 2.14.0. On Unix-like systems the parallelization is done by forking via the function \code{mclapply} whereas under Windows systems socket clusters are used. 
+Here we use stability selection to identify prognostic features, which have a relevant influence on the survival times of the patients in the AML data set, while controlling Type I errors to ensure that the features identified are truly associated with the survival times.
+To calculate the stability path for the $L_1$-penalized Cox regression we use the function \code{stabpath} from our \proglang{R} package. Via the \code{weakness} argument of the function \code{stabpath} it is possible to induce additional randomization by reweighting the penalization of each feature. In brief, in each subsampling step the individual penalization of each feature is randomized such that it lies in the range of $[\lambda,\lambda/\kappa]$, where $\kappa$ is represented by the \code{weakness} parameter which indicates the amount of this additional randomization. The weights $w_{i},\cdots,w_{p}$ to replace each $\lambda_{i}$ by $\lambda_{i}/w_{i}$ are generated by sampling from a uniform distribution, i.e. $w_{i} \sim \mathcal{U}(\kappa,1)$. \citet{MeinshausenBuehlmann2010} call this additional randomization 'randomized lasso' and showed that it greatly improves the variable selection performance of the stability selection. The function \code{stabpath} draws subsets and calculates in parallel the stability path, e.g., the selection probabilities of each feature along the range of possible penalization parameter values. For parallelization we use the package \pkg{parallel}, which has been a base package since \proglang{R} version 2.14.0. On Unix-like systems the parallelization is done by forking via the function \code{mclapply} whereas under Windows systems socket clusters are used. 
 
 <<stabilitySelection1, echo=TRUE, results=verbatim>>=
 y <- cbind(time=pData(eset)$os, status=pData(eset)$os_status)
@@ -422,7 +417,7 @@ After calculating the stability path, the function \code{stabsel} can be called 
 stabsel(spath, error=1, type="pfer", pi_thr=0.6)$stable
 @
 
-Alternativly, the \code{stabsel} function allows to control the per-comparison wise error rate (PCER) and family-wise error rate (FWER).In addition, we provide a \code{plot} function to visualize the stability path. This function calls \code{stabsel} to estimate stable features and indicates them in the plot (Figure~\ref{stab:path}).
+Alternativly, the \code{stabsel} function allows to control the per-comparison wise error rate (PCER) and family-wise error rate (FWER). In addition, we provide a \code{plot} function to visualize the stability path. This function calls \code{stabsel} to estimate stable features and indicates them in the plot (Figure~\ref{stab:path}).
 
 \begin{figure}[t!]
 \begin{center}
@@ -435,23 +430,23 @@ plot(spath, error=1, type="pfer", pi_thr=0.6, xvar="lambda", col.all="gray")
 \end{figure}
 
 %\clearpage
-\subsection{Parameter tuning for the elastic-net Cox model}
+\subsection{Parameter tuning for the elastic net Cox model}
 
 In the previous sections we have seen that the lasso-penalized Cox model does not seem to perform very well in terms of predicting overall survival for the AML data set. 
 The lasso model identified as the optimal model by 10-fold cross-validation is very sparse and contains only \Sexpr{length(cofn)} features.
-Furthermore, we have observed that these features are not very stable and 4 out of them do not even remain in the set of selected features when the amount of regularization is decreased and more features start to enter the model.
+Furthermore, we have observed that these features are not very stable and 4 of them do not even remain in the set of selected features when the amount of regularization is decreased and more features start to enter the model.
 
-In this section we fit an elastic-net model instead of lasso to the same data set. As outlined above, fitting an elastic-net model requires the simultaneous tuning of two parameters $\alpha$ and $\lambda$. For this computationally challenging task, we use the interval search algorithm in an efficient implementation in \proglang{R} function \code{EPSGO}. The EPSGO algorithm was originally implemented for support vector machines in the \proglang{R} package \pkg{penalizedSVM} \citep{becker2009,penSVM}. Here we provide an implementation for \code{glmnet} and in addition \code{summary} and \code{plot} functions to illustrate the interval search results.
+In this section we fit an elastic net model instead of lasso to the same data set. As outlined above, fitting an elastic net model requires the simultaneous tuning of two parameters $\alpha$ and $\lambda$. For this computationally challenging task, we use the interval search algorithm in an efficient implementation in \proglang{R} function \code{EPSGO}. The EPSGO algorithm was originally implemented for support vector machines in the \proglang{R} package \pkg{penalizedSVM} \citep{becker2009,penSVM}. Here we provide a version for \code{glmnet} and in addition \code{summary} and \code{plot} functions to illustrate the interval search results.
 
-The required objects and parameters for finding elastic-net Cox model with optimal parameters are listed below:
+The following code specifies the required objects and parameter values for optimising the tuning parameters of the elastic net Cox model. The \code{balancedFolds} function splits the data into balanced folds for 10-fold cross-validation.
 <<interval_search_setup,results=hide>>=
   x <- t(exprs(eset))
-  y <- cbind(time=pData(geo_exprs_data)$os,status=pData(geo_exprs_data)$os_status)
+  y <- cbind(time=pData(eset)$os,status=pData(eset)$os_status)
 
   bounds <- t(data.frame(alpha=c(0, 1)))
   colnames(bounds)<-c("lower","upper")
   
-  nfolds = 10
+  nfolds <- 10
   set.seed(1234)
   foldid <- balancedFolds(class.column.factor=y[,2], cross.outer=nfolds)
 @
@@ -459,7 +454,7 @@ The required objects and parameters for finding elastic-net Cox model with optim
 The task is to find a setting of tuning parameter values $\left(\alpha,\lambda\right)$, for which the \Sexpr{nfolds}-fold cross-validated penalized (partial) log likelihood deviance of the model is minimal.  The wrapper function \\
 \code{tune.glmnet.interval} calculates the (partial) log likelihood deviance of a model with given tuning parameter setting $\left(\alpha,\lambda\right)$.
 
-The second tuning parameter $\lambda$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\texttt{type.min ='lambda.1se'}).
+The second tuning parameter $\lambda$ will be found for each given $\alpha$ via the computation of the entire regularization path with the \code{glmnet} function. For each given $\alpha$ an optimal $\lambda$ is defined as the largest value of $\lambda$ such that the loss function value is within one standard error of the minimum (\code{type.min ='lambda.1se'}).
 
 
 <<interval_search_cox_show, echo=TRUE, eval=FALSE>>=
@@ -498,12 +493,12 @@ if (file.exists(".Rdata/fit_interval_search.RData")) {
 }  
 @
 
-Summary information can be extracted from the \texttt{fit} object using the \code{summary} function.
+Summary information can be extracted from the \code{fit} object using the \code{summary} function.
 <<interval_search_cox_extract_show>>=
 sumint <- summary(fit, verbose=TRUE)
 @
 
-At the initial step we sample 21 points in the parameter space. Those points are randomly distributed and uniformly cover the whole interval 
+At the initial step we sample 21 points in the parameter space for $\alpha$. Those points are randomly distributed and uniformly cover the whole interval 
 (0,1]. A Gaussian process model is trained based on these initial points. Then, iteratively, new points are added to the Gaussian process model in order to find an optimal combination of tuning parameter values. In total, \Sexpr{nrow(sumint$info)} iterations were needed to reach the optimum. 
 
 <<interval_search_cox_fit_opt, echo=FALSE,results=hide>>=
@@ -512,8 +507,8 @@ opt.model <- sumint$opt.models[[1]]
 cofn <- coef.optmodel(opt.model)
 @
 
-The final elastic-net model contains \Sexpr{length(cofn)} selected features, which obviously reflects much less sparsity than the final lasso model.
-The results are consistent in the sense, that the features contained in the final lasso model are also contained in the elastic-net model. Also, the individual feature selected by the stability algorithm is in the set of selected elastic-net features.
+The final elastic net model contains \Sexpr{length(cofn)} selected features, which obviously reflects much less sparsity than the final lasso model.
+The results are consistent in the sense, that the features contained in the final lasso model are also contained in the elastic net model. Also, the individual feature selected by the stability algorithm is in the set of selected elastic net features.
 <<interval_search_cox_check_overlap_stability,echo=FALSE,results=hide>>=
 names(cofn.lasso) %in% names(cofn)
 '206932_at' %in% names(cofn)
@@ -525,7 +520,7 @@ names(cofn.lasso) %in% names(cofn)
 plot(sumint)
 @
 \end{center}
-\caption{Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic-net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The solid red lines highlight the final solution with minimal partial log likelihood deviance. }
+\caption{Partial log likelihood deviance as a function of both tuning parameters $\alpha$ and log$\lambda$ when fitting the elastic net Cox model for the AML data set. For each evaluated point in the parameter space the number of selected features in the corresponding model is printed next to the data point symbol. Rectangles correspond to initially selected $\alpha$ values. The solid red lines highlight the final solution with minimal partial log likelihood deviance. }
 \label{fig:interval_search1}
 \end{figure}
 
@@ -541,12 +536,11 @@ This plot shows nicely that the interval search algorithm does not sequentially 
 plot(sumint,type="points") 
 @
 \end{center}
-\caption{The distribution of initial and visited points of the interval search plotted in chronological order. The interval search is employed to identify the optimal parameter value combination ($\alpha$,$\lambda$) for the elastic-net Cox model fitted to the AML data set.}
+\caption{The distribution of initial and visited points of the interval search plotted in chronological order. The interval search is employed to identify the optimal parameter value combination ($\alpha$,$\lambda$) for the elastic net Cox model fitted to the AML data set.}
 \label{fig:interval_search2}
 \end{figure}
 
-To our knowledge, the interval search approach have not been applied as an extension of glmnet so far. The only one application of this approach was in our other R package 'penalizedSVM' dealing with feature selection by classification with Support Vector Machines. 
-
+To our knowledge, the interval search algorithm has not yet been applied for the purpose of optimizing the tuning parameters of elastic net models fitted with the \pkg{glmnet} package. The only previous \proglang{R} implementation of this approach was in the \proglang{R} package \pkg{penalizedSVM}, which implements classification and simultaneous feature selection with support vector machines. 
 
 \begin{center}
 \begin{table}
@@ -565,7 +559,7 @@ Function & Description \\
 \code{predictProb.coxnet} &  Extract predicted survival probabilities from a \code{coxnet} fit \\
 \code{predictProb.glmnet} & Extract predicted survival probabilities from a \code{glmnet} fit \\
 \hline
-\code{stabpath} & Calculate the stability path for gaussian, binomial, poisson, multinomial and Cox \code{glmnet} models\\
+\code{stabpath} & Calculate the stability path for Gaussian, binomial, Poisson, multinomial and Cox \code{glmnet} models\\
 \code{stabsel} & Estimate a stable set of variables and allows to control the PFER, PCER or FWER\\
 \code{plot.stabpath} & Display stability path and indicates estimated stable features\\
 \hline
@@ -575,17 +569,17 @@ Function & Description \\
 \code{plot.sum.intsearch} &Plot \code{sum.intsearch} objects generated by \code{summary.intsearch}\\
 \hline
 \end{tabular}
-\caption{Overview of available functions.}
+\caption{Overview of available functions in the \pkg{c060} package.}
 \label{tab:functions}
 \end{table}
 \end{center}
 %\clearpage
 \section{Conclusions and outlook}
-The programming language and statistical computing environment \proglang{R} provides a highly useful framework for statistical data analysis and modelling. It is the dominating statistical software in many areas, for example in molecular biology and molecular medicine, which is largely due to the highly successful Bioconductor project \citep{Bioconductor}, which provides tools for the analysis and comprehension of high-throughput genomic data. Due to the open-source nature of \proglang{R} and Bioconductor, many very useful software packages have been developed by \proglang{R} users and made available for the entire \proglang{R} community. One example is the \pkg{glmnet} package, which  implements an efficient state-of-the-art algorithm for fitting penalized Cox and generalized linear models.
+The programming language and statistical computing environment \proglang{R} provides a highly useful framework for statistical data analysis and modelling. It is the dominating statistical software in many areas, for example in molecular biology and molecular medicine, which is largely due to the highly successful Bioconductor project \citep{Bioconductor}, which provides tools for the analysis and interpretation of high-throughput genomic data. Due to the open-source nature of \proglang{R} and Bioconductor, many useful software packages have been developed by \proglang{R} users and made available for the \proglang{R} community. One example is the \pkg{glmnet} package, which  implements an efficient state-of-the-art algorithm for fitting penalized Cox and generalized linear models with lasso, ridge or elastic net penalties.
 
-We have presented our \proglang{R} package \pkg{c060}, which provides extensions to \pkg{glmnet} and additional features which are essential for a full data analysis in practical applications, including stability selection, estimation of prediction error (curves) and an efficient interval search algorithm for finding the optimal elastic-net tuning parameter combination. These extensions have proved useful in our daily work, in particular for the task of performing prognostic modelling of patient survival data based on high-dimensional molecular biology data.
+We have presented our \proglang{R} package \pkg{c060}, which provides extensions to \pkg{glmnet} and additional features, which are essential for a complete data analysis in real-life applications, including stability selection, estimation of prediction error (curves) and an efficient interval search algorithm for finding the optimal elastic net tuning parameter combination. These extensions have proved useful in our daily work, in particular for the task of performing prognostic modelling of patient survival data based on high-dimensional molecular biology data. Table \ref{tab:functions} lists all functions that are available as part of the \pkg{c060} package.
 
-The \pkg{c060} package will be kept updated in the future to keep up with the fast-developing field of penalized regression methodology for feature selection and risk prediction modelling with high-dimensional input data. One example are developments for the estimation of standard errors, confidence intervals and the determination of p-values in high-dimensional regularized regression models, e.g., through subsampling methods similar to the approach taken by \citet{wasserman2009} and \citet{MMB2009}.
+The \pkg{c060} package will be kept updated in the future to keep up with new developments in the field of penalized regression methodology for feature selection and risk prediction modelling with high-dimensional input data. One example are developments for the estimation of standard errors, confidence intervals and the determination of p-values in high-dimensional regularized regression models, e.g., through subsampling methods similar to the approach taken by \citet{wasserman2009} and \citet{MMB2009}.
 
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
