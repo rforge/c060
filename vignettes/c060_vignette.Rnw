@@ -28,7 +28,7 @@
 \definecolor{gradbegin}{rgb}{0.6,0.1,0.6} % purple
 
 \author{Martin Sill\\
-\And Thomas Hielscher\\ \hspace{3.95 cm} Divison of Biostatistics (C060) \\  \hspace{4.3 cm} German Cancer Research Center, heidelberg
+\And Thomas Hielscher\\ \hspace{3.95 cm} Divison of Biostatistics (C060) \\  \hspace{4.3 cm} German Cancer Research Center, Heidelberg
 \And Natalia Becker\\
 \And Manuela Zucknick\\}
 \title{\pkg{c060}: Extended Inference with Lasso and Elastic-Net Regularized Cox and Generalized Linear Models}
@@ -162,7 +162,7 @@ Here, $\alpha \in (0,1]$ determines the influence of the $L_1$ penalty relative 
 \subsubsection{The interval-search algorithm to select the optimal elastic net parameter combination}
 The elastic net penalty function contains two tuning parameters which are data-dependent and hence cannot be set to some \emph{a priori} values. The challenge is to find a set of tuning parameters $\left(\alpha,\lambda\right)$, for which the k-fold cross-validated loss function of the model is minimal.
 
-The commonly used fixed grid search has its major disadvantage in the need to systematicically compute the penalized log likelihood deviance at each point of the grid, which implies that the grid density affects the accuracy and the time complexity of the algorithm. Furthermore, the choice of the grid is highly arbitrary and the solution depends on the choice of grid as well as on grid density. 
+The commonly used fixed grid search has its major disadvantage in the need to systematically compute the penalized log likelihood deviance at each point of the grid, which implies that the grid density affects the accuracy and the time complexity of the algorithm. Furthermore, the choice of the grid is highly arbitrary and the solution depends on the choice of grid as well as on grid density. 
 
 \Citet{froehlich2005} proposed an efficient algorithm for finding a global optimum on the tuning parameter space 
 called Efficient Parameter Selection via Global Optimization (EPSGO). The main idea of the algorithm is to treat the task of finding the optimal tuning parameter values as a global optimization problem. For that purpose one learns a Gaussian process model of the loss function surface in parameter space and samples systematically at points where the so-called expected improvement criterion reaches the maximum. 
@@ -199,7 +199,7 @@ As mentioned before, according to \citet{FHT2010} the coordinate descent algorit
 
 The time-dependent Brier score \citep{graf99} can be used to assess and compare the prediction accuracy of prognostic models for time-to-event endpoints.
 The Brier score at time point $t$ is a weighted mean squared error between predicted survival probability and observed survival status.
-Weighting depends on the estimated censoring distribution to account for the observations under risk \citep{gerds2006}. Computing the error for each time point over the entire follow-up horizon yields a predicton error curve. As a reference we use prediction errors based on the Kaplan-Meier curves estimated without any covariate information. 
+Weighting depends on the estimated censoring distribution to account for the observations under risk \citep{gerds2006}. Computing the error for each time point over the entire follow-up horizon yields a prediction error curve. As a reference we use prediction errors based on the Kaplan-Meier curves estimated without any covariate information. 
 
 The empirical time-dependent Brier score $BS(t)$ is defined as a function of time $t > 0$ by
 \[
@@ -354,7 +354,7 @@ Wrapper functions for new or customized prediction model algorithms can be defin
 In case of prognostic models for survival endpoints, algorithm-specific wrapper functions are required for model fitting, tuning and prediction. Wrapper functions for selected machine learning approaches are already implemented, but not yet for the \pkg{glmnet} package.
 
 With the \pkg{peperr} package prediction accuracy of survival models is by default assessed with prediction error curves based on the time-dependent Brier score, but it is also possible to define and use customized accuracy measures. We have implemented additional wrapper functions for the \pkg{glmnet} algorithm for fitting (\code{fit.glmnet}) and tuning (\code{complexity.glmnet}) the model, and predicting survival probabilities (\code{predictProb.glmnet}) based on the fitted model and the estimated baseline hazard from the training data using the Breslow estimator. We here want to assess the prognostic value of the $L_1$-penalized Cox PH regression model fitted in the previous section. The $.632+$ subsampling-based bootstrap estimator is calculated using 1000 bootstrap samples. The \pkg{peperr} package is designed for high-dimensional covariates data and allows for various parallel computation setups.
-Also, additional arguments can be passed directly to the \pkg{glmnet} call by specifing additional arguments for the corresponding fitting and/or tuning procedure.
+Also, additional arguments can be passed directly to the \pkg{glmnet} call by specifying additional arguments for the corresponding fitting and/or tuning procedure.
 Here, we include patient age as a mandatory feature, i.e., age is not subject to penalization, and 
 run the calculation on 3 CPUs in parallel using a socket cluster setup. 
 
@@ -398,7 +398,7 @@ An alternative implementation of the time-dependent Brier score for assessing th
 %\clearpage
 \subsection{Stability selection}
 
-So far implementations of stability selection can be found in the packages \pkg{s4vd}, \citep{s4vd,sill2011robust}, \pkg{mboost} \citep{mboost}, \pkg{lol} \citep{lol} and \pkg{BioMark} \citep{BioMark}. While in the package \pkg{s4vd} the stability selection is applied to sparse singular value decomposition in the context of biclustering, the \pkg{mboost} package offers stability selection for model based boosting. The implementation in the \pkg{lol} package is based on penalized generalized linear models and penalized Cox models available through the package \pkg{penalized} \citep{penalized}.  As both the \pkg{penalized} and the \pkg{glmnet} packages offer penalized models for survival, Poisson, binary and Gaussian response variables, the stability selection in \pkg{lol} is comparable to our implemetation. Due to the computational efficiency of the coordinate descent algorithm in \pkg{glmnet} it is more appropriate for complex resampling methods like stability selection. Morevoer, the code for the stability selection in the \pkg{lol} package is not yet parallelized and does not offer the possibility to compute the whole stability path. The \pkg{BioMark} package offers an implementation of stability selection for partial least squares (PLS), principal component regression (PCR), variable importance of projection (VIP) and logistic and Gaussian \pkg{glmnet} models. Until now the \pkg{BioMark} package allows only to calculate selection frequencies and does not provide type I error control nor the 'randomized lasso' as described in \citet{MeinshausenBuehlmann2010}. \\
+So far implementations of stability selection can be found in the packages \pkg{s4vd}, \citep{s4vd,sill2011robust}, \pkg{mboost} \citep{mboost}, \pkg{lol} \citep{lol} and \pkg{BioMark} \citep{BioMark}. While in the package \pkg{s4vd} the stability selection is applied to sparse singular value decomposition in the context of biclustering, the \pkg{mboost} package offers stability selection for model based boosting. The implementation in the \pkg{lol} package is based on penalized generalized linear models and penalized Cox models available through the package \pkg{penalized} \citep{penalized}.  As both the \pkg{penalized} and the \pkg{glmnet} packages offer penalized models for survival, Poisson, binary and Gaussian response variables, the stability selection in \pkg{lol} is comparable to our implementation. Due to the computational efficiency of the coordinate descent algorithm in \pkg{glmnet} it is more appropriate for complex resampling methods like stability selection. Moreover, the code for the stability selection in the \pkg{lol} package is not yet parallelized and does not offer the possibility to compute the whole stability path. The \pkg{BioMark} package offers an implementation of stability selection for partial least squares (PLS), principal component regression (PCR), variable importance of projection (VIP) and logistic and Gaussian \pkg{glmnet} models. Until now the \pkg{BioMark} package allows only to calculate selection frequencies and does not provide type I error control nor the 'randomized lasso' as described in \citet{MeinshausenBuehlmann2010}. \\
 
 Here we use stability selection to identify prognostic features, which have a relevant influence on the survival times of the patients in the AML data set, while controlling Type I errors to ensure that the features identified are truly associated with the survival times.
 To calculate the stability path for the $L_1$-penalized Cox regression we use the function \code{stabpath} from our \proglang{R} package. Via the \code{weakness} argument of the function \code{stabpath} it is possible to induce additional randomization by reweighting the penalization of each feature. In brief, in each subsampling step the individual penalization of each feature is randomized such that it lies in the range of $[\lambda,\lambda/\kappa]$, where $\kappa$ is represented by the \code{weakness} parameter which indicates the amount of this additional randomization. The weights $w_{i},\cdots,w_{p}$ to replace each $\lambda_{i}$ by $\lambda_{i}/w_{i}$ are generated by sampling from a uniform distribution, i.e. $w_{i} \sim \mathcal{U}(\kappa,1)$. \citet{MeinshausenBuehlmann2010} call this additional randomization 'randomized lasso' and showed that it greatly improves the variable selection performance of the stability selection. The function \code{stabpath} draws subsets and calculates in parallel the stability path, e.g., the selection probabilities of each feature along the range of possible penalization parameter values. For parallelization we use the package \pkg{parallel}, which has been a base package since \proglang{R} version 2.14.0. On Unix-like systems the parallelization is done by forking via the function \code{mclapply} whereas under Windows systems socket clusters are used. 
@@ -417,7 +417,7 @@ After calculating the stability path, the function \code{stabsel} can be called 
 stabsel(spath, error=1, type="pfer", pi_thr=0.6)$stable
 @
 
-Alternativly, the \code{stabsel} function allows to control the per-comparison wise error rate (PCER) and family-wise error rate (FWER). In addition, we provide a \code{plot} function to visualize the stability path. This function calls \code{stabsel} to estimate stable features and indicates them in the plot (Figure~\ref{stab:path}).
+Alternatively, the \code{stabsel} function allows to control the per-comparison wise error rate (PCER) and family-wise error rate (FWER). In addition, we provide a \code{plot} function to visualize the stability path. This function calls \code{stabsel} to estimate stable features and indicates them in the plot (Figure~\ref{stab:path}).
 
 \begin{figure}[t!]
 \begin{center}
@@ -528,7 +528,7 @@ Figure~\ref{fig:interval_search1} illustrates the relationship between both tuni
 To distinguish between initial and iteration points, the initial points are plotted as  squares and iteration points as circles. One can observe that the iteration points were chosen in the regions with lower deviance values.
 
 The distribution of initial points (iteration=0) and visited points (iteration>0) in the parameter space is plotted in Figure~\ref{fig:interval_search2}.
-This plot shows nicely that the interval search algorithm does not sequentially cover the entire parameter space, but rather quickly finds promising regions and draws new samples there. The optimal model contains with mininmal log-likelihood dieviance is found for $\alpha$ = \Sexpr{round(sumint$opt.alpha,3)} $\log\lambda$ = \Sexpr{round(log(sumint$opt.lambda),3)} and highlighted as a vertical line.
+This plot shows nicely that the interval search algorithm does not sequentially cover the entire parameter space, but rather quickly finds promising regions and draws new samples there. The optimal model contains with minimal log-likelihood deviance is found for $\alpha$ = \Sexpr{round(sumint$opt.alpha,3)} $\log\lambda$ = \Sexpr{round(log(sumint$opt.lambda),3)} and highlighted as a vertical line.
 
 \begin{figure}[t!]
 \begin{center}
