@@ -115,7 +115,7 @@ predictive accuracy of a penalized regression model via resampling methods even 
 Stability selection and interval search are currently defined for Gaussian, binomial, Poisson, multinomial and Cox models,  prediction error curves for Cox models and classification errors for
 binomial models. Since all functions are basically wrapped around the \pkg{glmnet} fitting or cross-validation function calls, the type of response is always specified by the \code{family} argument. 
 
-The software is available as \proglang{R} package \pkg{c060} on CRAN (URL \url{http://cran.r-project.org/web/packages/c060/}, version 0.2 at time of manuscript publication) and on R-forge (URL \url{https://r-forge.r-project.org/projects/c060/}, version 0.2-2 at the time of publication).
+The software is available as \proglang{R} package \pkg{c060} on CRAN (URL \url{http://cran.r-project.org/web/packages/c060/}, version 0.2-3 at time of manuscript publication) and on R-forge (URL \url{https://r-forge.r-project.org/projects/c060/}, version 0.2-3 at the time of publication).
 
 \section{Methods and algorithms}
 
@@ -329,12 +329,12 @@ The selected features are highlighted as red lines in the coefficient paths show
 
 <<glmnet3, echo=TRUE, results=hide, fig=FALSE, eval=FALSE>>=
 cof <- coef(res, s=cvres$lambda.min)
-plot.coef.glmnet(cvfit=cvres, betas=rownames(cof)[which(cof!=0)])
+Plot.coef.glmnet(cvfit=cvres, betas=rownames(cof)[which(cof!=0)])
 @
 \begin{figure}[H]
 \begin{center}
 <<glmnet4, echo=FALSE, results=hide, fig=TRUE, height=7, width=7>>=
-plot.coef.glmnet(cvfit=cvres, betas=names(cofn))
+Plot.coef.glmnet(cvfit=cvres, betas=names(cofn))
 @
 \end{center}
 \caption{\label{fig:coefpath}Coefficient paths for lasso-penalized Cox PH regression models applied to the AML data set. The features with highlighted paths have non-zero coefficients in the model with the optimal $\lambda$ value as determined by ten-fold cross-validation. %The dotted vertical have the same meaning as in Figure~\ref{fig:cvlasso}. 
@@ -502,7 +502,7 @@ At the initial step we sample 21 points in the parameter space for $\alpha$ as s
 <<interval_search_cox_fit_opt, echo=FALSE,results=hide>>=
 #select the model with optimal parameters from the object fit
 opt.model <- sumint$opt.models[[1]]
-cofn <- coef.optmodel(opt.model)
+cofn <- coef(opt.model)
 @
 
 The final elastic net model contains \Sexpr{length(cofn)} selected features, which obviously reflects much less sparsity than the final lasso model.
@@ -547,7 +547,7 @@ To our knowledge, the interval search algorithm has not yet been applied for the
 \hline                        
 Function & Description \\
 \hline
-\code{plot.coef.glmnet} & Plot the \code{glmnet} coefficient path and highlight the path of a pre-specified set of variables\\
+\code{Plot.coef.glmnet} & Plot the \code{glmnet} coefficient path and highlight the path of a pre-specified set of variables\\
 \hline
 \code{PLL.coxnet} & Predictive partial log-likelihood for \code{glmnet} Cox PH model fit\\ 
 \code{aggregation.auc} & Determine the area under the ROC curve for a fitted model\\
