@@ -138,6 +138,7 @@ plot.stabpath <- function(x,error=0.05,type=c("pfer","pcer"),pi_thr=0.6,xvar=c("
   abline(h=pi_thr,col="darkred",lwd=1,lty=1)
   abline(v=index[sel$lpos],col="darkred",lwd=1,lty=1)
   #text(x=20,y=0.9,paste(expression(paste(lambda)),"=",paste(round(sel[[2]],digits=3)),sep=""),cex=0.75)
+  par(mfrow=c(1,1))
   return(sel)
 }
 
