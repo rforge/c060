@@ -93,7 +93,7 @@ print.stabpath <- function(x,...){
 
 #plot penalization and stability path 
 plot.stabpath <- function(x,error=0.05,type=c("pfer","pcer"),pi_thr=0.6,xvar=c("lambda", "norm", "dev")
-                          , col.all="black", col.sel="red",...){
+                          , col.all="black", col.sel="red",penpath=TRUE,...){
   sel <- stabsel(x,error,type,pi_thr)
   if(class(x$fit)[1]=="multnet"){
     beta = as.matrix(Reduce("+",x$fit$beta))
@@ -124,12 +124,14 @@ plot.stabpath <- function(x,error=0.05,type=c("pfer","pcer"),pi_thr=0.6,xvar=c("
   cols[sel$stable] <- col.sel
   lwds <- rep(1,p)
   lwds[sel$stable] <- 2
-  if(!class(x$fit)[1]=="multnet"){
-  par(mfrow=c(2,1))
-  matplot(y=t(beta), x=index
-          ,type="l",col=cols,lwd=lwds,lty=1,ylab=expression(paste(hat(beta)[i]))
-          ,xlab=iname,main="Penalization Path",cex.lab=1,cex.axis=1,las=1,...)
-  }
+  if(penpath){
+    if(!class(x$fit)[1]=="multnet"){
+    par(mfrow=c(2,1))
+    matplot(y=t(beta), x=index
+            ,type="l",col=cols,lwd=lwds,lty=1,ylab=expression(paste(hat(beta)[i]))
+            ,xlab=iname,main="Penalization Path",cex.lab=1,cex.axis=1,las=1,...)
+    }
+  }  
   matplot(y=as.matrix(t(x$x)), x=index
           ,type="l",col=cols,lwd=lwds,lty=1,ylab=expression(paste(hat(Pi)))
           ,xlab=iname,main="Stability Path",ylim=c(0,1),cex.lab=1,cex.axis=1,las=1,...)
