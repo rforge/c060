@@ -8,7 +8,7 @@ Given a desired family-wise error rate (FWER) and a stability path calculated wi
 }
 \usage{
 \method{plot}{stabpath}(x, error=0.05, type=c("pfer","pcer"), pi_thr=0.6, xvar=c("lambda", "norm", "dev"),
-     col.all="black", col.sel="red",penpath=TRUE, ...)
+     col.all="black", col.sel="red", ...)
 }
 \arguments{
   \item{x}{
@@ -34,9 +34,6 @@ the color used for the variables that are not in the estimated stable set
 }
   \item{col.sel}{
 the color used for the variables in the estimated stable set
-}
- \item{penpath}{
-shall the penalization be plotted
 }
  \item{...}{
 further arguments that are passed to matplot

@@ -88,7 +88,7 @@ plot(res)
     
 #multinomial
 y=sample(1:4,100,replace=TRUE)
-res <- stabpath(y,x,weakness=1,mc.cores=2,family="multinomial",type.multinomial="grouped")
+res <- stabpath(y,x,weakness=1,mc.cores=2,family="multinomial")
 plot(res)
     
 #poisson

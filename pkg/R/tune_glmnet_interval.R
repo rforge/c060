@@ -1,4 +1,4 @@
-tune.glmnet.interval <- function(parms, x, y,
+tune.glmnet.interval<-function(parms, x, y,
                                          weights, 
                                          offset = NULL, 
                                          lambda = NULL, 
@@ -10,7 +10,6 @@ tune.glmnet.interval <- function(parms, x, y,
                                          type.min=c("lambda.min", "lambda.1se"),
                                          family,
                                          verbose=FALSE,
-                                         penalty.factor = rep(1, ncol(x)),
                                          ...){
   
   # 1. decode the parameters ############################################################
@@ -33,8 +32,7 @@ tune.glmnet.interval <- function(parms, x, y,
                 type.measure =type.measure,
                 nfolds = nfolds, 
                 foldid = foldid,
-                grouped = grouped,
-                penalty.factor = penalty.factor)
+                grouped = grouped )
   
   
   opt.lambda<-ifelse(type.min=="lambda.min", cv$lambda.min, cv$lambda.1se )
